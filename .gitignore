@@ -2,6 +2,7 @@ node_modules/
 .inspection/
 .validation/
 .release/
+.recordings/
 validation/
 _backups/
 coverage/

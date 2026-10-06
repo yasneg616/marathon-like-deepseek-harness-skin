@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 150" role="img" aria-label="酸性色 C5FA31、交互色 4255FF、阅读背景 11151A、正文色 ECF0E8">
+  <rect width="250" height="150" fill="#C5FA31"/><rect x="250" width="250" height="150" fill="#4255FF"/>
+  <rect x="500" width="250" height="150" fill="#11151A"/><rect x="750" width="250" height="150" fill="#ECF0E8"/>
+  <g font-family="monospace" font-size="12" letter-spacing="2"><text x="22" y="32" fill="#11151A">01 / ACID</text><text x="272" y="32" fill="#ECF0E8">02 / SIGNAL</text><text x="522" y="32" fill="#ECF0E8">03 / SURFACE</text><text x="772" y="32" fill="#11151A">04 / TEXT</text></g>
+  <g font-family="monospace" font-size="29" font-weight="bold"><text x="22" y="125" fill="#11151A">#C5FA31</text><text x="272" y="125" fill="#ECF0E8">#4255FF</text><text x="522" y="125" fill="#ECF0E8">#11151A</text><text x="772" y="125" fill="#11151A">#ECF0E8</text></g>
+</svg>

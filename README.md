@@ -1,108 +1,131 @@
 # marathon-like deepseek harness skin
 
-受 Marathon 工业视觉启发的 **DeepSeek Harness 外部皮肤插件**。当前版本 **2.3.3**，兼容性验证基于 **Windows / Harness 0.2.0-rc.2**。
+给 DeepSeek Harness 做的一套酸性工业皮肤。
 
-提供酸性色块、几何字标、三位数工作区编号和统一的交互动效。保留 Harness 的原生会话、轨迹、插件、模型、文件与工作区操作。这是独立的非官方项目，与 DeepSeek、Bungie 或 Marathon 没有隶属关系。
+从 Marathon 的大色块、硬边界和工业排版开始：字标切开，按钮收方，工作区放上三位数字。正文留出空间，切换时让颜色沿着界面的方向走。
 
-## 已实现
+`v2.3.3` · `Windows` · `Harness 0.2.0-rc.2`
 
-- **完整外观**：工业标题栏、几何鲸鱼符号、GRID / SIGNAL 字体，支持白天、黑天和跟随应用。
-- **可调配色**：酸性色、交互色、阅读背景和正文色支持取色器与 HEX 输入；明暗模式分别保存，正文自动处理对比度。
-- **四块往返遮罩**：左侧栏从左向右覆盖、反向揭开，右侧栏采用镜像方向；四块颜色直接跟随当前调色盘。页面、菜单、弹窗和轨迹详情使用各自的遮罩转场。
-- **Max 动效**：同频震颤、残像追赶、错帧暴走随机选取；一次 High → Max 充能期间保持同一种形式，回到 High 或更低后开始下一轮。
-- **原生模型与思考强度**：模型目录和推理等级由 Harness 提供；滑块可连续预览，松开后提交最近的真实等级，支持键盘操作。
-- **窄侧栏工作区选择**：收起后的 56px 栏中显示 `001`、`002` 等数字按钮，可直接切换工作区。当前工作区高亮，悬停显示名称，较长列表可滚动。
-- **一致的操作反馈**：3px 厚角、点击填充、输入框边线与状态灯、数字扫描校准和四方块状态信号。正文跟随真实模型输出。
-- **动效偏好**：完整、克制、停止三档，正常 `1×` 节奏；尊重系统“减少动态效果”，停用插件时清理自有样式、事件和动画。
+![皮肤设计全貌，独立展示页](docs/media/overview.jpg)
+
+图片和 **17 组 GIF** 录自独立展示页，都是 **1×**。动效、字体和配色代码来自正式插件；页面外壳、工作区名称、模型目录和内容使用展示样例。
+
+## 先看颜色和字
+
+这组夜间配色只有四个角色：酸性绿抓住操作和当前状态，蓝色标出交互，石墨黑留给阅读，灰白色撑起正文。四块遮罩也直接取这四种颜色。
+
+![演示使用的四种颜色](docs/media/palette.svg)
+
+字标用矩形切割和断口。GRID 放在开屏、HARNESS 字样和大号数字上，SIGNAL 放在编号与辅助信息里；中文正文保留原来的字体和字号。
+
+**开屏。** 色板从下方铺上来，横线走完，整块向上退去。
+
+![开屏色板、字标与横线](docs/media/01-opening.gif)
+
+**换一组颜色。** 调色盘改完，标题、侧栏、正文和遮罩一起更新。Max 的残影也跟着当前配色走。
+
+![酸性绿、工业橙和极地信号配色](docs/media/07-palette-follow.gif)
+
+**白天与黑天。** 阅读区跟着模式换，字标和边界仍然清楚。两套颜色分别保存。
+
+![白天与黑天模式](docs/media/08-day-night.gif)
+
+## 切换要有来有回
+
+遮罩的动作很简单：先盖住旧画面，停一小拍，再沿原路退回。侧栏走水平方向，页面、菜单和弹窗走竖直方向。
+
+**左侧栏。** 从左向右盖过去，再向左揭开。展开和收起用同一套动作。
+
+![左侧栏水平往返遮罩](docs/media/02-left-sidebar.gif)
+
+**右侧栏。** 方向正好镜像；文件预览沿着右侧栏的方向切换。
+
+![右侧栏水平往返遮罩](docs/media/03-right-sidebar.gif)
+
+**整页切换。** 旧页面留到色板完全覆盖，再露出新页面。
+
+![整页切换的覆盖与揭幕](docs/media/10-page-transition.gif)
+
+**文件标签。** 切到另一份文件，内容区走一次相同的往返。
+
+![README 与配色文件之间的预览转场](docs/media/11-file-preview.gif)
+
+## 编号和小动作
+
+工作区编号跟真实列表的次序走。大号数字切换时做一次扫描校准，名称直接更新；数字动起来，旁边的文字保持安静。
+
+![工作区编号的扫描校准](docs/media/04-workspace-digits.gif)
+
+侧栏收起后，`001`、`002`、`003` 留在窄栏里。可以直接选工作区，当前项高亮，悬停能看到名称。
+
+![窄侧栏中的工作区数字选择](docs/media/09-compact-workspaces.gif)
+
+按钮的反馈落在四个角上：悬停时 **3px 厚角** 收拢，按下时从中心填满，再外扩一圈轮廓。
+
+![按钮厚角、中心填充和外扩轮廓](docs/media/12-button-feedback.gif)
+
+输入框得到焦点，边线接上，厚角落位，右上角的小灯亮起。正文和光标留在原处。
+
+![输入框的边线、厚角与状态灯](docs/media/13-composer-feedback.gif)
+
+状态变化用四个小方块接力亮一下。同一状态不会反复播放。
+
+![状态变化触发的四方块信号](docs/media/14-status-signal.gif)
+
+## 菜单也用这套动作
+
+模型菜单和调色盘弹窗，打开时盖住再揭开，关闭时原路收回。转场做完就撤掉临时图层。
+
+**模型与思考强度。** 模型、等级和保存动作仍由 Harness 提供。
+
+![模型菜单的打开与关闭](docs/media/05-model-menu.gif)
+
+**调色盘。** 色块只在弹窗范围里走，后面的页面保持原位。
+
+![调色盘弹窗的打开与关闭](docs/media/06-palette-dialog.gif)
+
+## High → Max
+
+平常的轨道保持稳定。从 High 往 Max 推，震动和残影才逐渐变强；到 Max 后持续，拖回 High 就收住。
+
+三轮选型后留下了这三种。这里分开看，插件里随机出现；一次蓄力保持同一种，回到 High 或更低后再重新抽选。
+
+**01 / 同频震颤**
+
+滑块和轨道一起发紧，短距离的双层残影跟着震动。
+
+![Max 同频震颤，从 High 蓄力到 Max 后收回](docs/media/15-max-tremor.gif)
+
+**02 / 残像追赶**
+
+残影拉长，速度线逐渐展开，能看见滑块后面拖出的几层延迟。
+
+![Max 残像追赶，从 High 蓄力到 Max 后收回](docs/media/16-max-afterimage.gif)
+
+**03 / 错帧暴走**
+
+轨道分片错位，重影把边缘撕开。幅度随位置增加，配色随调色盘变化。
+
+![Max 错帧暴走，从 High 蓄力到 Max 后收回](docs/media/17-max-rupture.gif)
+
+动效有「完整 / 克制 / 停止」三档，也跟随系统的“减少动态效果”。停止时仍保留静态 Max 标识。
 
 ## 安装
 
-1. 在 [Releases](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases) 下载 `dsh-industrial-acid-skin-2.3.3.tgz`。
-2. 在 Harness 的“插件 → 添加插件”中选择运行包并启用。
-3. 在侧栏底部的调色盘或“设置 → 通用设置 → 皮肤外观”调整颜色和动效。
+1. 从 [Releases](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.3.3) 下载 `dsh-industrial-acid-skin-2.3.3.tgz`。
+2. 在 Harness 的「插件 → 添加插件」中导入并启用。
+3. 在侧栏调色盘，或「设置 → 通用设置 → 皮肤外观」里调整颜色和动效。
 
-运行包内置字体、SVG 和编译后的客户端，皮肤资源可离线加载。插件包名保留 `dsh-industrial-acid-skin`，便于现有安装升级并保留外观偏好。
+当前验证范围是 **Windows / Harness 0.2.0-rc.2**。竖排窗口按钮需要单独的 Windows 桌面适配器；安装、构建和回退步骤放在 [安装与开发](docs/INSTALL.md) 里。
 
-核心皮肤使用 `ctx.theme.overrideTokens` 和原生扩展槽。Windows 标题栏最右侧的竖向窗口按钮需要下述可选桌面适配器。其他系统及新版 Harness 尚未验证；宿主内部 DOM 或接口变更可能需要适配。
-
-## 构建与测试
-
-需要 Node.js 22 或更新版本及 npm。构建与测试使用 Node.js 内置模块，不需要安装 Harness 的私有 SDK；实际运行由 Harness 提供 React 和宿主服务。
+想自己拨一拨滑块、试一下切换，可以运行仓库里的展示页：
 
 ```sh
-git clone https://github.com/yasneg616/marathon-like-deepseek-harness-skin.git
-cd marathon-like-deepseek-harness-skin
-npm run build
-npm run check
-npm test
-npm pack
+node tools/serve-showcase.cjs
 ```
 
-`npm pack` 生成可导入的 `.tgz` 运行包。仓库提交了 `lib/client.js`，可以检查构建前后的差异。
+打开 [本地动效展示页](http://127.0.0.1:19411/?controls=1)。它使用展示数据，不连接 Harness。字体与 SVG 内置，皮肤资源可以离线加载。
 
-31 项自动测试覆盖插件撤销、配色与对比度、工作区编号及选择、原生桥接权限、模型与推理等级、随机 Max 轮次、连续位置提交、遮罩方向与色块，以及侧栏和分栏边界。自动测试使用宿主模拟环境，不能替代真实 Electron 窗口的兼容性验证。
+设计方向参考 [Marathon](https://marathonthegame.com/zh-chs)。这是非官方皮肤，与 DeepSeek、Bungie 或 Marathon 没有隶属关系；不包含 Marathon 官网代码或游戏素材。
 
-## 源码安装与回退
-
-也可以退出 Harness 后，从源码目录执行：
-
-```sh
-node tools/install.cjs
-```
-
-默认读取当前用户的 `.dsh/profiles/desktop`。使用自定义数据目录时，先设置 `DSH_HOME`。安装脚本备份 profile 清单，只添加本插件的依赖和 bundle 关联；安装记录保存在本机 `validation/` 下。
-
-解除本插件的 profile 关联：
-
-```sh
-node tools/uninstall.cjs
-```
-
-日常使用也可在 Harness 插件页停用。解除关联保留其他配置、聊天、工作区、插件缓存与本机颜色偏好。
-
-## 可选：Windows 桌面标题栏适配器
-
-适配器将原生窗口操作接入皮肤的竖排按钮，并保留原生应用/编辑菜单、窗口拖动及关闭确认。它会修改本机 `resources/app.asar` 中的两个桌面入口，因此请先完全退出 Harness。
-
-在 PowerShell 中指定实际安装目录：
-
-```powershell
-$env:DSH_DESKTOP_DIR = Join-Path $env:LOCALAPPDATA 'Programs\DeepSeek Harness'
-node tools/desktop-bridge.cjs install
-```
-
-适配器只接受已验证的 `0.2.0-rc.2` 原始 archive，其 SHA256 为：
-
-```text
-983ca71114e6dfd353fc79af5a1f9481a250ee64c2a3c757673029b811b23bc2
-```
-
-写入前自动备份到安装目录的 `_backups/`，校验未改动文件并记录本机恢复路径。版本或哈希不匹配时拒绝写入。停用皮肤后提供横向窗口按钮回退；安装到其他机器时，需要在那里重新生成备份。
-
-退出 Harness 后，在同一源码目录、相同 `DSH_DESKTOP_DIR` 下恢复：
-
-```powershell
-node tools/desktop-bridge.cjs restore
-```
-
-恢复同样校验当前 archive；应用已更新时会拒绝覆盖。保留本机 `validation/desktop-bridge.json` 和备份目录，直到完成恢复。
-
-## 目录
-
-| 路径 | 用途 |
-| --- | --- |
-| `src/shell.js`、`src/workspaces.js` | 标题栏、原生操作、工作区编号与窄栏选择 |
-| `src/accepted-motion.js`、`src/accepted-motion.css` | 往返遮罩、反馈、校准和动画清理 |
-| `src/max-berserk.js` | 三种随机 Max 渲染与轮次策略 |
-| `src/model-controls.js`、`src/model-controls.css` | 原生模型选择和推理滑块 |
-| `src/palette.js`、`src/skin.css`、`src/planar.css` | 配色、对比度与布局 |
-| `src/motion.js` | 原生菜单可用空间修正 |
-| `assets/`、`locale/` | 本地字体、SVG 和语言资源 |
-| `lib/client.js` | 编译后的离线客户端 |
-| `tools/`、`tests/` | 构建、安装、回退和自动测试 |
-
-`diagnostics` 默认关闭。开发时临时启用会生成含本机认证 URL 的 `.validation/connection.json`，使用后应关闭诊断；此目录已排除出 Git 和运行包。
-
-## 许可与资源
-
-代码采用 [MIT License](LICENSE)。GRID / SIGNAL 为此项目使用的原创字体派生版本，详见 [字体来源](assets/fonts/SOURCE.md)。Marathon 官网仅作为视觉与动效方向参考；项目不包含其网页代码、字体或游戏素材。DeepSeek、Harness、Marathon 及相关名称的权利属于各自所有者。
+[MIT License](LICENSE) · [GRID / SIGNAL 字体来源](assets/fonts/SOURCE.md)

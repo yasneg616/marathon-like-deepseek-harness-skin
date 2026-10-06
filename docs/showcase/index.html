@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN" data-industrial-acid data-industrial-shell="planar-v2" data-industrial-motion="full" data-windows-titlebar>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Harness Skin / Motion Study</title>
+  <script src="/docs/showcase/host.js"></script>
+  <script src="/showcase-runtime.js"></script>
+  <script>const skinStyle=document.createElement('style');skinStyle.textContent=window.showcaseCore.CSS;document.head.append(skinStyle);</script>
+  <link rel="stylesheet" href="/docs/showcase/showcase.css">
+</head>
+<body>
+  <header class="acid-masthead" data-native-controls="true">
+    <div class="acid-wordmark">
+      <button class="acid-sidebar-toggle" id="sidebar-toggle" aria-label="展开或收起侧栏"><svg viewBox="0 0 20 20"><path d="M3 4h14v12H3zM8 4v12"/></svg></button>
+      <button class="acid-brand-home" aria-label="回到展示首页"><svg class="acid-brand-symbol" viewBox="0 0 96 96" data-symbol></svg><span class="acid-wordmark-svg" data-wordmark></span></button>
+    </div>
+    <div class="acid-menus"><button id="palette-trigger"><span>01</span>调色盘</button><button id="route-trigger"><span>02</span>动效</button></div>
+    <button class="acid-context workspace-display" id="workspace-trigger" aria-label="选择工作区">
+      <span class="workspace-counter"><strong class="acid-context-number workspace-index" id="workspace-index">001</strong></span>
+      <span class="workspace-detail"><span class="acid-meta">ACTIVE WORKSPACE</span><span class="workspace-name-slot"><span class="acid-context-title" id="workspace-name">Design Studio</span></span></span><span class="acid-workspace-arrow">↗</span>
+    </button>
+    <div class="acid-window-controls" aria-hidden="true"><span>−</span><span>□</span><span>×</span></div>
+  </header>
+  <main class="BynINW_frame">
+    <aside class="BynINW_sidebarCol">
+      <nav class="_2H3hWW_root">
+        <button class="_2H3hWW_newSession" id="new-session"><span>＋</span><span class="wide-label">新会话</span></button>
+        <button class="_2H3hWW_panelRow" id="plugins"><span>♧</span><span class="wide-label">插件</span></button>
+        <div class="_2H3hWW_regionArea" data-slot="sidebar.workspaces">
+          <div class="side-heading wide-label">工作区 <span>⌕　＋</span></div><div class="_9lTDKa_listArea" id="workspace-list"></div>
+        </div>
+        <div class="sidebar-bottom"><div class="acid-sidebar-cut" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="acid-mode-switch"><button data-mode="day" aria-label="白天">☀<span class="wide-label">白天</span></button><button data-mode="night" aria-label="黑天">☾<span class="wide-label">黑天</span></button></div>
+          <button class="acid-palette-shortcut" id="palette-shortcut"><i></i><span class="wide-label">调色盘</span><span class="wide-label">↗</span></button>
+          <small class="wide-label">MARATHON-LIKE / HARNESS</small>
+        </div>
+      </nav>
+    </aside>
+    <section class="BynINW_centerCol">
+      <div class="session-heading"><span>Design Studio</span><span>视觉与动效研究　／　展示数据</span><button data-sidebar-right-toggle aria-label="打开右侧边栏">◫</button></div>
+      <div class="screen-content" id="screen-content">
+        <div class="hero-kicker">001 / VISUAL STUDY</div>
+        <h1><svg class="acid-hero-mark" viewBox="0 0 96 96" data-symbol></svg><span>探索未至之境</span><small>预览版</small></h1>
+        <p class="hero-note">大块的颜色，清楚的边界。每次切换，都有来有回。</p>
+        <div class="composer-group">
+          <div class="composer-context"><span>▱ Design Studio ⌄</span><span>♧ 标准模式 ⌄</span></div>
+          <div class="RlGAzG_card"><textarea data-composer-input="true" aria-label="展示输入框" placeholder="描述你想要构建的内容，/ 调用指令，@ 文件或对话"></textarea>
+            <div class="composer-bottom"><button class="attach-button" aria-label="添加附件">＋</button><span>工作区内修改 ⌄</span><div class="acid-model-controls"><button class="acid-model-trigger" id="model-trigger">◇ DeepSeek-V4.1-Flash ⌄</button><button class="acid-effort-trigger" id="effort-trigger"><span class="acid-reason-bars"><i></i><i></i><i></i></span><span id="effort-label">High</span><span>⌄</span></button></div><button class="send-button" aria-label="展示发送反馈">↑</button></div>
+          </div>
+        </div>
+        <div class="study-stamp"><span>ACID / COBALT / GRAPHITE</span><span>1× MOTION　·　NO LIVE DATA</span></div>
+      </div>
+    </section>
+    <aside class="BynINW_rightbarCol"><section class="OUqwTW_panel" data-sidebar-right-session="showcase" data-sidebar-right-panel="push" aria-hidden="true">
+      <div data-dockkit-pane="design-files"><div class="right-toolbar"><span>FILES / DESIGN</span><button data-sidebar-right-expand aria-label="全屏或还原">↗</button><button data-sidebar-right-toggle aria-label="关闭右侧边栏">×</button></div>
+        <div class="preview-tabs"><button role="tab" aria-selected="true" data-tab="readme">README.md</button><button role="tab" aria-selected="false" data-tab="tokens">palette.css</button></div>
+        <div class="OUqwTW_tabBody" data-sidebar-right-tab="readme"><span class="file-kicker">DESIGN NOTES / 001</span><h2>让切换有方向</h2><p>左侧从左边来，右侧从右边来。</p><p>色块盖住旧画面，再沿原路退回去。展开、收起、全屏、还原，都用同一套动作。</p><div class="file-palette"><i></i><i></i><i></i><i></i></div><h3>四种颜色，四块遮罩</h3><p>酸性色 / 交互色 / 阅读背景 / 正文色</p><pre>motion: 1×;
+sidebar: 600ms;
+direction: there-and-back;
+palette: current;</pre></div>
+        <div class="OUqwTW_tabBody" data-sidebar-right-tab="tokens" hidden><span class="file-kicker">PALETTE / 002</span><h2>颜色跟着界面走</h2><pre><span>/* FOUR COLORS */</span>
+:root {
+  --accent:  #C5FA31;
+  --signal:  #4255FF;
+  --surface: #11151A;
+  --text:    #ECF0E8;
+}</pre><div class="file-palette"><i></i><i></i><i></i><i></i></div><p>换配色后，侧栏、正文、Max 残影和遮罩一起更新。</p></div>
+      </div>
+    </section></aside>
+    <div class="BynINW_handle" data-side="rightbar" hidden></div>
+  </main>
+  <section class="detail-study" id="detail-study" hidden></section>
+  <div class="preview-label">DESIGN DEMO / v2.3.3</div>
+  <script src="/docs/showcase/showcase.js"></script>
+</body>
+</html>
