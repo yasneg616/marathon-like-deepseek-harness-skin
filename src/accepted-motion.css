@@ -1,0 +1,50 @@
+/* 02/03: approved 3px registration corners and central press feedback. */
+.acid-fx{overflow:visible;contain:layout;--acid-corner-width:3px}
+.acid-hover-corner{position:absolute;width:11px;height:11px;border:solid currentColor;opacity:0;pointer-events:none}
+.acid-hover-corner.tl{left:0;top:0;border-width:3px 0 0 3px}.acid-hover-corner.tr{right:0;top:0;border-width:3px 3px 0 0}
+.acid-hover-corner.bl{left:0;bottom:0;border-width:0 0 3px 3px}.acid-hover-corner.br{right:0;bottom:0;border-width:0 3px 3px 0}
+.acid-hover-line{position:absolute;left:5px;right:5px;bottom:2px;height:1px;background:currentColor;transform-origin:left;opacity:0}
+.acid-press-fill{position:absolute;inset:0;background:currentColor;opacity:0;pointer-events:none}
+.acid-press-outline{position:absolute;inset:0;border:1px solid currentColor;opacity:0;pointer-events:none}
+/* 04/06/07/10: vertical round trips; sidebars mirror horizontal round trips. */
+.acid-mask-positioned{position:relative}
+.acid-approved-mask{position:absolute;inset:0;z-index:5;display:grid;grid-template-columns:repeat(4,1fr);background:var(--acid-lime);color:var(--acid-accent-fore);pointer-events:none;overflow:hidden}
+.acid-approved-mask>i{border-right:1px solid color-mix(in srgb,currentColor 20%,transparent)}
+.acid-approved-mask>i:nth-child(1){background:var(--acid-lime)}
+.acid-approved-mask>i:nth-child(2){background:var(--acid-blue)}
+.acid-approved-mask>i:nth-child(3){background:var(--acid-palette-surface)}
+.acid-approved-mask>i:nth-child(4){background:var(--acid-palette-text)}
+.acid-transition-proxy{position:fixed;z-index:2200;overflow:hidden;pointer-events:none!important;isolation:isolate}
+.acid-transition-proxy *{pointer-events:none!important;animation:none!important;transition:none!important}
+.acid-transition-proxy>.acid-approved-mask{z-index:10}
+.acid-dialog,html[data-industrial-acid] .wCInkW_panel,html[data-industrial-acid] .wCInkW_options>*,html[data-industrial-acid] .fO69Vq_cardHead{animation:none!important}
+/* Keep the existing native icon controls when Windows hides its collapsed track. */
+html[data-industrial-acid][data-windows-titlebar] .BynINW_frame[data-sidebar-collapsed]{grid-template-columns:var(--acid-rail-columns,56px minmax(0,1fr) 0px)!important;--dsh-windows-sidebar-width:56px!important}
+html[data-industrial-acid][data-windows-titlebar] .BynINW_frame[data-sidebar-collapsed] .BynINW_handle[data-side=rightbar]{left:calc(100% - min(var(--acid-rail-right-width,0px),max(0px,calc(100% - 456px))))!important}
+html[data-industrial-acid][data-windows-titlebar] ._2H3hWW_root._2H3hWW_collapsed{padding:23px 10px 6px;--dsh-sidebar-inline-padding:10px}
+html[data-industrial-acid] ._2H3hWW_root._2H3hWW_collapsed ._2H3hWW_regionArea{display:flex}
+html[data-industrial-acid] ._2H3hWW_root._2H3hWW_collapsed ._2H3hWW_newSession{width:36px;height:36px;margin:0 0 12px;padding:0;border-radius:0;clip-path:none}
+html[data-industrial-acid] ._2H3hWW_root._2H3hWW_collapsed ._2H3hWW_panelRow{min-height:36px}
+/* Geometry and dock content are revealed by the approved masks, with no second slide. */
+html[data-industrial-acid] .BynINW_frame[data-animating],html[data-industrial-acid] .BynINW_frame[data-animating] .BynINW_handle{transition:none!important}
+html[data-industrial-acid] .OUqwTW_panel [data-dockkit-host=dock],html[data-industrial-acid] .OUqwTW_panel [data-dockkit-empty],html[data-industrial-acid] .OUqwTW_panel [data-dockkit-divider]{transition:none!important}
+html[data-industrial-acid] ._2H3hWW_wide,html[data-industrial-acid] ._2H3hWW_fading>*,html[data-industrial-acid] ._2H3hWW_railIn>*{animation:none!important;transition:none!important}
+html[data-industrial-acid][data-windows-titlebar] .BynINW_frame[data-sidebar-collapsed] .OUqwTW_panel[data-sidebar-right-panel=push]{max-width:max(0px,calc(100vw - 456px))}
+/* 05: the scanner is clipped to the real number, never the workspace name. */
+#workspace-index{position:relative;overflow:hidden;display:inline-flex}
+.acid-workspace-scan{position:absolute;top:0;bottom:0;width:3px;background:var(--acid-accent-display);z-index:3;pointer-events:none}
+.acid-digit-old,.acid-digit-calibration{position:absolute;inset:0;display:block;pointer-events:none}.acid-digit-calibration{color:var(--acid-accent-display);z-index:2}
+/* 08: leave the native editor, text nodes, caret and hit areas intact. */
+.acid-accepted-composer{position:relative}
+.acid-composer-fx{position:absolute;inset:0;z-index:1;pointer-events:none;color:var(--acid-accent-display)}
+.acid-composer-fx .acid-composer-line{position:absolute;left:0;right:0;height:1px;background:currentColor;opacity:0}
+.acid-composer-fx .acid-composer-line.top{top:0;transform-origin:left}.acid-composer-fx .acid-composer-line.bottom{bottom:0;transform-origin:right}
+.acid-composer-lamp{position:absolute;right:17px;top:9px;width:5px;height:5px;border:1px solid currentColor;background:var(--dsw-alias-border-l2);opacity:.65}
+.acid-composer-focused>.acid-composer-fx .acid-hover-corner,.acid-composer-focused>.acid-composer-fx .acid-composer-line{opacity:1}
+.acid-composer-focused>.acid-composer-fx .acid-composer-lamp{background:currentColor;opacity:1}
+/* 09: the native renderer continues to append actual provider chunks directly. */
+/* 12: signal real status changes with four squares; never fabricate progress. */
+.acid-signal-queue{display:inline-flex;gap:3px;margin-inline-start:8px;vertical-align:middle;pointer-events:none;color:var(--acid-accent-display)}
+.acid-signal-queue>i{display:block;width:4px;height:4px;background:currentColor}
+html[data-industrial-motion=off] .acid-composer-line,html[data-industrial-motion=off] .acid-approved-mask,html[data-industrial-motion=off] .acid-transition-proxy{display:none}
+@media(prefers-reduced-motion:reduce){.acid-fx,.acid-approved-mask,.acid-transition-proxy{display:none}.acid-composer-fx *{animation:none;transition:none}}

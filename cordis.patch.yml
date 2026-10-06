@@ -1,0 +1,7 @@
+- insert:
+    - id: industrial-acid-skin
+      name: dsh-industrial-acid-skin
+      config:
+        mastheadHeight: 128
+        canvas: night
+        diagnostics: false

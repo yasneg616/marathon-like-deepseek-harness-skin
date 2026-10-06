@@ -1,0 +1,26 @@
+{
+  "fonts": [
+    {
+      "family": "Industrial GRID",
+      "sourceSha256": "f8d65d22ea6a9d0cede00cd2a8435b8718ff9bf6d4dc682dce5d7f9301977b30",
+      "woff2Sha256": "cfd01f1d2676b8bd6d286ac10c1891980ca2a95dc2bf1f94dcd8caba8aed7b37",
+      "asciiCoverage": 95,
+      "advancesUnchanged": true,
+      "roundtrip": true,
+      "pointsBefore": 2565,
+      "pointsAfter": 1778,
+      "redrawnGlyphs": "AEHNRS0123456789"
+    },
+    {
+      "family": "Industrial SIGNAL",
+      "sourceSha256": "ba913d2b255553755ba10df6d1c28e8a4d23a26e232d398763d25243860159bc",
+      "woff2Sha256": "de15c5afc7b97879814f2e16405a4dd0ab160527794879672687aeeccac7db94",
+      "asciiCoverage": 95,
+      "advancesUnchanged": true,
+      "roundtrip": true,
+      "pointsBefore": 2715,
+      "pointsAfter": 2462,
+      "redrawnGlyphs": ""
+    }
+  ]
+}

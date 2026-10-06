@@ -1,0 +1,8 @@
+# Preserve source bytes so the bundled client rebuilds identically on Windows and Unix.
+* -text
+*.md text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+LICENSE text eol=lf
+*.ttf binary
+*.woff2 binary

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 828 142">
+ <defs><mask id="slices"><rect width="828" height="94" fill="white"/><path fill="black" d="M0 37h828v5H0zM0 75h828v3H0zM185 0h4v94h-4zM395 0h4v94h-4zM710 0h4v94h-4z"/></mask></defs>
+ 
+ <g id="whale" fill="currentColor" fill-rule="evenodd" mask="url(#slices)">
+  <path data-letter="D" d="M0 5h65l25 20v45L65 89H0V5Zm28 18v48h29l8-7V30l-8-7H28Z"/>
+  <path data-letter="E" d="M105 5h85v18h-57v14h46v18h-46v17h57v17h-85V5Z"/>
+  <path data-letter="E" d="M210 5h85v18h-57v14h46v18h-46v17h57v17h-85V5Z"/>
+  <path data-letter="P" d="M315 5h69l17 17v30l-17 15h-41v22h-28V5Zm28 18v27h28V23h-28Z"/>
+  <path data-letter="S" d="M438 5h69v18h-59v14h42l17 16v22l-15 14h-70V72h58V55h-43l-15-15V20l16-15Z"/>
+  <path data-letter="E" d="M527 5h85v18h-57v14h46v18h-46v17h57v17h-85V5Z"/>
+  <path data-letter="E" d="M632 5h85v18h-57v14h46v18h-46v17h57v17h-85V5Z"/>
+  <path data-letter="K" d="M737 5h28v32h12l23-32h28l-29 42 29 42h-29l-22-34h-12v34h-28V5Z"/>
+ </g>
+<text data-harness-letter="H" x="0" y="134" font-family="Industrial GRID, sans-serif" font-size="30" fill="currentColor">H</text><text data-harness-letter="A" x="115" y="134" font-family="Industrial GRID, sans-serif" font-size="30" fill="currentColor">A</text><text data-harness-letter="R" x="230" y="134" font-family="Industrial GRID, sans-serif" font-size="30" fill="currentColor">R</text><text data-harness-letter="N" x="345" y="134" font-family="Industrial GRID, sans-serif" font-size="30" fill="currentColor">N</text><text data-harness-letter="E" x="460" y="134" font-family="Industrial GRID, sans-serif" font-size="30" fill="currentColor">E</text><text data-harness-letter="S" x="575" y="134" font-family="Industrial GRID, sans-serif" font-size="30" fill="currentColor">S</text><text data-harness-letter="S" x="690" y="134" font-family="Industrial GRID, sans-serif" font-size="30" fill="currentColor">S</text></svg>

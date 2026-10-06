@@ -1,0 +1,16 @@
+const fs = require('node:fs');
+const path = require('node:path');
+const os = require('node:os');
+const ID = 'dsh-industrial-acid-skin';
+const profile = path.join(process.env.DSH_HOME || path.join(os.homedir(), '.dsh'), 'profiles', 'desktop');
+const file = path.join(profile, 'package.json');
+const text = fs.readFileSync(file, 'utf8');
+const manifest = JSON.parse(text);
+if (!Array.isArray(manifest.dsh?.profile?.bundles)) throw new Error('Invalid profile; unchanged.');
+manifest.dsh.profile.bundles = manifest.dsh.profile.bundles.filter(name => name !== ID);
+if (manifest.dependencies) delete manifest.dependencies[ID];
+fs.copyFileSync(file, `${file}.before-industrial-removal`);
+if (fs.readFileSync(file, 'utf8') !== text) throw new Error('Profile changed concurrently; unchanged.');
+fs.writeFileSync(`${file}.industrial.tmp`, `${JSON.stringify(manifest, null, 2)}\n`);
+fs.renameSync(`${file}.industrial.tmp`, file);
+console.log('Removed only the skin dependency and bundle selection. Other configuration and cached package files are preserved.');
