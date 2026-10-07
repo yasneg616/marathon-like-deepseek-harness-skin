@@ -1,6 +1,5 @@
 function SkinSymbol({className=''}){return h('svg',{className,viewBox:'0 0 96 96','aria-hidden':true,dangerouslySetInnerHTML:{__html:SYMBOL}});}
 function HeroMark(){return h(SkinSymbol,{className:'acid-hero-mark'});}
-function Footer({wide}){return wide?h('div',{className:'acid-sidebar-cut','aria-hidden':true},...[0,1,2,3,4].map(i=>h('span',{key:i}))):null;}
 function SettingsHeader({t}){return h('strong',{className:'acid-settings-title'},t('settings'));}
 
 function NativeDialog({title,children,onClose,className=''}){

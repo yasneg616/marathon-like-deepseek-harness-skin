@@ -4,6 +4,8 @@ function element(tag, props, ...children) {
   for (const [key, value] of Object.entries(props || {})) {
     if (key === 'key' || value === undefined || value === null) continue;
     if (key === 'className') node.className = value;
+    else if (key === 'style') for (const [property, color] of Object.entries(value)) node.style.setProperty(property, color);
+    else if (['disabled','hidden','inert','required'].includes(key)) { if (value) node.setAttribute(key, ''); }
     else if (/^on[A-Z]/.test(key)) node.addEventListener(key.slice(2).toLowerCase(), value);
     else node.setAttribute(key, String(value));
   }

@@ -12,7 +12,7 @@ function startShowcase(port = 0) {
         const original = fs.readFileSync(path.join(root, 'lib/client.js'), 'utf8');
         const anchor = "return { inject: ['slots'";
         if (original.split(anchor).length !== 2) throw new Error('Production module export changed; rebuild the preview adapter.');
-        const runtime = original.replace(anchor, "return { createAcceptedMotionController, createMaxBerserkRuntime, WorkspaceRailButtons, paintDigits, CSS, MASTHEAD, SYMBOL, inject: ['slots'");
+        const runtime = original.replace(anchor, "return { createAcceptedMotionController, createMaxBerserkRuntime, WorkspaceRailButtons, paintDigits, tokenActivityCalendar, tokenActivityLevel, normalizeTokenThresholds, validTokenThresholds, TOKEN_ACTIVITY_DEFAULTS, compactTokens, tokenActivityRange, CSS, MASTHEAD, SYMBOL, inject: ['slots'");
         res.writeHead(200, {'Content-Type':mime['.js'], 'Cache-Control':'no-store'}); res.end(runtime); return;
       }
       const relative = pathname === '/' ? 'docs/showcase/index.html' : pathname.replace(/^\/+/, '');

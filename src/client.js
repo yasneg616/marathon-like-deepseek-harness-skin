@@ -17,6 +17,7 @@ window.__ModuleLoader__.load({
     const MOTION_PREF = `${ID}:motion`;
     const NS = 'industrial.acid';
     /*__PALETTE_CORE__*/
+    /*__TOKEN_ACTIVITY_CORE__*/
     const dictionaries = {
       zh: { 'workspace': '工作区', 'none': '未选择工作区', 'plugins': '插件', 'settings': '设置', 'canvas': '皮肤外观', 'canvas.description': '白天与黑天切换整套皮肤；跟随应用使用原有外观设置。', 'paper': '白天', 'night': '黑天', 'adaptive': '跟随应用', 'local': '本地工作区', 'palette': '调色盘', 'palette.description': '调整即生效，白天与黑天分别保存。', 'accent': '酸性色', 'signal': '交互色', 'surface': '阅读背景', 'text': '正文色', 'acid': '经典酸性', 'orange': '工业橙', 'polar': '极地信号', 'reset': '恢复默认', 'contrast': '正文对比度', 'adjusted': '已增强正文对比度，实际颜色', 'hex': 'HEX 色值', 'motion': '动效', 'full': '完整', 'quiet': '克制', 'off': '停止' },
       en: { 'workspace': 'WORKSPACE', 'none': 'No workspace selected', 'plugins': 'Plugins', 'settings': 'Settings', 'canvas': 'Skin appearance', 'canvas.description': 'Day and night switch the entire skin. Follow app uses the existing appearance setting.', 'paper': 'Day', 'night': 'Night', 'adaptive': 'Follow app', 'local': 'LOCAL WORKSPACE', 'palette': 'Palette', 'palette.description': 'Updates immediately. Day and night palettes are saved separately.', 'accent': 'Acid accent', 'signal': 'Interaction', 'surface': 'Reading canvas', 'text': 'Text', 'acid': 'Classic acid', 'orange': 'Industrial orange', 'polar': 'Polar signal', 'reset': 'Reset palette', 'contrast': 'Text contrast', 'adjusted': 'Text contrast enhanced; effective color', 'hex': 'HEX color', 'motion': 'Motion', 'full': 'Full', 'quiet': 'Quiet', 'off': 'Off' }
@@ -88,7 +89,8 @@ window.__ModuleLoader__.load({
         refreshTokens?.();
       }
 
-      ctx.effect(() => ctx.locale.register(NS, { zh:{...dictionaries.zh,...MODEL_DICTIONARIES.zh}, en:{...dictionaries.en,...MODEL_DICTIONARIES.en} }), `${ID}: locale`);
+      const activityStore = createTokenActivityStore(ctx);
+      ctx.effect(() => ctx.locale.register(NS, { zh:{...dictionaries.zh,...MODEL_DICTIONARIES.zh,...ACTIVITY_DICTIONARIES.zh}, en:{...dictionaries.en,...MODEL_DICTIONARIES.en,...ACTIVITY_DICTIONARIES.en} }), `${ID}: locale`);
       ctx.effect(() => {
         const root = document.documentElement;
         const previous = { enabled: root.getAttribute('data-industrial-acid'), canvas: root.getAttribute('data-industrial-canvas'), mode: root.getAttribute('data-industrial-mode'), shell: root.getAttribute('data-industrial-shell'), motion: root.getAttribute('data-industrial-motion'), motionSet: root.getAttribute('data-industrial-motion-set'), height: root.style.getPropertyValue('--acid-header-max'), priority: root.style.getPropertyPriority('--acid-header-max') };
@@ -138,7 +140,7 @@ window.__ModuleLoader__.load({
       }
       function AppearanceFooter({ wide, t }) {
         const state = useAppearance();const [paletteOpen,setPaletteOpen]=React.useState(false);
-        return h('div', { className: 'acid-footer' }, h(Footer, { wide, t }),
+        return h('div', { className: 'acid-footer' }, h(TokenActivity, { wide, t, store: activityStore, useAppearance }),
           h('div', { className: `acid-mode-switch${wide ? '' : ' acid-mode-switch-rail'}`, role: 'group', 'aria-label': t('canvas') },
             ...['paper', 'night', 'adaptive'].map(value => h('button', { key: value, type: 'button', 'data-appearance-option': value, title: t(value), 'aria-label': t(value), 'aria-pressed': state.canvas === value, onClick: () => updateAppearance({ canvas: value }) }, h(ModeIcon, { value }), wide ? h('span', null, t(value)) : null))),
           h('button',{type:'button',className:'acid-palette-shortcut',onClick:()=>setPaletteOpen(true),'aria-label':t('palette')},h('span',{className:'acid-palette-swatch','aria-hidden':true}),wide?t('palette'):null,wide?h('span',{'aria-hidden':true},'↗'):null),
@@ -170,7 +172,8 @@ window.__ModuleLoader__.load({
           h('div', { className: 'acid-palette-presets', role: 'group', 'aria-label': t('palette') }, ...Object.entries(PALETTE_PRESETS).map(([key, colors]) => h('button', { key, type: 'button', 'data-palette-preset': key, 'aria-pressed': JSON.stringify(palette) === JSON.stringify(colors[state.mode]), onClick: () => setPalette(colors[state.mode]) }, h('span', { className: 'acid-preset-dot', style: { background: colors[state.mode].accent }, 'aria-hidden': true }), t(key)))),
           h('div', { className: 'acid-palette-fields' }, ...['accent', 'signal', 'surface', 'text'].map(field => h(ColorField, { key: field, field, prefix, value: palette[field], t, onColor: color => setPalette({ ...palette, [field]: color }) }))),
           h('div', { className: 'acid-palette-preview', style: { background: palette.surface, color: scheme.text }, 'aria-hidden': true }, h('strong', null, 'Aa / 0123'), h('span', { style: { background: palette.accent, color: scheme.variables['--acid-accent-fore'] } }, 'DS'), h('span', { style: { background: palette.signal, color: scheme.variables['--acid-blue-fore'] } }, '01')),
-          h('p', { className: 'acid-contrast-note', role: 'status', 'aria-live': 'polite' }, `${t('contrast')} ${scheme.contrast.toFixed(1)}:1`, scheme.adjusted ? ` · ${t('adjusted')} ${scheme.text}` : ''));
+          h('p', { className: 'acid-contrast-note', role: 'status', 'aria-live': 'polite' }, `${t('contrast')} ${scheme.contrast.toFixed(1)}:1`, scheme.adjusted ? ` · ${t('adjusted')} ${scheme.text}` : ''),
+          h(TokenActivitySettings, { t, store: activityStore, prefix }));
       }
 
       ctx.effect(installComposerMenuClearance,`${ID}: native composer menu clearance`);
@@ -185,6 +188,6 @@ window.__ModuleLoader__.load({
       installModelControls(ctx, useAppearance);
     }
 
-    return { inject: ['slots', 'locale', 'theme', 'layout', 'uiWorkspace'], apply, tokenOverrides, workspaceContext, formatWorkspaceIndex, normalizePalettes, normalizeCanvas, resolveMode, makeScheme, contrast, DEFAULT_PALETTES, PALETTE_PRESETS, modelControlSnapshot, effortSelection, modelPopoverPlacement, effortVisual, selectionIdentity, createMaxEpisode, acceptedDuration, ACCEPTED_MOTION };
+    return { inject: ['slots', 'locale', 'theme', 'layout', 'uiWorkspace', 'connection'], apply, tokenOverrides, workspaceContext, formatWorkspaceIndex, normalizePalettes, normalizeCanvas, resolveMode, makeScheme, contrast, DEFAULT_PALETTES, PALETTE_PRESETS, modelControlSnapshot, effortSelection, modelPopoverPlacement, effortVisual, selectionIdentity, createMaxEpisode, acceptedDuration, ACCEPTED_MOTION };
   }
 });

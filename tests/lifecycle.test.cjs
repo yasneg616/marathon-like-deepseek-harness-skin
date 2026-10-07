@@ -24,7 +24,7 @@ function harness(options = {}) {
   const context = vm.createContext({
     Element: class Element {},AbortController,MutationObserver:class{observe(){}disconnect(){}},setTimeout,clearTimeout,innerHeight:1000,
     window: { addEventListener: (name, fn) => { if (!windowEvents.has(name)) windowEvents.set(name, new Set()); windowEvents.get(name).add(fn); }, removeEventListener: (name, fn) => windowEvents.get(name)?.delete(fn), __ModuleLoader__: { load: declaration => { exports = declaration.factory(() => ({ createElement: (...args) => args, useState: value => [value, () => {}], useEffect: () => {}, useSyncExternalStore: (_subscribe, getSnapshot) => getSnapshot() })); } } },
-    document: { documentElement: html, head: { appendChild: node => styles.add(node) },body:{append:node=>bodies.add(node)},addEventListener(){},querySelectorAll(){return []},querySelector(){return null},createElement:makeNode },
+    document: { documentElement: html, head: { appendChild: node => styles.add(node) },body:{append:node=>bodies.add(node)},addEventListener(){},removeEventListener(){},querySelectorAll(){return []},querySelector(){return null},createElement:makeNode },
     localStorage: { getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value) }
   });
   vm.runInContext(fs.readFileSync(path.join(root, 'lib/client.js'), 'utf8'), context);
@@ -118,8 +118,9 @@ test('Host rejects invalid options before applying any effects', async () => {
   assert.throws(() => host.apply(ctx, { mastheadHeight: 500 }), /mastheadHeight/);
   assert.throws(() => host.apply(ctx, { canvas: 'neon' }), /canvas/);
   assert.throws(() => host.apply(ctx, { diagnostics: 'true' }), /diagnostics/);
-  host.apply(ctx, { diagnostics: false });
-  host.apply(ctx, { canvas: 'night', diagnostics: false });
+  const validCtx = { inject: names => assert.deepEqual(names, ['connection', 'sessionQuery']) };
+  host.apply(validCtx, { diagnostics: false });
+  host.apply(validCtx, { canvas: 'night', diagnostics: false });
 });
 
 test('legacy canvas preferences survive and adaptive mode tracks the native scheme without replacing tokens', () => {

@@ -1,10 +1,11 @@
 import { writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { installTokenActivityHost } from './lib/token-activity-host.js';
 
-/** Host half: validates visual options; all UI work belongs to the Client half. */
+/** Host half: validates options and serves counters from read-only session observations. */
 export const name = 'industrial-acid-skin';
 
-/** Mount the skin's Host settings and optional temporary validation connection. */
+/** Mount daily usage counters and the optional temporary validation connection. */
 export function apply(ctx, raw = {}) {
   const height = raw.mastheadHeight ?? 216;
   const canvas = raw.canvas ?? 'paper';
@@ -15,6 +16,7 @@ export function apply(ctx, raw = {}) {
   if (raw.diagnostics !== undefined && typeof raw.diagnostics !== 'boolean') {
     throw new Error('diagnostics must be a boolean.');
   }
+  ctx.inject(['connection', 'sessionQuery'], installTokenActivityHost);
   if (raw.diagnostics === true) ctx.inject(['connection', 'webServer'], (child) => {
     child.effect(() => {
       const directory = fileURLToPath(new URL('.validation/', import.meta.url));
