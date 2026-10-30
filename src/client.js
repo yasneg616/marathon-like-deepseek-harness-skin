@@ -198,6 +198,13 @@ window.__ModuleLoader__.load({
         style.dataset.plugin = ID;
         ownedStyle = style;
         root.setAttribute('data-industrial-acid', '');root.setAttribute('data-industrial-shell','planar-v2');root.setAttribute('data-industrial-motion-set','accepted-r3');
+        // The stylesheet keys the traffic-light band on the platform, so the attribute has to be
+        // present before the first paint. The desktop host publishes one of its own; only fill the
+        // gap. `navigator` is absent in the test sandbox, which mounts this effect without a page.
+        if (root.getAttribute('data-platform') == null) {
+          const platform = typeof navigator === 'undefined' ? '' : navigator.userAgentData?.platform || navigator.platform || '';
+          root.setAttribute('data-platform', /Mac/i.test(platform) ? 'darwin' : 'other');
+        }
         syncAppearance();
         root.style.setProperty('--acid-header-max', `${height}px`);
         document.head.appendChild(style);

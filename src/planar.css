@@ -1,12 +1,18 @@
 /* Approved planar shell, scoped to the skin. Native content and behavior remain in place. */
-html[data-industrial-acid]{--acid-header-height:128px;--dsh-frame-chrome-top:0px!important;--dsh-windows-titlebar-height:0px!important;--acid-fx-color:var(--acid-accent-display)}
-html[data-industrial-acid] .mP3x-q_frame{padding-top:var(--acid-header-height)}
+html[data-industrial-acid]{--acid-native-clearance:0px;--acid-header-height:128px;--dsh-frame-chrome-top:0px!important;--dsh-windows-titlebar-height:0px!important;--acid-fx-color:var(--acid-accent-display)}
+html[data-industrial-acid] .mP3x-q_frame{padding-top:calc(var(--acid-header-height) + var(--acid-native-clearance))}
 html[data-industrial-acid] .mP3x-q_frame:before{display:none}
-html[data-industrial-acid] .mP3x-q_handle{top:var(--acid-header-height)}
+html[data-industrial-acid] .mP3x-q_handle{top:calc(var(--acid-header-height) + var(--acid-native-clearance))}
 html[data-industrial-acid] .mP3x-q_centerCol{border-left:1px solid var(--acid-rule);position:relative}
-html[data-industrial-acid] .acid-masthead{top:0;height:var(--acid-header-height);grid-template-columns:minmax(240px,1fr) minmax(140px,190px) minmax(220px,1fr) 48px;pointer-events:auto!important;-webkit-app-region:drag;border-bottom:1px solid var(--acid-accent-display);padding-right:max(12px, env(titlebar-area-width, 0px));box-sizing:border-box}
+html[data-industrial-acid] .acid-masthead{top:var(--acid-native-clearance);height:var(--acid-header-height);grid-template-columns:minmax(240px,1fr) minmax(140px,190px) minmax(220px,1fr) 48px;pointer-events:auto!important;-webkit-app-region:drag;border-bottom:1px solid var(--acid-accent-display);padding-right:max(12px, env(titlebar-area-width, 0px));box-sizing:border-box}
 html[data-industrial-acid] .acid-masthead[data-native-controls=false]{grid-template-columns:minmax(280px,1fr) minmax(300px,460px) 48px}
 html[data-industrial-acid] .acid-masthead button{-webkit-app-region:no-drag}
+/* The desktop host draws macOS traffic lights at (16,18) above the page. Without a band the
+   masthead paints underneath them, and the drag region swallows the clicks. The band is 34px,
+   the lower edge of the buttons plus a small margin. */
+.acid-mac-native-slot{display:none}
+html[data-industrial-acid][data-platform=darwin]:not([data-fullscreen]){--acid-native-clearance:34px}
+html[data-industrial-acid][data-platform=darwin]:not([data-fullscreen]) .acid-mac-native-slot{display:block;position:fixed;top:0;left:0;width:80px;height:34px;z-index:91;-webkit-app-region:no-drag}
 html[data-industrial-acid] .acid-wordmark{padding:18px 27px;gap:19px;background:var(--acid-lime);color:var(--acid-accent-fore);position:relative;isolation:isolate}
 .acid-wordmark:after{content:'';position:absolute;right:0;top:0;width:18px;height:100%;pointer-events:none;z-index:2;background:linear-gradient(to bottom,var(--acid-context-bg,var(--acid-lime)) 0 18px,transparent 18px 52%,var(--acid-context-bg,var(--acid-lime)) 52% 65%,transparent 65%)}
 html[data-industrial-acid][data-industrial-mode=night] .acid-wordmark:after{background:linear-gradient(to bottom,var(--acid-ws-context,var(--acid-context-bg)) 0 18px,transparent 18px 52%,var(--acid-ws-context,var(--acid-context-bg)) 52% 65%,transparent 65%)}
