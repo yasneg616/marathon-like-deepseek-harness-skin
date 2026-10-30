@@ -4,9 +4,11 @@
 
 从 Marathon 的大色块、硬边界和工业排版开始：字标切开，按钮收方，工作区放上三位数字。正文留出空间，切换时让颜色沿着界面的方向走。
 
-`v2.4.10` · `Windows / macOS` · `Harness 0.2.0-rc.2 / 0.2.1（含 RC）`
+`v2.4.11` · `Windows / macOS` · `Harness 0.2.0-rc.2 / 0.2.1（含 RC）`
 
-[下载 2.4.10](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.10) · [安装与回退](docs/INSTALL.md) · [本次更新](docs/RELEASE-v2.4.10.md)
+[下载 2.4.11](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.11) · [安装与回退](docs/INSTALL.md) · [本次更新](docs/RELEASE-v2.4.11.md)
+
+**v2.4.11**：适配 Windows Harness 0.2.1-rc.5，修正右侧栏和字号按钮的跨构建类名识别；可选的 Windows 标题栏适配器新增对已核对哈希的 rc.5 安装包支持。首次启动曾有一次色条与经典布局混杂，刷新后恢复，另两次全新启动未复现；详见[更新说明](docs/RELEASE-v2.4.11.md)。
 
 **v2.4.10 正式版**：解决不同系统、不同构建的 CSS Module 哈希不一致导致的皮肤样式失效；采用 [Siyuan-Zhao770707 的 PR #4](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/pull/4) 主要实现。macOS 增加竖向窗口按钮，部分操作需要系统辅助功能权限，仍欢迎 Mac 用户实机反馈。详情见 [更新说明](docs/RELEASE-v2.4.10.md)。
 
@@ -22,7 +24,7 @@
 
 皮肤里新增了许多围绕 **Marathon IP memes** 的彩蛋，留给熟悉这个系列的你慢慢发现。彩蛋中的图形、字形和文案均为原创，未使用游戏的原始界面、标志或音频。
 
-这些彩蛋与工作区色条状态动画也包含在 **v2.4.10 安装包**中，下载后即可在 Harness 中安装，无需构建源码。
+这些彩蛋与工作区色条状态动画也包含在 **v2.4.11 安装包**中，下载后即可在 Harness 中安装，无需构建源码。
 
 ## 2.4.6：工作区收进色条
 
@@ -176,16 +178,16 @@
 
 ## 安装
 
-1. 下载 [v2.4.10 正式版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.10) 中的 `dsh-industrial-acid-skin-2.4.10.tgz`。无需 Node.js。
+1. 下载 [v2.4.11 正式版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.11) 中的 `dsh-industrial-acid-skin-2.4.11.tgz`。无需 Node.js。
 2. Harness「插件 → 添加插件」，粘贴完整下载链接，或输入已下载文件的本机绝对路径：
 
    ```text
-https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v2.4.10/dsh-industrial-acid-skin-2.4.10.tgz
+https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v2.4.11/dsh-industrial-acid-skin-2.4.11.tgz
    ```
 
-3. 启用插件，按提示重启。Windows 的可选桌面标题栏适配器仍可沿用原版；新安装前必须按 [说明](docs/DESKTOP-ADAPTER.md) 校验宿主版本与哈希。macOS 最小化与全屏控制可能需要系统辅助功能权限。
+3. 启用插件，按提示重启。Windows 升级到 rc.5 后如需竖排窗口按钮，请下载新版可选适配器并按 [说明](docs/DESKTOP-ADAPTER.md) 校验宿主版本与哈希。macOS 最小化与全屏控制可能需要系统辅助功能权限。
 
-Windows 90/90 项自动测试通过，维护者已确认在真实 Windows Harness 客户端正常运行。macOS、Ubuntu 自动测试通过，但 macOS 窗口交互仍需实机反馈。
+Windows rc.5 已在隔离配置下验证皮肤交互和可选窗口适配器。macOS 窗口交互仍需实机反馈。
 
 想自己拨一拨滑块、试一下切换，可以运行仓库里的展示页：
 

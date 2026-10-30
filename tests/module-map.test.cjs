@@ -207,6 +207,37 @@ test('a single reusable local name is not resolved when ambiguous', () => {
   assert.equal(resolvePrefix(new Set(['arrow']), candidates), null);
 });
 
+test('a single reusable local name remains unresolved even when candidates have different sizes', () => {
+  const candidates = new Map([
+    ['SMALL', new Set(['panel'])],
+    ['RIGHT', new Set(['panel', 'tabBody'])],
+  ]);
+  assert.equal(resolvePrefix(new Set(['panel']), candidates), null);
+});
+
+test('right sidebar and font arrows use their complete component signatures', () => {
+  const candidates = new Map([
+    ['PICKER', new Set(['panel'])],
+    ['RIGHT', new Set(['panel', 'tabBody'])],
+    ['ATTACHMENT', new Set(['arrow'])],
+    ['FONT', new Set(['arrow', 'stepper', 'arrows'])],
+  ]);
+  const mapping = mapModules('.OUqwTW_panel{}._0Fr0Ha_arrow{}', candidates);
+  assert.equal(mapping.get('OUqwTW'), 'RIGHT');
+  assert.equal(mapping.get('_0Fr0Ha'), 'FONT');
+  assert.equal(rewrite('.OUqwTW_tabBody ._0Fr0Ha_arrow', mapping), '.RIGHT_tabBody .FONT_arrow');
+});
+
+test('component signatures wait for their host stylesheet instead of matching unrelated controls', () => {
+  const candidates = new Map([
+    ['PICKER', new Set(['panel'])],
+    ['ATTACHMENT', new Set(['arrow'])],
+  ]);
+  const mapping = mapModules('.OUqwTW_panel{}._0Fr0Ha_arrow{}', candidates);
+  assert.equal(mapping.has('OUqwTW'), false);
+  assert.equal(mapping.has('_0Fr0Ha'), false);
+});
+
 test('a decisive signature still resolves', () => {
   const candidates = new Map([
     ['AAAAAA', new Set(['arrow', 'chevron'])],

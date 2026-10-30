@@ -30,7 +30,7 @@ jobs:
           npm test
       - name: Inspect runtime package
         run: npm pack --dry-run
-      - name: Build Windows v2.4.10 smoke-test archive
+      - name: Build Windows v2.4.11 smoke-test archive
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
@@ -38,15 +38,15 @@ jobs:
           New-Item -ItemType Directory -Force -Path $out | Out-Null
           npm pack --pack-destination $out
           if ($LASTEXITCODE -ne 0) { throw "npm pack failed" }
-          $archive = Join-Path $out 'dsh-industrial-acid-skin-2.4.10.tgz'
+          $archive = Join-Path $out 'dsh-industrial-acid-skin-2.4.11.tgz'
           if (!(Test-Path $archive)) { throw "Expected versioned archive is missing" }
           $hash = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant()
-          "$hash  dsh-industrial-acid-skin-2.4.10.tgz" | Set-Content (Join-Path $out 'SHA256SUMS.txt') -Encoding ascii
+          "$hash  dsh-industrial-acid-skin-2.4.11.tgz" | Set-Content (Join-Path $out 'SHA256SUMS.txt') -Encoding ascii
       - name: Upload Windows smoke-test archive (not a Release)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: dsh-skin-2.4.10-windows-smoke
+          name: dsh-skin-2.4.11-windows-smoke
           path: ${{ runner.temp }}/skin-smoke/*
           if-no-files-found: error
           retention-days: 14

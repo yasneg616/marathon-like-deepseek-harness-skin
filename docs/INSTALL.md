@@ -1,6 +1,6 @@
 # 安装与开发
 
-当前正式版 **v2.4.10**：动态识别 CSS Module 哈希，包含 PR #4 的 macOS 窗口操作实现。Windows 已经过维护者实机验收；macOS 的辅助功能授权和窗口交互仍需真实 Mac 用户复测。参见 [v2.4.10 更新说明](RELEASE-v2.4.10.md)。
+当前正式版 **v2.4.11**：修复新版 Harness 的右侧栏和字号按钮类名识别，并为已核对哈希的 Windows 0.2.1-rc.5 提供可选标题栏适配器。macOS 的辅助功能授权和窗口交互仍需真实 Mac 用户复测。参见 [v2.4.11 更新说明](RELEASE-v2.4.11.md)。
 
 历史的 [v2.4.10-rc.1](RELEASE-v2.4.10-rc.1.md) 使用不同的 macOS 原生红黄绿留白方案，仅供追溯。
 
@@ -32,21 +32,21 @@
 
 ## 安装
 
-1. 从 [v2.4.10 Release](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.10) 下载 `dsh-industrial-acid-skin-2.4.10.tgz` 运行包。历史版本见 [Releases](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases)。
+1. 从 [v2.4.11 Release](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.11) 下载 `dsh-industrial-acid-skin-2.4.11.tgz` 运行包。历史版本见 [Releases](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases)。
 2. 在 Harness「插件 → 添加插件」的**包名或地址**输入框粘贴下方的 `.tgz` 完整 URL 后安装，完成后点击「立即启用」（提示重启时重启）：
 
    ```text
-   https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v2.4.10/dsh-industrial-acid-skin-2.4.10.tgz
+   https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v2.4.11/dsh-industrial-acid-skin-2.4.11.tgz
    ```
 
-   或先从 Release 下载 `.tgz`，输入下载文件的**本机绝对路径**，例如 `C:\Users\你的用户名\Downloads\dsh-industrial-acid-skin-2.4.10.tgz`。Harness 的输入框接受 npm 包名、Git 地址、tarball URL 或本地路径；不提供按文件名自动搜索 GitHub Release 的功能。只输入 `dsh-industrial-acid-skin-2.4.9` 会触发 npm 查询并出现「未找到相关插件」，这不表示发布包失效。
+   或先从 Release 下载 `.tgz`，输入下载文件的**本机绝对路径**，例如 `C:\Users\你的用户名\Downloads\dsh-industrial-acid-skin-2.4.11.tgz`。Harness 的输入框接受 npm 包名、Git 地址、tarball URL 或本地路径；不提供按文件名自动搜索 GitHub Release 的功能。只输入文件名会触发 npm 查询，这不表示发布包失效。
 3. 在侧栏底部的调色盘或“设置 → 通用设置 → 皮肤外观”调整颜色、动效和工作区样式。新版色条的调色盘入口在底部 MORE 抽屉里。
 
 运行包内置字体、SVG 和编译后的客户端，皮肤资源可离线加载。插件包名保留 `dsh-industrial-acid-skin`，便于现有安装升级并保留外观偏好。
 
-核心皮肤使用 `ctx.theme.overrideTokens` 和原生扩展槽。2.4.9 延续 DSH `>=0.2.0-rc.2 <0.2.2-0`，包含 0.2.1 的 RC 与正式版；桌面验证环境为 0.2.1-rc.3。更高版本需要重新核对接口。更新插件无需修改应用 archive。
+核心皮肤使用 `ctx.theme.overrideTokens` 和原生扩展槽。版本范围为 DSH `>=0.2.0-rc.2 <0.2.2-0`；本版桌面验证环境为 Windows 0.2.1-rc.5。更高版本需要重新核对接口。更新插件无需修改应用 archive。
 
-Windows 运行窗口图标沿用 2.4.1 的可撤销实现，停用插件时恢复原图标。下述标题栏适配器支持已核对哈希的原始 0.2.0-rc.2、0.2.1-rc.2 与 0.2.1-rc.3；它是运行包之外的可选步骤，也单独打包在 Release 的 `dsh-industrial-caption-adapter-2.4.9.zip` 中，使用方法见[适配器说明](DESKTOP-ADAPTER.md)。已安装适配器的用户可直接升级皮肤，保留原适配器及其恢复记录。
+Windows 运行窗口图标沿用 2.4.1 的可撤销实现，停用插件时恢复原图标。可选标题栏适配器支持已核对哈希的原始 0.2.0-rc.2、0.2.1-rc.2、rc.3 与 rc.5；新版单独打包在 Release 的 `dsh-industrial-caption-adapter-2.4.11.zip` 中，使用方法见[适配器说明](DESKTOP-ADAPTER.md)。Harness 更新可能覆盖旧适配器，保留旧恢复记录并先检查当前 archive。
 
 ## 构建与测试
 
@@ -63,7 +63,7 @@ npm pack
 
 `npm pack` 生成可导入的 `.tgz` 运行包。仓库提交了 `lib/client.js`，可以检查构建前后的差异。
 
-65 项自动测试覆盖插件撤销、配色与消息气泡对比度、工作区编号及识别色、独立颜色保存与恢复默认、经典与新版切换、原生桥接权限、模型与推理等级、随机 Max、遮罩方向与侧栏边界、token 分档与统计，以及 Marathon 彩蛋和工作区状态动画。自动测试使用宿主模拟环境，真实 Electron 窗口另行验证。
+自动测试覆盖插件撤销、配色与消息气泡对比度、工作区、原生桥接权限、模型选择、遮罩、token 统计和跨构建类名识别。设置 `DSH_ASAR` 后还会读取指定的真实宿主归档；未设置时该项跳过。真实 Electron 窗口另行验证。
 
 2.4.9 在本机 Windows Harness 验证了原生重命名、删除确认与取消、选色与 HEX 输入、恢复默认、刷新保存、明暗配色、窄窗口、样式切换和编号稳定性。文字方向使用实际皮肤 CSS 在隔离页面通过 12 项检查，覆盖中文、英文与混排的统一朝向、阅读顺序及编号间距。实机删除测试使用临时工作区，原有工作区和外观偏好均保留，验证未发送会话消息。
 
@@ -112,12 +112,13 @@ $env:DSH_DESKTOP_DIR = Join-Path $env:LOCALAPPDATA 'Programs\DeepSeek Harness'
 node tools/desktop-bridge.cjs install
 ```
 
-可先运行 `node tools/desktop-bridge.cjs check` 做只读校验；已安装时会核对当前文件和原始备份。适配器只接受以下三个已验证版本的原始 archive：
+可先运行 `node tools/desktop-bridge.cjs check` 做校验；已安装时会核对当前文件和原始备份。适配器只接受以下已验证版本的原始 archive：
 
 ```text
 0.2.0-rc.2  983ca71114e6dfd353fc79af5a1f9481a250ee64c2a3c757673029b811b23bc2
 0.2.1-rc.2  47874618bf5b3011fcaac10cd4c85f69da333e70d4f99b921207c78d0999512a
 0.2.1-rc.3  04b32e3a872826ba15cfb2081c6a929a8d4ecaa65e09a2543e5a6b30e2eff1f0
+0.2.1-rc.5  e1b6f25fa937da98086c3e77af77aa14791105963c4d337a1c42179d232c6915
 ```
 
 写入前自动备份到安装目录的 `_backups/`，校验未改动文件并记录本机恢复路径。版本或哈希不匹配时拒绝写入。停用皮肤后提供横向窗口按钮回退；安装到其他机器时，需要在那里重新生成备份。

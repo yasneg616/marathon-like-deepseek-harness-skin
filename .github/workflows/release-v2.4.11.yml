@@ -1,0 +1,61 @@
+name: Publish v2.4.11
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - docs/RELEASE-v2.4.11.md
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Recheck release source
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $pkg = Get-Content package.json -Raw | ConvertFrom-Json
+          if ($pkg.version -ne '2.4.11') { throw 'Unexpected package version' }
+          npm run build
+          if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
+          git diff --exit-code -- lib/client.js
+          if ($LASTEXITCODE -ne 0) { throw 'Build output mismatch' }
+          npm run check
+          if ($LASTEXITCODE -ne 0) { throw 'Syntax check failed' }
+          npm test
+          if ($LASTEXITCODE -ne 0) { throw 'Tests failed' }
+      - name: Package skin and optional caption adapter
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          npm pack --pack-destination dist
+          if ($LASTEXITCODE -ne 0) { throw 'Package failed' }
+          $stage = Join-Path $env:RUNNER_TEMP 'caption-adapter'
+          New-Item -ItemType Directory -Force -Path (Join-Path $stage 'tools') | Out-Null
+          Copy-Item tools/desktop-bridge.cjs (Join-Path $stage 'tools/desktop-bridge.cjs')
+          Copy-Item docs/DESKTOP-ADAPTER.md (Join-Path $stage 'README.md')
+          Copy-Item LICENSE (Join-Path $stage 'LICENSE')
+          Compress-Archive -Path (Join-Path $stage '*') -DestinationPath dist/dsh-industrial-caption-adapter-2.4.11.zip
+          $files = @('dist/dsh-industrial-acid-skin-2.4.11.tgz', 'dist/dsh-industrial-caption-adapter-2.4.11.zip')
+          foreach ($file in $files) {
+            if (!(Test-Path $file)) { throw "Missing release asset: $file" }
+            $hash = (Get-FileHash $file -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash  $([IO.Path]::GetFileName($file))" | Add-Content dist/SHA256SUMS.txt -Encoding ascii
+          }
+      - name: Publish release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          gh release create v2.4.11 dist/dsh-industrial-acid-skin-2.4.11.tgz dist/dsh-industrial-caption-adapter-2.4.11.zip dist/SHA256SUMS.txt --repo "$env:GITHUB_REPOSITORY" --target "$env:GITHUB_SHA" --title "v2.4.11 - Harness rc.5 compatibility" --notes-file docs/RELEASE-v2.4.11.md --latest
+          if ($LASTEXITCODE -ne 0) { throw 'Release creation failed' }

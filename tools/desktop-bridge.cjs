@@ -10,7 +10,8 @@ const stateFile = path.join(root, 'validation/desktop-bridge.json');
 const SUPPORTED_DESKTOPS = Object.freeze({
   '983ca71114e6dfd353fc79af5a1f9481a250ee64c2a3c757673029b811b23bc2': '0.2.0-rc.2',
   '47874618bf5b3011fcaac10cd4c85f69da333e70d4f99b921207c78d0999512a': '0.2.1-rc.2',
-  '04b32e3a872826ba15cfb2081c6a929a8d4ecaa65e09a2543e5a6b30e2eff1f0': '0.2.1-rc.3'
+  '04b32e3a872826ba15cfb2081c6a929a8d4ecaa65e09a2543e5a6b30e2eff1f0': '0.2.1-rc.3',
+  'e1b6f25fa937da98086c3e77af77aa14791105963c4d337a1c42179d232c6915': '0.2.1-rc.5'
 });
 const CHANNEL = 'dsh-desktop:industrial-window-controls';
 const sha = data => crypto.createHash('sha256').update(data).digest('hex');
@@ -126,7 +127,7 @@ function assertStopped(){
 
 function prepare(original){
   const originalHash=sha(original),supportedDesktop=SUPPORTED_DESKTOPS[originalHash];
-  if(!supportedDesktop)throw new Error('Desktop has changed. This adapter supports only hash-verified 0.2.0-rc.2, 0.2.1-rc.2 and 0.2.1-rc.3 archives; no files changed.');
+  if(!supportedDesktop)throw new Error('Desktop has changed. This adapter supports only hash-verified 0.2.0-rc.2, 0.2.1-rc.2, 0.2.1-rc.3 and 0.2.1-rc.5 archives; no files changed.');
   const source=parse(original);
   if(JSON.parse(source.read('package.json')).version!==supportedDesktop)throw new Error('Desktop version does not match its verified archive. No files changed.');
   const replacements=transform(source.read('lib/main.js').toString(),source.read('lib/preload-app.cjs').toString());
