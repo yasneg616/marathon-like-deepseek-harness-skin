@@ -10,12 +10,17 @@ function NativeDialog({title,children,onClose,className=''}){
     h('div',{className:'acid-dialog-heading'},h('h2',null,title),h('button',{type:'button','aria-label':'关闭',onClick:close},'×')),children);
 }
 
-function WorkspaceRailButtons({items,numbers,workspaceId,onPick,t}){
+function WorkspaceRailButtons({items,numbers,workspaceId,onPick,t,colors,onColor}){
   if(!items.length)return null;
+  // Same rule as the classic rows: only a colour the user picked is painted, so the rail keeps its
+  // native ink until the palette dialog is used. The right button asks for a colour instead.
+  const picked=id=>{try{return normalizeHex(colors?.[id],null);}catch{return null;}};
   return h('nav',{className:'acid-workspace-rail','aria-label':t('workspace')},...items.map((item,i)=>{
-    const number=formatWorkspaceIndex(numbers?.[String(item.workspaceId)]??i+1),name=item.title||item.name||item.path?.split(/[\\/]/).filter(Boolean).at(-1)||t('none');
+    const number=formatWorkspaceIndex(numbers?.[String(item.workspaceId)]??i+1),name=item.title||item.name||item.path?.split(/[\\/]/).filter(Boolean).at(-1)||t('none'),color=picked(String(item.workspaceId));
     return h('button',{key:item.workspaceId,type:'button',className:'acid-rail-workspace','data-acid-workspace':item.workspaceId,
-      title:`${number} ${name}`,'aria-label':`${t('workspace')} ${number} ${name}`,'aria-pressed':workspaceId===item.workspaceId,
+      ...(color?{'data-acid-ws-color':'',style:{'--acid-ws-id':color}}:null),
+      title:`${number} ${name}${onColor?` · ${t('ws.color')}`:''}`,'aria-label':`${t('workspace')} ${number} ${name}`,'aria-pressed':workspaceId===item.workspaceId,
+      onContextMenu:onColor?event=>{event.preventDefault();onColor(String(item.workspaceId));}:undefined,
       onClick:()=>onPick(item.workspaceId)},number);
   }));
 }
@@ -49,9 +54,15 @@ function Masthead(props){
   const current=props.useSessions(state=>Object.values(state.byId).find(session=>(session.retainedBy?.mainView??0)>0)?.id);
   const panel=props.usePanelInfo(state=>state.activePanelId),numbers=workspaceNumbers(items),ordered=sortByNumber(items,numbers),workspace=workspaceContext(items,current,numbers);
   const appearance=props.useAppearance();
-  const identityColor=workspace?workspaceIdentity(items.map(item=>String(item.workspaceId)),numbers,appearance.workspaceColors)[String(workspace.workspaceId)]:null;
+  // Identity is resolved once for the whole list: the masthead paints the active workspace with it,
+  // the rail and the classic rows paint the ones the palette dialog stored a colour for.
+  const identity=workspaceIdentity(items.map(item=>String(item.workspaceId)),numbers,appearance.workspaceColors);
+  const identityColor=workspace?identity[String(workspace.workspaceId)]:null;
+  const classic=appearance.sidebarStyle==='classic';
   const context=React.useRef(null),previous=React.useRef(null);
-  const [picker,setPicker]=React.useState(false),[nativeState,setNativeState]=React.useState(null);
+  const [picker,setPicker]=React.useState(false),[colorTarget,setColorTarget]=React.useState(null),[nativeState,setNativeState]=React.useState(null);
+  const [,setOrderRevision]=React.useState(0);
+  const copy=React.useRef(props.t);copy.current=props.t;
   const native=window.dshDesktop?.windowControls;
   // Windows reports its caption buttons through the desktop bridge; the macOS build exposes no
   // such channel, because there the traffic lights are drawn by the system in the top-left
@@ -110,9 +121,59 @@ function Masthead(props){
     else{cancelWorkspaceHeader();context.current.querySelector('#workspace-index').textContent='—';delete context.current.querySelector('#workspace-index').dataset.ordinal;context.current.querySelector('#workspace-name').textContent=props.t('none');context.current.setAttribute('aria-label',props.t('workspace'));}
     if(last&&workspace&&last.workspaceId!==workspace.workspaceId)props.motion()?.revealStage('workspace',workspace.index>(last.index??0)?1:-1);
     else if(last&&last.panel!==panel)props.motion()?.revealStage('page');
-    previous.current={...workspace,panel};syncWorkspaceOrdinals(items,workspaceNumbers(items));
+    previous.current={...workspace,panel};syncWorkspaceOrdinals(items,workspaceNumbers(items),appearance.workspaceColors);
   },[workspace?.index,workspace?.workspaceId,workspace?.title,panel,items,appearance,identityColor]);
-  React.useEffect(()=>{const observer=new MutationObserver(()=>syncWorkspaceOrdinals(items,workspaceNumbers(items)));observer.observe(document.querySelector('[data-slot="sidebar.workspaces"]')||document.body,{childList:true,subtree:true});return()=>observer.disconnect();},[items]);
+  // The classic list is the only layout whose reorder never announces itself: a drag leaves the
+  // persisted order alone, so the numbers drift away from what is on screen. The rendered list is
+  // read instead, and a settled permutation that differs from the stored one is adopted; the bump
+  // re-renders the rail and the picker with the new numbers. Painting stays immediate.
+  // The classic list is also where the colour belongs: the collapsed rail is invisible whenever the
+  // sidebar is open, so every workspace row carries its own chip, and right-clicking the row opens
+  // the same dialog. Both write through setColorTarget, the state the picker swatch already uses.
+  React.useEffect(()=>{
+    let timer=0;
+    const chips=()=>{
+      const colors=appearance.workspaceColors||{};
+      for(const chip of document.querySelectorAll('[data-acid-ws-chip]')){
+        const color=normalizeHex(colors[chip.getAttribute('data-acid-ws-chip')],null);
+        if(color){chip.style.setProperty('--acid-ws-id',color);chip.setAttribute('data-acid-ws-picked','');}
+        else{chip.style.removeProperty('--acid-ws-id');chip.removeAttribute('data-acid-ws-picked');}
+      }
+    };
+    const paint=()=>{syncWorkspaceOrdinals(items,workspaceNumbers(items),appearance.workspaceColors);chips();};
+    const settle=()=>{timer=0;if(classic&&adoptNativeWorkspaceOrder(items))setOrderRevision(value=>value+1);paint();};
+    const decorate=()=>{
+      if(!classic)return;
+      for(const row of document.querySelectorAll('[data-slot="sidebar.workspaces"] [data-row-key^="workspace:"]')){
+        if(row.querySelector('[data-acid-ws-chip]'))continue;
+        const id=row.dataset.rowKey.slice(10),chip=document.createElement('button');
+        chip.type='button';chip.className='acid-ws-chip';chip.title=copy.current('ws.color');
+        chip.setAttribute('data-acid-ws-chip',id);chip.setAttribute('aria-label',copy.current('ws.color'));
+        chip.setAttribute('aria-haspopup','dialog');
+        chip.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();setColorTarget(id);});
+        // Ride inside the row's own action cluster: that cluster already hides itself until the row is
+        // hovered and spaces its buttons, so the chip inherits both instead of inventing a rhythm of
+        // its own next to two buttons it knows nothing about.
+        const actions=row.querySelector('[class*="rowActions"]');
+        if(actions)actions.insertBefore(chip,actions.firstElementChild);
+        else row.append(chip);
+      }
+    };
+    const changed=()=>{paint();decorate();clearTimeout(timer);timer=setTimeout(settle,240);};
+    const list=document.querySelector('[data-slot="sidebar.workspaces"]');
+    const observer=new MutationObserver(changed);
+    observer.observe(list||document.body,{childList:true,subtree:true});
+    const context=event=>{
+      if(!classic||!(event.target instanceof Element))return;
+      const row=event.target.closest('[data-slot="sidebar.workspaces"] [data-row-key^="workspace:"]');
+      if(!row)return;
+      event.preventDefault();event.stopPropagation();
+      setColorTarget(row.dataset.rowKey.slice(10));
+    };
+    document.addEventListener('contextmenu',context,true);
+    changed();
+    return()=>{observer.disconnect();clearTimeout(timer);document.removeEventListener('contextmenu',context,true);for(const chip of document.querySelectorAll('[data-acid-ws-chip]'))chip.remove();};
+  },[items,appearance.workspaceColors,classic]);
   React.useEffect(()=>()=>cancelWorkspaceHeader(),[]);
   // Closing is answered by the bridge, which reports nothing back; the other two return the
   // settled state and update the glyph. A closed window legitimately becomes unreadable, so an
@@ -140,7 +201,7 @@ function Masthead(props){
       h('button',{type:'button','aria-label':'最小化',title:'最小化',onClick:()=>windowAction('minimize')},'−'),
       h('button',{type:'button','aria-label':nativeState?.maximized?'还原':'最大化',title:nativeState?.maximized?'还原':'最大化',onClick:()=>windowAction('maximize')},nativeState?.maximized?'▣':'□'),
       h('button',{type:'button','aria-label':'关闭',title:'关闭',onClick:()=>windowAction('close')},'×')):null),
-    appearance.sidebarStyle==='classic'?h(WorkspaceRail,{items:ordered,numbers,workspaceId:workspace?.workspaceId,t:props.t,onPick:id=>{
+    appearance.sidebarStyle==='classic'?h(WorkspaceRail,{items:ordered,numbers,workspaceId:workspace?.workspaceId,t:props.t,colors:appearance.workspaceColors,onColor:setColorTarget,onPick:id=>{
       if(id===workspace?.workspaceId){props.goHome();return;}
       props.motion()?.captureStage();props.pickWorkspace(id);
     }}):null,
@@ -148,5 +209,17 @@ function Masthead(props){
       if(id===workspace?.workspaceId){props.goHome();return;}
       props.motion()?.captureStage();props.pickWorkspace(id);
     }}):null,
-    picker?h(NativeDialog,{title:props.t('workspace'),className:'acid-workspace-dialog',onClose:()=>setPicker(false)},...ordered.map((item,i)=>h('button',{key:item.workspaceId,type:'button',className:'acid-workspace-option','data-acid-workspace':item.workspaceId,'aria-pressed':workspace?.workspaceId===item.workspaceId,onClick:()=>{setPicker(false);props.pickWorkspace(item.workspaceId);}},h('span',null,formatWorkspaceIndex(numbers[String(item.workspaceId)]??i+1)),h('strong',null,item.title||item.path?.split(/[\\/]/).filter(Boolean).at(-1)||props.t('none')),h('span',{'aria-hidden':true},workspace?.workspaceId===item.workspaceId?'↗':'+')))):null);
+    picker?h(NativeDialog,{title:props.t('workspace'),className:'acid-workspace-dialog',onClose:()=>setPicker(false)},...ordered.map((item,i)=>{
+      // Every row keeps its native pick target and gains the one thing the classic layout never
+      // had: a swatch that opens the colour field for that workspace. The swatch is a sibling, not
+      // a child, because a button inside a button is invalid and swallows the outer click.
+      const id=String(item.workspaceId),number=formatWorkspaceIndex(numbers[id]??i+1),name=item.title||item.name||item.path?.split(/[\\/]/).filter(Boolean).at(-1)||props.t('none');
+      return h('div',{key:item.workspaceId,className:'acid-workspace-entry',style:{'--acid-ws-id':identity[id]}},
+        h('button',{type:'button',className:'acid-workspace-option','data-acid-workspace':item.workspaceId,'aria-pressed':workspace?.workspaceId===id,onClick:()=>{setPicker(false);props.pickWorkspace(item.workspaceId);}},h('span',null,number),h('strong',null,name),h('span',{'aria-hidden':true},workspace?.workspaceId===id?'↗':'+')),
+        h('button',{type:'button',className:'acid-workspace-swatch','data-workspace-color':id,'data-acid-ws-picked':appearance.workspaceColors?.[id]?'':'',style:{'--acid-ws-id':identity[id]},title:`${copy.current('ws.color')} · ${number} ${name}`,'aria-label':`${copy.current('ws.color')} · ${number} ${name}`,'aria-haspopup':'dialog','aria-expanded':colorTarget===id,onClick:()=>setColorTarget(current=>current===id?null:id)}));
+    })):null,
+    colorTarget!=null?h(NativeDialog,{title:`${copy.current('ws.color')} · ${items.filter(entry=>String(entry.workspaceId)===colorTarget).map(entry=>entry.title||entry.name||entry.path?.split(/[\\/]/).filter(Boolean).at(-1))[0]||''}`,className:'acid-workspace-dialog',onClose:()=>setColorTarget(null)},
+      h('div',{className:'acid-workspace-color',style:{'--acid-ws-id':identity[colorTarget]}},
+        h(ColorField,{field:'ws.color',prefix:`acid-ws-${colorTarget}`,value:identity[colorTarget]||IDENTITY_COLORS[0],t:props.t,onColor:color=>props.setWorkspaceColor(colorTarget,color)}),
+        h('button',{type:'button',className:'acid-workspace-color-reset',disabled:!appearance.workspaceColors?.[colorTarget],onClick:()=>props.setWorkspaceColor(colorTarget,null)},props.t('ws.color.reset')))):null);
 }

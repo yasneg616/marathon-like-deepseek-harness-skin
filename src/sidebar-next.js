@@ -87,6 +87,29 @@ function moveWorkspace(id,beforeId){
   const order=moveInOrder(loadWorkspaceOrder()||[],String(id),beforeId==null?null:String(beforeId));
   saveWorkspaceOrder(order);return order;
 }
+// A drag inside the native tree never reaches the skin through React state, and the drop listeners
+// that read it belong to the colour-strip layout. The rendered list is therefore the only witness
+// of a reorder that the classic layout has: when a settled list carries exactly the ids the stored
+// order already knows, in a different order, that is a reorder the user performed on screen and it
+// is adopted so the numbers follow the list. A list that gained or lost an id is a create or a
+// delete instead, and keeps the append-style numbering above, so the id sets must match first.
+function nativeWorkspaceOrder(){
+  return [...document.querySelectorAll('[data-slot="sidebar.workspaces"] [data-row-key^="workspace:"]')].map(row=>row.dataset.rowKey.slice(10));
+}
+function adoptNativeWorkspaceOrder(items){
+  const ids=(items||[]).map(item=>String(item.workspaceId));
+  if(ids.length<2)return false;
+  const order=nativeWorkspaceOrder();
+  if(order.length!==ids.length)return false;
+  const rendered=new Set(order);
+  if(rendered.size!==order.length||!ids.every(id=>rendered.has(id)))return false;
+  const stored=loadWorkspaceOrder();
+  if(!stored)return false;
+  const known=stored.filter(id=>rendered.has(id));
+  if(known.length!==ids.length||known.join('|')===order.join('|'))return false;
+  saveWorkspaceOrder(order);
+  return true;
+}
 
 // Placement on a half-strip grid (one row = half a strip): 001 starts the
 // left column, the command block fills the first half-row on the right, so

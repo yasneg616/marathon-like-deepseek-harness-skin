@@ -82,6 +82,17 @@ html[data-industrial-acid] [data-acid-ordinal]:before{content:attr(data-acid-ord
 .acid-rail-workspace:hover{background:var(--acid-sidebar-hover)}
 .acid-rail-workspace[aria-pressed=true]{background:var(--acid-sidebar-active);color:var(--acid-sidebar-active-fore);border-color:var(--acid-sidebar-active-fore)}
 .acid-rail-workspace:focus-visible{outline:2px solid var(--acid-sidebar-fore);outline-offset:-2px}
+/* A colour picked in the workspace palette is the only workspace ink the classic layout paints;
+   the default identity palette would turn the monochrome list into ten competing swatches. */
+html[data-industrial-acid]:not([data-acid-sidebar=next]) [data-slot="sidebar.workspaces"] [data-acid-ws-color]{box-shadow:inset 3px 0 0 var(--acid-ws-id)}
+html[data-industrial-acid]:not([data-acid-sidebar=next]) [data-slot="sidebar.workspaces"] [data-acid-ws-color][data-acid-ordinal]:before{color:var(--acid-ws-id)}
+.acid-rail-workspace[data-acid-ws-color]{color:var(--acid-ws-id);box-shadow:inset 0 -3px 0 var(--acid-ws-id)}
+.acid-rail-workspace[data-acid-ws-color][aria-pressed=true]{color:var(--acid-sidebar-active-fore)}
+/* The colour chip rides inside the row's own action cluster, so the two native buttons keep their
+   spacing: the cluster's own gap does the work and the chip only has to size itself. */
+html[data-industrial-acid]:not([data-acid-sidebar=next]) [data-slot="sidebar.workspaces"] [data-acid-ws-chip]{box-sizing:border-box;flex:none;width:14px;height:14px;min-width:0;padding:0;background:transparent;border:1px solid var(--acid-sidebar-secondary);border-radius:2px;opacity:.65;cursor:pointer;transition:opacity .12s ease,border-color .12s ease}
+html[data-industrial-acid]:not([data-acid-sidebar=next]) [data-slot="sidebar.workspaces"] [data-acid-ws-chip]:hover,html[data-industrial-acid]:not([data-acid-sidebar=next]) [data-slot="sidebar.workspaces"] [data-acid-ws-chip]:focus-visible{opacity:1;border-color:var(--acid-sidebar-fore);outline:none}
+html[data-industrial-acid]:not([data-acid-sidebar=next]) [data-slot="sidebar.workspaces"] [data-acid-ws-chip][data-acid-ws-picked]{opacity:1;border-color:var(--acid-ws-id);background:var(--acid-ws-id)}
 .acid-sidebar-cut{height:88px;display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr .6fr;gap:5px;margin:20px 0 12px}
 .acid-sidebar-cut span{background:var(--acid-sidebar-signature);clip-path:polygon(0 0,100% 0,100% 58%,70% 58%,70% 100%,0 100%)}
 .acid-sidebar-cut span:nth-child(2){margin-top:24px}.acid-sidebar-cut span:nth-child(3){background:var(--acid-blue);margin-top:24px;clip-path:none}.acid-sidebar-cut span:nth-child(4){clip-path:polygon(0 0,100% 0,100% 100%,50% 100%,50% 45%,0 45%)}.acid-sidebar-cut span:nth-child(5){background:repeating-linear-gradient(to bottom,var(--acid-sidebar-signature) 0 3px,transparent 3px 7px);clip-path:none}
@@ -110,6 +121,15 @@ html[data-industrial-acid] .AnXs9G_options>*:nth-child(2){animation-delay:45ms}h
 .acid-dialog-heading button{width:29px;height:29px;background:transparent;color:inherit;border:1px solid var(--acid-rule);font:20px var(--dsw-font-family);cursor:pointer}
 .acid-workspace-option{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:14px;width:100%;padding:18px 5px;align-items:center;background:transparent;color:inherit;border:0;border-bottom:1px solid var(--acid-rule);text-align:left;cursor:pointer}
 .acid-workspace-option>span:first-of-type{font:900 22px var(--acid-display);font-synthesis:none;color:var(--acid-accent-display)}.acid-workspace-option strong{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.acid-workspace-option[aria-pressed=true]{background:var(--dsw-alias-interactive-bg-hover)}
+.acid-workspace-entry{display:grid;grid-template-columns:minmax(0,1fr) 34px;align-items:center;gap:6px;border-bottom:1px solid var(--acid-rule)}
+.acid-workspace-entry .acid-workspace-option{border-bottom:0}
+.acid-workspace-swatch{width:34px;height:34px;padding:0;background:var(--acid-ws-id);border:1px solid var(--acid-rule);opacity:.72;cursor:pointer;transition:opacity .12s ease,border-color .12s ease}
+.acid-workspace-swatch:hover{opacity:1;border-color:var(--acid-ws-id)}
+.acid-workspace-swatch[data-acid-ws-picked]{opacity:1;border-color:var(--acid-ws-id);box-shadow:0 0 0 1px var(--acid-ws-id)}
+.acid-workspace-color{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:end;padding:18px 0 2px}
+.acid-workspace-color .acid-color-field{min-width:0}
+.acid-workspace-color-reset{align-self:end;height:38px;padding:0 14px;background:transparent;color:inherit;border:1px solid var(--acid-rule);font:11px var(--dsw-font-family);cursor:pointer}
+.acid-workspace-color-reset:disabled{opacity:.45;cursor:default}
 .acid-route-curtain{position:fixed;z-index:40;display:grid;grid-template-rows:repeat(var(--bands),1fr);overflow:hidden;pointer-events:none}
 .acid-route-curtain[data-transition=page]{display:flex}
 .acid-curtain-band{position:relative;flex:1;height:100%;background:var(--dsw-alias-bg-layer-1);border-bottom:2px solid var(--dsw-alias-bg-base)}

@@ -22,10 +22,16 @@ function installComposerMenuClearance(){
 
 function installSkinMotion(getMotion){return createAcceptedMotionController(getMotion);}
 
-function syncWorkspaceOrdinals(items,numbers){
+// Classic rows carry the number and, when the palette dialog was used, the colour picked for that
+// workspace. The default identity palette is deliberately not painted: ten saturated bars would
+// fight the monochrome sheet, so an unpicked workspace keeps the ink it always had.
+function syncWorkspaceOrdinals(items,numbers,colors){
   const ordinals=new Map(items.map((workspace,i)=>[String(workspace.workspaceId),formatWorkspaceIndex(numbers?.[String(workspace.workspaceId)]??i+1)]));
   for(const row of document.querySelectorAll('[data-slot="sidebar.workspaces"] [data-row-key^="workspace:"]')){
-    const index=ordinals.get(row.dataset.rowKey.slice(10));
+    const id=row.dataset.rowKey.slice(10),index=ordinals.get(id);
     if(index)row.setAttribute('data-acid-ordinal',index);else row.removeAttribute('data-acid-ordinal');
+    const color=typeof normalizeHex==='function'?normalizeHex(colors?.[id],null):null;
+    if(color){row.style.setProperty('--acid-ws-id',color);row.setAttribute('data-acid-ws-color','');}
+    else if(row.hasAttribute('data-acid-ws-color')){row.removeAttribute('data-acid-ws-color');row.style.removeProperty('--acid-ws-id');}
   }
 }
