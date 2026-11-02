@@ -4,7 +4,7 @@ html[data-industrial-acid] .mP3x-q_frame{padding-top:calc(var(--acid-header-heig
 html[data-industrial-acid] .mP3x-q_frame:before{display:none}
 html[data-industrial-acid] .mP3x-q_handle{top:calc(var(--acid-header-height) + var(--acid-native-clearance))}
 html[data-industrial-acid] .mP3x-q_centerCol{border-left:1px solid var(--acid-rule);position:relative}
-html[data-industrial-acid] .acid-masthead{top:var(--acid-native-clearance);height:var(--acid-header-height);grid-template-columns:minmax(240px,1fr) minmax(140px,190px) minmax(220px,1fr) 48px;pointer-events:auto!important;-webkit-app-region:drag;border-bottom:1px solid var(--acid-accent-display);padding-right:max(12px, env(titlebar-area-width, 0px));box-sizing:border-box}
+html[data-industrial-acid] .acid-masthead{top:0;height:calc(var(--acid-header-height) + var(--acid-native-clearance));padding-top:var(--acid-native-clearance);grid-template-columns:minmax(240px,1fr) minmax(140px,190px) minmax(220px,1fr) 48px;pointer-events:auto!important;-webkit-app-region:drag;border-bottom:1px solid var(--acid-accent-display);padding-right:max(12px, env(titlebar-area-width, 0px));box-sizing:border-box}
 html[data-industrial-acid] .acid-masthead[data-native-controls=false]{grid-template-columns:minmax(280px,1fr) minmax(300px,460px) 48px}
 html[data-industrial-acid] .acid-masthead button{-webkit-app-region:no-drag}
 /* The desktop host draws macOS traffic lights at (16,18) above the page. Without a band the
