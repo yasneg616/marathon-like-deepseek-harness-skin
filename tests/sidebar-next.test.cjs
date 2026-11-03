@@ -30,6 +30,51 @@ test('strips interlock: equal strips alternate columns, right column offset half
   assert.equal(all[1].row,2);
   assert.deepEqual([...IDENTITY_COLORS.slice(0,6)],['#C6F500','#FF2D78','#FF6A1A','#2B45FF','#9B4DFF','#00D1E0']);
 });
+test('crossing another strip on the way to the flyout cancels the pending switch',t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  const events={},effects=[],refs=[],states=[];
+  const groups=['a','b'].map(id=>{
+    const row={dataset:{rowKey:'workspace:'+id},classList:{contains:()=>false},getAttribute:()=>null,querySelector:()=>null};
+    const group={classList:{contains:()=>true},querySelector:()=>row,getBoundingClientRect:()=>({top:20,bottom:80,right:id==='a'?60:110}),
+      setAttribute(){},removeAttribute(){}};
+    group.closest=selector=>selector==='[data-acid-ws-strip]'?group:null;
+    return group;
+  });
+  const list={children:groups,contains:node=>groups.includes(node),addEventListener:(type,fn)=>{events[type]=fn;}};
+  states.push(list);
+  let stateIndex=0,refIndex=0,api;
+  const React={
+    createElement:(type,props,...children)=>({type,props,children}),
+    useState(initial){const i=stateIndex++;if(!(i in states))states[i]=initial;return [states[i],value=>{states[i]=value;}];},
+    useRef(initial){const i=refIndex++;return refs[i]??={current:initial};},
+    useMemo:fn=>fn(),useSyncExternalStore:(_subscribe,snapshot)=>snapshot(),useLayoutEffect(){},
+    useEffect:fn=>effects.push(fn),
+  };
+  const code=fs.readFileSync(path.join(__dirname,'../lib/client.js'),'utf8').replace("return { inject: ['slots'","return { SidebarNext, inject: ['slots'");
+  const document={querySelector:()=>null,activeElement:null};
+  const window={addEventListener(){},__ModuleLoader__:{load:module=>api=module.factory(name=>name==='react'?React:{createPortal:element=>element})}};
+  vm.runInNewContext(code,{document,window,setTimeout,clearTimeout});
+  const flyout=()=>{
+    stateIndex=refIndex=0;
+    return api.SidebarNext({items:[{workspaceId:'a'},{workspaceId:'b'}]}).children[1];
+  };
+  const [first,second]=groups;
+  const tick=ms=>t.mock.timers.tick(ms);
+  flyout();effects.at(-1)();
+  events.pointerover({target:first});tick(90);
+  assert.equal(flyout().props.state.id,'a');
+  assert.equal(flyout().props.state.anchor.left,60);
+  events.pointerout({target:first,relatedTarget:second});
+  events.pointerover({target:second});tick(180);
+  assert.equal(flyout().props.state.id,'a');
+  events.pointerout({target:second,relatedTarget:{closest:selector=>selector==='.acid-ws-flyout'?{}:null}});
+  flyout().props.onEnter();tick(400);
+  assert.equal(flyout().props.state.id,'a');
+  flyout().props.onLeave();
+  events.pointerover({target:second});tick(350);
+  assert.equal(flyout().props.state.id,'b');
+  assert.equal(flyout().props.state.anchor.left,110);
+});
 function loadNumbering(){
   let api;const store={};
   const code=fs.readFileSync(path.join(__dirname,'../lib/client.js'),'utf8').replace("return { inject: ['slots'","return { workspaceIdentity, normalizeWorkspaceColors, identityInk, inject: ['slots'");

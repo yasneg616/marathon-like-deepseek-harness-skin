@@ -201,16 +201,18 @@ function createAcceptedMotionController(getMotion) {
     if(routeRun)routeRun.owner.dataset.transition=kind;
   }
   function decorateButton(button) {
-    if(excluded(button)||button.querySelector(':scope > .acid-fx'))return;
+    if(excluded(button)||button.closest('[role="menuitem"],[data-menu-material]'))return false;
+    if(button.querySelector(':scope > .acid-fx'))return true;
     if(getComputedStyle(button).position==='static')button.classList.add('acid-layer-positioned');
     button.classList.add('acid-layered');buttons.add(button);
     const layer=document.createElement('span');layer.className='acid-fx';layer.setAttribute('aria-hidden','true');
     layer.innerHTML='<i class="acid-hover-corner tl"></i><i class="acid-hover-corner tr"></i><i class="acid-hover-corner bl"></i><i class="acid-hover-corner br"></i><i class="acid-hover-line"></i><i class="acid-press-fill"></i><i class="acid-press-outline"></i>';
     button.prepend(layer);
+    return true;
   }
   function feedback(button, kind='press') {
-    if(button.disabled||getMotion()==='off'||disposed)return;
-    decorateButton(button);buttonRuns.get(button)?.finish(false);
+    if(button.disabled||getMotion()==='off'||disposed||!decorateButton(button))return;
+    buttonRuns.get(button)?.finish(false);
     const current=run(button,acceptedDuration(kind,getMotion()));buttonRuns.set(button,current);
     button.dataset.acidFeedback=kind;
     if(kind==='hover') {

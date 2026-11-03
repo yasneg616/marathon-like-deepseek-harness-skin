@@ -4,9 +4,11 @@
 
 从 Marathon 的大色块、硬边界和工业排版开始：字标切开，按钮收方，工作区放上三位数字。正文留出空间，切换时让颜色沿着界面的方向走。
 
-`v2.4.11` · `Windows / macOS` · `Harness 0.2.0-rc.2 / 0.2.1（含 RC）`
+`v2.4.13` · `Windows / macOS` · `Harness 0.2.0-rc.2 / 0.2.1（含 RC）`
 
-[下载 2.4.11](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.11) · [安装与回退](docs/INSTALL.md) · [本次更新](docs/RELEASE-v2.4.11.md)
+[下载 2.4.13](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.13) · [安装与回退](docs/INSTALL.md) · [本次更新](docs/RELEASE-v2.4.13.md)
+
+**v2.4.13** 的对话浮层紧贴所属色条，掠过相邻工作区时留出移入时间。底部细色带在悬停或聚焦时显示 HEX 编辑器，原生工作区菜单的图标与文字也修复了重叠。
 
 **v2.4.11**：适配 Windows Harness 0.2.1-rc.5，修正右侧栏和字号按钮的跨构建类名识别；可选的 Windows 标题栏适配器新增对已核对哈希的 rc.5 安装包支持。首次启动曾有一次色条与经典布局混杂，刷新后恢复，另两次全新启动未复现；详见[更新说明](docs/RELEASE-v2.4.11.md)。
 
@@ -24,13 +26,13 @@
 
 皮肤里新增了许多围绕 **Marathon IP memes** 的彩蛋，留给熟悉这个系列的你慢慢发现。彩蛋中的图形、字形和文案均为原创，未使用游戏的原始界面、标志或音频。
 
-这些彩蛋与工作区色条状态动画也包含在 **v2.4.11 安装包**中，下载后即可在 Harness 中安装，无需构建源码。
+这些彩蛋与工作区色条状态动画包含在安装包中，下载后即可在 Harness 中安装，无需构建源码。
 
 ## 2.4.6：工作区收进色条
 
 **新版色条。** 113px 侧栏，两列色条错位排列。每个工作区保留自己的编号和识别色；悬停或键盘聚焦时，会话卡片从旁边展开。黑夜是黑底白字，白天是白底深字。
 
-**工作区管理与颜色。** 色条编号下方的「…」打开 Harness 原生菜单，可重命名或删除工作区，删除仍需原生确认。悬浮卡片底部可选择工作区颜色、输入六位 HEX 色值或恢复默认；配色按工作区在本机保存，顶部当前工作区同步更新，深浅颜色会自动选择清楚的文字色。中文、英文及混排名称统一侧转 90°，从下往上读。
+**工作区管理与颜色。** 色条编号下方的「…」打开 Harness 原生菜单，可重命名或删除工作区，删除仍需原生确认。悬停或聚焦卡片底部的细色带，可选择工作区颜色、输入六位 HEX 色值或恢复默认。配色按工作区在本机保存，顶部当前工作区同步更新，深浅颜色会自动选择清楚的文字色。中文、英文及混排名称统一侧转 90°，从下往上读。
 
 ![新版色条、工作区切换与黑白悬停卡片](docs/media/20-next-sidebar.gif)
 
@@ -178,11 +180,11 @@
 
 ## 安装
 
-1. 下载 [v2.4.11 正式版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.11) 中的 `dsh-industrial-acid-skin-2.4.11.tgz`。无需 Node.js。
+1. 下载 [v2.4.13 正式版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.13) 中的 `dsh-industrial-acid-skin-2.4.13.tgz`。无需 Node.js。
 2. Harness「插件 → 添加插件」，粘贴完整下载链接，或输入已下载文件的本机绝对路径：
 
    ```text
-https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v2.4.11/dsh-industrial-acid-skin-2.4.11.tgz
+https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v2.4.13/dsh-industrial-acid-skin-2.4.13.tgz
    ```
 
 3. 启用插件，按提示重启。Windows 升级到 rc.5 后如需竖排窗口按钮，请下载新版可选适配器并按 [说明](docs/DESKTOP-ADAPTER.md) 校验宿主版本与哈希。macOS 最小化与全屏控制可能需要系统辅助功能权限。

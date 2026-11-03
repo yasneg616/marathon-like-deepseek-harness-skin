@@ -219,8 +219,11 @@ function WorkspaceFlyout({state,color,custom,onColor,t,onEnter,onLeave,onClose,m
       onClick:()=>open(entry),onContextMenu:event=>{event.preventDefault();entry.row.dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,cancelable:true,clientX:event.clientX,clientY:event.clientY,button:2}));}},
       h('span',{className:'acid-ws-fly-name'},entry.title),entry.time?h('span',{className:'acid-ws-fly-time'},entry.time):null))):
       h('p',{className:'acid-ws-fly-empty'},'NO CONVERSATIONS // —'),
-    h('div',{className:'acid-ws-color'},h(ColorField,{field:'ws.color',value:color,t,prefix:`acid-ws-${state.id}`,onColor}),
-      h('button',{type:'button',className:'acid-ws-color-reset',disabled:!custom,onClick:()=>onColor(null)},t('ws.color.reset')))),document.body);
+    h('div',{className:'acid-ws-color'},
+      h('button',{type:'button',className:'acid-ws-color-bar','aria-label':t('ws.color')}),
+      h('div',{className:'acid-ws-color-editor'},
+        h(ColorField,{field:'ws.color',value:color,t,prefix:`acid-ws-${state.id}`,onColor}),
+        h('button',{type:'button',className:'acid-ws-color-reset',disabled:!custom,onClick:()=>onColor(null)},t('ws.color.reset'))))),document.body);
 }
 
 function SidebarNext({items,numbers,workspaceId,colors={},onColor,onPick,t,motion,toggleSidebar,statusSource=idleStatusSource}){
@@ -298,30 +301,32 @@ function SidebarNext({items,numbers,workspaceId,colors={},onColor,onPick,t,motio
   React.useEffect(()=>{
     if(!list||!active)return;
     const clear=name=>{clearTimeout(timers.current[name]);timers.current[name]=undefined;};
+    const cancelOpen=()=>{clear('open');timers.current.pending=undefined;};
     const restore=group=>{if(group&&expanded.current.has(group)){expanded.current.delete(group);const row=group.querySelector('[data-row-key^="workspace:"]');if(row?.getAttribute('aria-expanded')==='true')row.click();}};
-    const close=()=>{clear('open');clear('close');const current=flyRef.current;if(current){restore(current.group);current.group.removeAttribute('data-acid-ws-open');}setFly(null);};
+    const close=()=>{cancelOpen();clear('close');const current=flyRef.current;if(current){restore(current.group);current.group.removeAttribute('data-acid-ws-open');}setFly(null);};
     const open=group=>{
+      cancelOpen();clear('close');
       const row=group.querySelector('[data-row-key^="workspace:"]');if(!row||row.classList.contains(moduleClass('wnFoaW_menuOpen')))return;
       const id=row.dataset.rowKey.slice(10),{identity,byId}=live.current;
       if(flyRef.current?.group===group)return;
       if(flyRef.current){restore(flyRef.current.group);flyRef.current.group.removeAttribute('data-acid-ws-open');}
       if(row.getAttribute('aria-expanded')==='false'){expanded.current.add(group);row.click();}
-      const rect=group.getBoundingClientRect(),side=document.querySelector(moduleSelector('.mP3x-q_sidebarCol'))?.getBoundingClientRect();
+      const rect=group.getBoundingClientRect();
       const entry=byId.get(id);const index=live.current.numbers?.[id]??(entry?entry.index+1:groups.indexOf(group)+1);
       group.setAttribute('data-acid-ws-open','');
       setFly({group,id,color:identity[id]||IDENTITY_COLORS[0],number:row.getAttribute('data-acid-ordinal')||formatWorkspaceIndex(index),
-        name:row.querySelector(moduleSelector('.wnFoaW_title'))?.textContent||entry?.item.title||entry?.item.name||'—',path:entry?.item.path||'',anchor:{top:rect.top,bottom:rect.bottom,left:(side?.right??rect.right)+2}});
+        name:row.querySelector(moduleSelector('.wnFoaW_title'))?.textContent||entry?.item.title||entry?.item.name||'—',path:entry?.item.path||'',anchor:{top:rect.top,bottom:rect.bottom,left:rect.right}});
     };
-    // Micro-movements inside the same strip must not keep postponing the open.
-    const schedule=(group,delay=90)=>{
-      clear('close');if(flyRef.current?.group===group)return;
-      if(timers.current.pending===group&&timers.current.open)return;
+    // Give the pointer time to cross neighbouring strips on its way to the flyout.
+    const schedule=(group,delay=flyRef.current?350:90)=>{
+      clear('close');if(flyRef.current?.group===group){cancelOpen();return;}
+      if(delay&&timers.current.pending===group)return;
       clear('open');timers.current.pending=group;
-      timers.current.open=setTimeout(()=>{timers.current.open=undefined;timers.current.pending=undefined;open(group);},delay);
+      timers.current.open=setTimeout(()=>open(group),delay);
     };
-    const leave=()=>{clear('open');timers.current.pending=undefined;clear('close');timers.current.close=setTimeout(()=>{if(!document.activeElement?.closest('.acid-ws-flyout'))close();},200);};
+    const leave=()=>{cancelOpen();clear('close');timers.current.close=setTimeout(()=>{if(!document.activeElement?.closest('.acid-ws-flyout'))close();},200);};
     const groupOf=node=>node?.closest?.('[data-acid-ws-strip]');
-    const over=event=>{if(event.target.closest?.(moduleSelector('.wnFoaW_rowActions'))){close();return;}const group=groupOf(event.target);if(group&&list.contains(group))schedule(group);};
+    const over=event=>{if(event.target.closest?.(moduleSelector('.wnFoaW_rowActions'))){leave();return;}const group=groupOf(event.target);if(group&&list.contains(group))schedule(group);};
     const out=event=>{const from=groupOf(event.target),to=groupOf(event.relatedTarget);if(from&&from!==to&&!event.relatedTarget?.closest?.('.acid-ws-flyout'))leave();};
     const focus=event=>{if(event.target.closest?.(moduleSelector('.wnFoaW_rowActions'))){close();return;}const group=groupOf(event.target);if(group)schedule(group,0);};
     const pick=event=>{
@@ -336,7 +341,7 @@ function SidebarNext({items,numbers,workspaceId,colors={},onColor,onPick,t,motio
     list.addEventListener('pointerover',over);list.addEventListener('pointerout',out);list.addEventListener('focusin',focus);
     list.addEventListener('click',pick,true);list.addEventListener('keydown',pick,true);
     const dropped=()=>markWorkspaceReorder();list.addEventListener('drop',dropped,true);list.addEventListener('dragend',dropped,true);
-    timers.current.api={enter:()=>clear('close'),leave,close};
+    timers.current.api={enter:()=>{cancelOpen();clear('close');},leave,close};
     const scroll=()=>close();list.addEventListener('scroll',scroll,{passive:true});window.addEventListener('resize',scroll);
     return()=>{list.removeEventListener('pointerover',over);list.removeEventListener('pointerout',out);list.removeEventListener('focusin',focus);
       list.removeEventListener('click',pick,true);list.removeEventListener('keydown',pick,true);list.removeEventListener('drop',dropped,true);list.removeEventListener('dragend',dropped,true);list.removeEventListener('scroll',scroll);window.removeEventListener('resize',scroll);close();};

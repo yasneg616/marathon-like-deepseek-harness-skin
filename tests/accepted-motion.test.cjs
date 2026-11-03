@@ -7,16 +7,39 @@ function runtime(){
     setAttribute(){}append(node){node.parent=this;}remove(){nodes.delete(this);}querySelectorAll(){return [];}closest(){return null;}matches(){return false;}
     animate(frames,options){const animation={frames,options,finished:Promise.resolve(),cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;}
   }
-  const body=new Element(),document={body,querySelector(){return null;},querySelectorAll(){return [];},addEventListener(){},createElement:()=>new Element()};
+  const events={};
+  const body=new Element(),document={body,querySelector(){return null;},querySelectorAll(){return [];},
+    addEventListener(type,listener){events[type]=listener;},createElement:()=>new Element()};
   const code=fs.readFileSync(path.join(__dirname,'../lib/client.js'),'utf8').replace("return { inject: ['slots'","return { createAcceptedMotionController, inject: ['slots'");
   vm.runInNewContext(code,{Element,AbortController,MutationObserver:class{observe(){}disconnect(){}},document,
     getComputedStyle:node=>node.style,performance:{now:()=>clock},
     setTimeout:(fn,delay)=>{const id=++sequence;timers.set(id,{fn,at:clock+delay});return id;},clearTimeout:id=>timers.delete(id),
     window:{__ModuleLoader__:{load:module=>api=module.factory(()=>({createElement(){}}))}}});
   const controller=api.createAcceptedMotionController(()=>motion);
-  return {api,controller,nodes,animations,Element,setMotion:value=>motion=value,
+  return {api,controller,nodes,animations,Element,events,setMotion:value=>motion=value,
     advance(value){const target=clock+value;while(true){const next=[...timers].filter(([,timer])=>timer.at<=target).sort((a,b)=>a[1].at-b[1].at)[0];if(!next)break;clock=next[1].at;timers.delete(next[0]);next[1].fn();}clock=target;},pending:()=>timers.size};
 }
+test('native menu buttons skip decoration and hover feedback while regular buttons keep both',()=>{
+  const r=runtime();
+  const button=(menuSelector)=>{
+    const node=new r.Element();
+    node.contains=()=>false;
+    node.closest=selector=>selector==='button'||(menuSelector&&selector.includes(menuSelector))?node:null;
+    node.prepend=layer=>{node.layer=layer;};
+    node.querySelector=selector=>selector===':scope > .acid-fx'?node.layer:null;
+    return node;
+  };
+  const menuItem=button('[role="menuitem"]'),menuButton=button('[data-menu-material]'),regular=button();
+  for(const target of [menuItem,menuButton,regular])r.events.pointerover({target,relatedTarget:null});
+  for(const target of [menuItem,menuButton]){
+    assert.equal(target.layer,undefined);
+    assert.equal(target.dataset.acidFeedback,undefined);
+    assert.equal(target.classList.contains('acid-layered'),false);
+  }
+  assert.equal(regular.layer.className,'acid-fx');
+  assert.equal(regular.dataset.acidFeedback,'hover');
+  r.controller.dispose();
+});
 test('the menu is fully covered before the upward reveal and restores the original clip',()=>{
   const r=runtime(),node=new r.Element();node.style.clipPath='inset(1px)';let completed=0;
   r.controller.mask(node,{kind:'menu',done:()=>completed++});
