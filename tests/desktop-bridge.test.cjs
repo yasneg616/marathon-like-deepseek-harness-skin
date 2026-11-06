@@ -35,6 +35,7 @@ test('caption transform preserves desktop guards and requires every known source
   assert.equal(SUPPORTED_DESKTOPS['47874618bf5b3011fcaac10cd4c85f69da333e70d4f99b921207c78d0999512a'],'0.2.1-rc.2');
   assert.equal(SUPPORTED_DESKTOPS['04b32e3a872826ba15cfb2081c6a929a8d4ecaa65e09a2543e5a6b30e2eff1f0'],'0.2.1-rc.3');
   assert.equal(SUPPORTED_DESKTOPS['e1b6f25fa937da98086c3e77af77aa14791105963c4d337a1c42179d232c6915'],'0.2.1-rc.5');
+  assert.equal(SUPPORTED_DESKTOPS['5fa8a6b21bceb8f3e99e30efa2270efd0cc773a11e42aa0488f804a64b34e637'],'0.2.2-rc.1');
 });
 
 test('archive rebuild changes only named entries and preserves their integrity metadata',()=>{

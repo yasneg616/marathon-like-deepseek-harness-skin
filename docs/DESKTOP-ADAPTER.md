@@ -1,10 +1,10 @@
-# Windows 竖排窗口按钮适配器 / 2.4.11
+# Windows 竖排窗口按钮适配器 / 2.4.14
 
-这是皮肤运行包之外的可选工具。先在 Harness 中安装并启用 `dsh-industrial-acid-skin-2.4.11.tgz`；只有需要右上角竖排窗口按钮时，再使用此适配器。
+这是皮肤运行包之外的可选工具。先在 Harness 中安装并启用 `dsh-industrial-acid-skin-2.4.14.tgz`。需要右上角竖排窗口按钮时，再使用此适配器。
 
 如果 Harness 更新覆盖了旧适配器，可将新版 ZIP 解压到新目录，在检查通过后重新安装；保留旧目录及原有恢复记录。
 
-需要 Windows、Node.js 22 或更新版本，以及已核对哈希的原始 DeepSeek Harness 0.2.0-rc.2、0.2.1-rc.2、rc.3 或 rc.5。不同哈希会拒绝写入。已验证的 Windows rc.5 原始 archive SHA256 为 `e1b6f25fa937da98086c3e77af77aa14791105963c4d337a1c42179d232c6915`。
+需要 Windows、Node.js 22 或更新版本，以及已核对哈希的原始 DeepSeek Harness 0.2.0-rc.2、0.2.1-rc.2、rc.3、rc.5 或 0.2.2-rc.1。不同哈希会拒绝写入。已验证的 Windows 0.2.2-rc.1 原始 archive SHA256 为 `5fa8a6b21bceb8f3e99e30efa2270efd0cc773a11e42aa0488f804a64b34e637`。
 
 ## 安装
 

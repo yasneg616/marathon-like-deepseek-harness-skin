@@ -122,7 +122,10 @@ function mapModules(css, candidates) {
     // The stylesheet only references a common local name for these components. Include the
     // other stable names used by the host so unrelated panels and arrows cannot win the match.
     const extra = prefix === 'OUqwTW' ? ['tabBody'] : prefix === '_0Fr0Ha' ? ['stepper', 'arrows'] : [];
-    const hit = resolvePrefix(new Set([...locals, ...extra]), candidates);
+    const signature = new Set([...locals, ...extra]);
+    // SettingsRoot dropped the content wrapper in 0.2.2. Keep styling it on older builds.
+    if (prefix === 'AnXs9G') signature.delete('content');
+    const hit = resolvePrefix(signature, candidates);
     if (hit) mapping.set(prefix, hit); // Unchanged hashes still count as resolved for first paint.
   }
   return mapping;

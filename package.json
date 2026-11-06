@@ -1,6 +1,6 @@
 {
   "name": "dsh-industrial-acid-skin",
-  "version": "2.4.13",
+  "version": "2.4.14",
   "description": "Marathon-inspired DeepSeek Harness skin with Marathon meme easter eggs, animated workspace status, palette-driven motion, daily token activity, and random Max effects.",
   "repository": {
     "type": "git",
@@ -12,7 +12,7 @@
   },
   "engines": {
     "node": ">=22",
-    "dsh": ">=0.2.0-rc.2 <0.2.2-0"
+    "dsh": ">=0.2.0-rc.2 <0.2.2-0 || 0.2.2-rc.1"
   },
   "type": "module",
   "main": "index.js",
@@ -46,7 +46,7 @@
     }
   },
   "peerDependencies": {
-    "@deepseek-ai/dsh-client-ui-theme": ">=0.2.0-rc.2 <0.2.2-0"
+    "@deepseek-ai/dsh-client-ui-theme": ">=0.2.0-rc.2 <0.2.2-0 || 0.2.2-rc.1"
   },
   "peerDependenciesMeta": {
     "@deepseek-ai/dsh-client-ui-theme": {

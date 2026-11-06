@@ -28,7 +28,7 @@ const authoredPrefixes = [...new Set([...css.matchAll(/\.((?:_?[A-Za-z0-9][A-Za-
 // Modules that own the shell: the frame grid, the sidebar tree, the workspace list and the
 // composer. Everything else (settings, plugin manager, deliverables) loads on demand, so making
 // the paint wait for those would hold the skin back until the user opens that page.
-const STRUCTURAL = new Set(['mP3x-q', 'wtg9ga', 'GAkraW', 'wnFoaW', 'RlGAzG', 'GRgSLq', 'Dc7zOa', 'WOwLGG', 'OUqwTW', 'RsIu1q']);
+const STRUCTURAL = new Set(['mP3x-q', 'wtg9ga', 'GAkraW', 'wnFoaW', 'RlGAzG', 'GRgSLq', 'Dc7zOa', 'WOwLGG', 'OUqwTW']);
 const structuralPrefixes = authoredPrefixes.filter(prefix => STRUCTURAL.has(prefix));
 fs.mkdirSync(path.join(root, 'lib'), { recursive: true });
 fs.writeFileSync(path.join(root, 'lib/client.js'), source.replace('__AUTHORED_MODULES__', JSON.stringify(authoredPrefixes)).replace('__STRUCTURAL_MODULES__', JSON.stringify(structuralPrefixes)));

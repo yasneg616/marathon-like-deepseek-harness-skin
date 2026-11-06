@@ -9,7 +9,7 @@ html[data-acid-sidebar=next] .GAkraW_sectionHeader{height:30px;min-height:30px;m
 html[data-acid-sidebar=next] .GAkraW_sectionLabel{font:700 10px/1 var(--acid-mono);letter-spacing:.14em;text-transform:uppercase}
 /* the native workspace hover card would cover the flyout; its path moves into the flyout header */
 html[data-acid-sidebar=next] [class*=_card_]:has(>.wnFoaW_hoverContent){display:none!important}
-html[data-acid-sidebar=next] .RsIu1q_exits,html[data-acid-sidebar=next] .GAkraW_fade{display:none!important}
+html[data-acid-sidebar=next] [data-slot="sidebar.workspaces"] [class$="_exits"][aria-hidden="true"],html[data-acid-sidebar=next] .GAkraW_fade{display:none!important}
 /* 2 — v3 rail: 113px, two 46px columns, 5px gaps, 16px inset, half-strip offset. */
 html[data-industrial-acid]{--acid-next-bg:#1E2022;--acid-next-block:#0B0C0D;--acid-next-line:rgba(226,228,224,.22);--acid-next-ink:#0B0C0D;--acid-next-card:#E4E5E1;--acid-next-card-row:#D2D4CF;--acid-next-hazard:var(--acid-lime);--acid-next-hazard-ink:var(--acid-accent-fore)}
 html[data-acid-sidebar=next] .mP3x-q_frame:not([data-sidebar-collapsed]){grid-template-columns:var(--acid-next-columns,113px minmax(0,1fr) 0px)!important;--dsh-windows-sidebar-width:113px!important}
