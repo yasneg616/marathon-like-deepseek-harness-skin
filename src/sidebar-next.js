@@ -289,7 +289,7 @@ function SidebarNext({items,numbers,workspaceId,colors={},onColor,onPick,t,motio
       if(title&&title.dataset.acidFallback!==fallback)title.dataset.acidFallback=fallback;
 
     });
-  });
+  },[list,active,identity,byId,numbers,activity,workspaceId,colors,t]);
   React.useEffect(()=>()=>{
     if(!list)return;list.removeAttribute('data-acid-ws-grid');
     for(const group of list.querySelectorAll('[data-acid-ws-strip]')){

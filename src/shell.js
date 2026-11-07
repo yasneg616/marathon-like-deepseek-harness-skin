@@ -159,7 +159,10 @@ function Masthead(props){
         else row.append(chip);
       }
     };
-    const changed=()=>{paint();decorate();clearTimeout(timer);timer=setTimeout(settle,240);};
+    // React commits a navigation as its own mutation storm. Paint once per frame instead of
+    // once per batch: the native list only needs to look right at the next paint anyway.
+    let frame=0;
+    const changed=()=>{clearTimeout(timer);timer=setTimeout(settle,240);if(frame)return;frame=requestAnimationFrame(()=>{frame=0;paint();decorate();});};
     const list=document.querySelector('[data-slot="sidebar.workspaces"]');
     const observer=new MutationObserver(changed);
     observer.observe(list||document.body,{childList:true,subtree:true});
@@ -172,7 +175,7 @@ function Masthead(props){
     };
     document.addEventListener('contextmenu',context,true);
     changed();
-    return()=>{observer.disconnect();clearTimeout(timer);document.removeEventListener('contextmenu',context,true);for(const chip of document.querySelectorAll('[data-acid-ws-chip]'))chip.remove();};
+    return()=>{observer.disconnect();clearTimeout(timer);if(frame)cancelAnimationFrame(frame);document.removeEventListener('contextmenu',context,true);for(const chip of document.querySelectorAll('[data-acid-ws-chip]'))chip.remove();};
   },[items,appearance.workspaceColors,classic]);
   React.useEffect(()=>()=>cancelWorkspaceHeader(),[]);
   // Closing is answered by the bridge, which reports nothing back; the other two return the
