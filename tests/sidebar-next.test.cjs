@@ -75,6 +75,53 @@ test('crossing another strip on the way to the flyout cancels the pending switch
   assert.equal(flyout().props.state.id,'b');
   assert.equal(flyout().props.state.anchor.left,110);
 });
+
+test('the flyout mirrors the native overflow button and shows the highest-priority session status',()=>{
+  let api,refresh,expanded=false,stateIndex=0;
+  const states=[];
+  const rows=Array.from({length:7},(_,i)=>({
+    dataset:{rowKey:`session:${i}`},
+    querySelector:()=>({textContent:`Session ${i}`}),getAttribute:()=>null
+  }));
+  const overflow={
+    get textContent(){return expanded?'收起会话':'展开其余 2 个会话';},
+    getAttribute:()=>String(expanded),
+    click(){expanded=!expanded;refresh();}
+  };
+  const group={querySelectorAll:()=>rows.slice(0,expanded?7:5),querySelector:selector=>selector.includes('overflow:')?overflow:null};
+  const react={
+    createElement:(type,props,...children)=>({type,props,children}),useRef:value=>({current:value}),
+    useState(initial){
+      const index=stateIndex++;
+      if(!(index in states))states[index]=typeof initial==='function'?initial():initial;
+      return [states[index],value=>{states[index]=value;}];
+    },
+    useEffect:callback=>{if(!refresh)callback();},useLayoutEffect(){}
+  };
+  const code=fs.readFileSync(path.join(__dirname,'../lib/client.js'),'utf8').replace("return { inject: ['slots'","return { WorkspaceFlyout, inject: ['slots'");
+  const document={body:{},querySelectorAll:()=>[]};
+  const window={innerHeight:720,__ModuleLoader__:{load:module=>api=module.factory(name=>name==='react'?react:{createPortal:element=>element})}};
+  vm.runInNewContext(code,{window,document,MutationObserver:class{constructor(fn){refresh=fn;}observe(){}}});
+  const render=()=>{
+    stateIndex=0;
+    return api.WorkspaceFlyout({state:{group,id:'w',anchor:{left:60,top:20,bottom:80}},t:key=>key,statuses:new Map([
+      ['0',{pendingInteraction:{kind:'approval'},running:true,completionUnread:true}],
+      ['1',{running:true,completionUnread:true}],['2',{completionUnread:true}]
+    ])});
+  };
+  const panel=render(),meta=panel.children.find(child=>child?.props.className==='acid-ws-fly-meta');
+  assert.equal(meta.children[0].children[0],'CONVERSATIONS 05 +2');
+  const list=panel.children.find(child=>child?.props.className==='acid-ws-fly-list');
+  assert.deepEqual(Array.from(list.children.slice(0,3),row=>row.children[0].props['data-status']),['attention','working','done']);
+  const overflowButton=panel.children.find(child=>child?.props.className==='acid-ws-fly-overflow');
+  assert.equal(overflowButton.children[0],'展开其余 2 个会话');
+  overflowButton.props.onClick();
+  const after=render();
+  assert.equal(after.children.find(child=>child?.props.className==='acid-ws-fly-list').children.length,7);
+  assert.equal(after.children.find(child=>child?.props.className==='acid-ws-fly-meta').children[0].children[0],'CONVERSATIONS 07');
+  assert.equal(after.children.find(child=>child?.props.className==='acid-ws-fly-overflow').props['aria-expanded'],true);
+});
+
 function loadNumbering(){
   let api;const store={};
   const code=fs.readFileSync(path.join(__dirname,'../lib/client.js'),'utf8').replace("return { inject: ['slots'","return { workspaceIdentity, normalizeWorkspaceColors, identityInk, inject: ['slots'");

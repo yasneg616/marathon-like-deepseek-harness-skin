@@ -1,6 +1,6 @@
 // NEXT sidebar: staggered workspace strips, hover flyout, identity colours.
 // Native rows stay mounted and own every action; this layer only arranges
-// them and proxies clicks, so ordering, menus and drag reorder stay native.
+// them and proxies interaction, so ordering, menus and drag reorder stay native.
 const IDENTITY_PREF=`${ID}:workspace-identity`;
 const WORKSPACE_COLORS_PREF=`${ID}:workspace-colors`;
 function normalizeWorkspaceColors(value){
@@ -121,14 +121,19 @@ function stripPlacement(index){
 // Strip activity from the native per-session status store: a pending approval/answer outranks a
 // running turn, which outranks an unread completion. Sessions are matched by id; no content is read.
 const WORKSPACE_ACTIVITY=Object.freeze(['attention','working','done']);
+function sessionActivityRank(status){
+  if(status?.pendingInteraction!==undefined)return 0;
+  if(status?.running===true)return 1;
+  if(status?.completionUnread===true)return 2;
+  return WORKSPACE_ACTIVITY.length;
+}
 function workspaceActivity(items,statuses){
   const out={};
   for(const item of items||[]){
     let rank=WORKSPACE_ACTIVITY.length;
     for(const id of item?.sessionIds||[]){
-      const status=statuses?.get?.(id);if(!status)continue;
-      const next=status.pendingInteraction!==undefined?0:status.running===true?1:status.completionUnread===true?2:rank;
-      if(next<rank)rank=next;if(rank===0)break;
+      rank=Math.min(rank,sessionActivityRank(statuses?.get?.(id)));
+      if(rank===0)break;
     }
     if(rank<WORKSPACE_ACTIVITY.length)out[String(item.workspaceId)]=WORKSPACE_ACTIVITY[rank];
   }
@@ -193,32 +198,100 @@ function DrawerTools(){
   }));
 }
 
-function WorkspaceFlyout({state,color,custom,onColor,t,onEnter,onLeave,onClose,motion}){
+// The native drag state is only needed for a committed drop. Its rows are hidden,
+// so use their midpoint to communicate the side chosen on the visible proxy.
+function dropNativeSession(source,target,side){
+  const dataTransfer=new DataTransfer();
+  const dispatch=(row,type,clientY=0)=>row.dispatchEvent(new DragEvent(type,{bubbles:true,cancelable:true,dataTransfer,clientY}));
+  flushSync(()=>dispatch(source,'dragstart'));
+  try{
+    const rect=target.getBoundingClientRect();
+    const midpoint=rect.top+rect.height/2;
+    dispatch(target,'drop',side==='before'?Math.floor(midpoint)-1:Math.ceil(midpoint));
+  }finally{
+    dispatch(source,'dragend');
+  }
+}
+
+function WorkspaceFlyout({state,color,custom,onColor,t,onEnter,onLeave,onClose,motion,statuses=EMPTY_STATUS}){
   const ref=React.useRef(null);
   const [rows,setRows]=React.useState(()=>sessionRows(state.group));
+  const dragged=React.useRef(null);
+  const [marker,setMarker]=React.useState(null);
   React.useEffect(()=>{
     const refresh=()=>setRows(sessionRows(state.group));refresh();
     const observer=new MutationObserver(refresh);
-    observer.observe(state.group,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['aria-selected']});
+    observer.observe(state.group,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['aria-selected','aria-expanded','draggable']});
     return()=>observer.disconnect();
   },[state.group]);
   // Reuse the skin's own four-colour wipe, sideways like the sidebar itself.
   React.useLayoutEffect(()=>{if(ref.current)activeAcceptedMotion?.mask(ref.current,{kind:'hover',direction:'left-right'});},[]);
-  const place=state.anchor,below=place.top+380>window.innerHeight;
-  const style={left:place.left+'px','--acid-ws-id':color};
-  if(below)style.bottom=Math.max(8,window.innerHeight-place.bottom)+'px';else style.top=Math.max(8,place.top)+'px';
+  const place=state.anchor;
+  const top=Math.max(8,place.top),bottom=Math.max(8,window.innerHeight-place.bottom);
+  const up=top+380>window.innerHeight&&bottom<top;
+  const offset=up?bottom:top;
+  const style={left:place.left+'px',[up?'bottom':'top']:offset+'px',maxHeight:`min(480px, calc(100vh - ${offset+8}px))`,'--acid-ws-id':color};
   const create=state.group.querySelector(moduleSelector('.wnFoaW_projectRow .wnFoaW_rowActions button[aria-keyshortcuts]'));
+  const overflow=state.group.querySelector(':scope > button[data-row-key^="overflow:"]');
+  const overflowLabel=overflow?.textContent.trim();
+  const expanded=overflow?.getAttribute('aria-expanded')==='true';
+  const hidden=!expanded&&overflowLabel?.match(/\d+/)?.[0];
   const open=(entry)=>{motion()?.captureStage();entry.row.click();onClose();};
-  return createPortal(h('aside',{ref,className:'acid-ws-flyout','data-acid-motion-owned':'flyout','data-placement':below?'up':'down',style,role:'dialog','aria-label':`${state.number} ${state.name}`,onPointerEnter:onEnter,onPointerLeave:onLeave,onFocus:onEnter,onBlur:event=>{if(!event.currentTarget.contains(event.relatedTarget))onLeave();},onKeyDown:event=>{if(event.key==='Escape'){event.stopPropagation();onClose(true);}}},
+  const stopDrag=()=>{dragged.current=null;setMarker(null);};
+  const dropSide=(event,entry)=>{
+    const source=dragged.current,target=entry.row;
+    if(!source?.isConnected||!source.draggable||!target.isConnected||source===target)return;
+    const group=moduleSelector('.GAkraW_groupSection');
+    if(source.closest(group)!==target.closest(group))return;
+    const pin=moduleSelector('.wnFoaW_pinIndicator');
+    if(Boolean(source.querySelector(pin))!==Boolean(target.querySelector(pin)))return;
+    // The native provisional new-session row always stays first.
+    if(!entry.time)return 'after';
+    const rect=event.currentTarget.getBoundingClientRect();
+    return event.clientY<rect.top+rect.height/2?'before':'after';
+  };
+  return createPortal(h('aside',{ref,className:'acid-ws-flyout','data-acid-motion-owned':'flyout','data-placement':up?'up':'down',style,role:'dialog','aria-label':`${state.number} ${state.name}`,onPointerEnter:onEnter,onPointerLeave:onLeave,onFocus:onEnter,onBlur:event=>{if(!event.currentTarget.contains(event.relatedTarget))onLeave();},onKeyDown:event=>{if(event.key==='Escape'){event.stopPropagation();onClose(true);}}},
     h('header',{className:'acid-ws-fly-head'},
       h('span',{className:'acid-ws-fly-number'},state.number),
       h('span',{className:'acid-ws-fly-title'},h('strong',null,state.name),state.path?h('em',{title:state.path},state.path):null)),
-    h('div',{className:'acid-ws-fly-meta'},h('span',null,`CONVERSATIONS ${String(rows.length).padStart(2,'0')}`),
+    h('div',{className:'acid-ws-fly-meta'},h('span',null,`CONVERSATIONS ${String(rows.length).padStart(2,'0')}${hidden?` +${hidden}`:''}`),
       create?h('button',{type:'button',className:'acid-ws-fly-new','aria-label':create.getAttribute('aria-label'),title:create.getAttribute('aria-label'),onClick:()=>{motion()?.captureStage();create.click();onClose();}},h('b',{'aria-hidden':true},'+'),'NEW CHAT HERE'):null),
-    rows.length?h('div',{className:'acid-ws-fly-list',role:'list'},...rows.map(entry=>h('button',{key:entry.key,type:'button',role:'listitem',className:'acid-ws-fly-row','aria-current':entry.selected?'true':undefined,
-      onClick:()=>open(entry),onContextMenu:event=>{event.preventDefault();entry.row.dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,cancelable:true,clientX:event.clientX,clientY:event.clientY,button:2}));}},
-      h('span',{className:'acid-ws-fly-name'},entry.title),entry.time?h('span',{className:'acid-ws-fly-time'},entry.time):null))):
+    rows.length?h('div',{className:'acid-ws-fly-list',role:'list'},...rows.map(entry=>{
+      const status=WORKSPACE_ACTIVITY[sessionActivityRank(statuses.get(entry.key.slice('session:'.length)))];
+      const label=status?t(`ws.${status}`):undefined;
+      return h('button',{key:entry.key,type:'button',role:'listitem',className:'acid-ws-fly-row','aria-current':entry.selected?'true':undefined,'aria-description':label,
+        draggable:entry.row.draggable,'data-drop-side':marker?.row===entry.row?marker.side:undefined,
+        onClick:()=>open(entry),onContextMenu:event=>{event.preventDefault();entry.row.dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,cancelable:true,clientX:event.clientX,clientY:event.clientY,button:2}));},
+        onDragStart:event=>{
+          if(!entry.row.draggable){event.preventDefault();return;}
+          dragged.current=entry.row;
+          event.dataTransfer.effectAllowed='move';
+          event.dataTransfer.setData('application/x-acid-session',entry.key);
+        },
+        onDragOver:event=>{
+          const side=dropSide(event,entry);
+          if(!side)return;
+          event.preventDefault();
+          event.dataTransfer.dropEffect='move';
+          setMarker(current=>current?.row===entry.row&&current.side===side?current:{row:entry.row,side});
+        },
+        onDragLeave:event=>{
+          if(!event.currentTarget.contains(event.relatedTarget))setMarker(current=>current?.row===entry.row?null:current);
+        },
+        onDrop:event=>{
+          const side=dropSide(event,entry);
+          if(!side)return;
+          event.preventDefault();event.stopPropagation();
+          const source=dragged.current;
+          stopDrag();
+          dropNativeSession(source,entry.row,side);
+        },
+        onDragEnd:stopDrag},
+        h('span',{className:'acid-ws-fly-dot','data-status':status,title:label,'aria-hidden':true}),
+        h('span',{className:'acid-ws-fly-name'},entry.title),entry.time?h('span',{className:'acid-ws-fly-time'},entry.time):null);
+    })):
       h('p',{className:'acid-ws-fly-empty'},'NO CONVERSATIONS // —'),
+    overflowLabel?h('button',{type:'button',className:'acid-ws-fly-overflow','aria-expanded':expanded,onClick:()=>overflow.click()},overflowLabel):null,
     h('div',{className:'acid-ws-color'},
       h('button',{type:'button',className:'acid-ws-color-bar','aria-label':t('ws.color')}),
       h('div',{className:'acid-ws-color-editor'},
@@ -340,7 +413,8 @@ function SidebarNext({items,numbers,workspaceId,colors={},onColor,onPick,t,motio
     };
     list.addEventListener('pointerover',over);list.addEventListener('pointerout',out);list.addEventListener('focusin',focus);
     list.addEventListener('click',pick,true);list.addEventListener('keydown',pick,true);
-    const dropped=()=>markWorkspaceReorder();list.addEventListener('drop',dropped,true);list.addEventListener('dragend',dropped,true);
+    const dropped=event=>{if(!event.target.closest?.('[data-row-key^="session:"]'))markWorkspaceReorder();};
+    list.addEventListener('drop',dropped,true);list.addEventListener('dragend',dropped,true);
     timers.current.api={enter:()=>{cancelOpen();clear('close');},leave,close};
     const scroll=()=>close();list.addEventListener('scroll',scroll,{passive:true});window.addEventListener('resize',scroll);
     return()=>{list.removeEventListener('pointerover',over);list.removeEventListener('pointerout',out);list.removeEventListener('focusin',focus);
@@ -349,5 +423,5 @@ function SidebarNext({items,numbers,workspaceId,colors={},onColor,onPick,t,motio
   if(!list||!active)return null;
   const api=timers.current.api||{enter(){},leave(){},close(){}};
   return h(React.Fragment,null,createPortal(h(CommandStack,{tick}),list),
-    fly&&byId.has(fly.id)?h(WorkspaceFlyout,{key:fly.id,state:fly,color:identity[fly.id],custom:!!colors[fly.id],onColor:color=>onColor(fly.id,color),t,motion,onEnter:()=>api.enter(),onLeave:()=>api.leave(),onClose:refocus=>{api.close();if(refocus)fly.group.querySelector('[data-row-key^="workspace:"]')?.focus();}}):null);
+    fly&&byId.has(fly.id)?h(WorkspaceFlyout,{key:fly.id,state:fly,color:identity[fly.id],custom:!!colors[fly.id],onColor:color=>onColor(fly.id,color),t,motion,statuses,onEnter:()=>api.enter(),onLeave:()=>api.leave(),onClose:refocus=>{api.close();if(refocus)fly.group.querySelector('[data-row-key^="workspace:"]')?.focus();}}):null);
 }

@@ -2,7 +2,7 @@ window.__ModuleLoader__.load({
   id: 'dsh-industrial-acid-skin',
   factory: (require) => {
     const React = require('react');
-    const { createPortal } = require('react-dom');
+    const { createPortal, flushSync } = require('react-dom');
     const h = React.createElement;
     const ID = 'dsh-industrial-acid-skin';
     const CSS = "__SKIN_CSS__";
@@ -91,8 +91,8 @@ window.__ModuleLoader__.load({
       en: { 'workspace': 'WORKSPACE', 'none': 'No workspace selected', 'plugins': 'Plugins', 'settings': 'Settings', 'canvas': 'Skin appearance', 'canvas.description': 'Day and night switch the entire skin. Follow app uses the existing appearance setting.', 'paper': 'Day', 'night': 'Night', 'adaptive': 'Follow app', 'local': 'LOCAL WORKSPACE', 'palette': 'Palette', 'palette.description': 'Updates immediately. Day and night palettes are saved separately.', 'accent': 'Acid accent', 'signal': 'Interaction', 'surface': 'Reading canvas', 'text': 'Text', 'acid': 'Classic acid', 'orange': 'Industrial orange', 'polar': 'Polar signal', 'reset': 'Reset palette', 'contrast': 'Text contrast', 'adjusted': 'Text contrast enhanced; effective color', 'hex': 'HEX color', 'motion': 'Motion', 'full': 'Full', 'quiet': 'Quiet', 'off': 'Off' }
     };
 
-    Object.assign(dictionaries.zh, { 'ws.color': '工作区颜色', 'ws.color.reset': '恢复默认', 'ws.working': '工作中', 'ws.done': '已完成', 'ws.attention': '等待确认', 'sidebarStyle': '工作区样式', 'sidebarStyle.description': '切换后立即生效，并保留现有工作区和会话。', 'sidebarStyle.next': '新版色条', 'sidebarStyle.classic': '经典工作区' });
-    Object.assign(dictionaries.en, { 'ws.color': 'Workspace color', 'ws.color.reset': 'Reset color', 'ws.working': 'Working', 'ws.done': 'Completed', 'ws.attention': 'Needs input', 'sidebarStyle': 'Workspace style', 'sidebarStyle.description': 'Applies immediately and keeps existing workspaces and conversations.', 'sidebarStyle.next': 'Color strips', 'sidebarStyle.classic': 'Classic workspaces' });
+    Object.assign(dictionaries.zh, { 'ws.color': '工作区颜色', 'ws.color.reset': '恢复默认', 'ws.working': '工作中', 'ws.done': '完成未读', 'ws.attention': '等待确认', 'sidebarStyle': '工作区样式', 'sidebarStyle.description': '切换后立即生效，并保留现有工作区和会话。', 'sidebarStyle.next': '新版色条', 'sidebarStyle.classic': '经典工作区' });
+    Object.assign(dictionaries.en, { 'ws.color': 'Workspace color', 'ws.color.reset': 'Reset color', 'ws.working': 'Working', 'ws.done': 'Unread completion', 'ws.attention': 'Needs input', 'sidebarStyle': 'Workspace style', 'sidebarStyle.description': 'Applies immediately and keeps existing workspaces and conversations.', 'sidebarStyle.next': 'Color strips', 'sidebarStyle.classic': 'Classic workspaces' });
 
     // Semantic statuses are intentionally owned by the original application.
     function tokenOverrides(canvas, inputPalettes) {

@@ -1,6 +1,6 @@
 # 安装与开发
 
-当前正式版 **v2.4.14** 适配 Harness 0.2.2-rc.1 的工作区首屏、设置面板和 Windows 竖排窗口按钮。参见 [v2.4.14 更新说明](RELEASE-v2.4.14.md)。
+当前正式版 **v2.4.15** 为新版色条浮层加入会话展开、状态点和拖动排序。[更新说明与演示](RELEASE-v2.4.15.md)
 
 历史的 [v2.4.10-rc.1](RELEASE-v2.4.10-rc.1.md) 使用不同的 macOS 原生红黄绿留白方案，仅供追溯。
 
@@ -32,11 +32,11 @@
 
 ## 安装
 
-1. 从 [v2.4.14 Release](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.14) 下载 `dsh-industrial-acid-skin-2.4.14.tgz` 运行包。历史版本见 [Releases](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases)。
+1. 下载 v2.4.15 的 `dsh-industrial-acid-skin-2.4.15.tgz` 运行包。[当前发行版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.15) · [历史版本](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases)
 2. 在 Harness「插件 → 添加插件」的**包名或地址**输入框粘贴下方的 `.tgz` 完整 URL 后安装，完成后点击「立即启用」（提示重启时重启）：
 
    ```text
-   https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v2.4.14/dsh-industrial-acid-skin-2.4.14.tgz
+   https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v2.4.15/dsh-industrial-acid-skin-2.4.15.tgz
    ```
 
    或先从 Release 下载 `.tgz`，输入下载文件的**本机绝对路径**。Harness 的输入框接受 npm 包名、Git 地址、tarball URL 或本地路径。只输入文件名会触发 npm 查询。
@@ -44,9 +44,9 @@
 
 运行包内置字体、SVG 和编译后的客户端，皮肤资源可离线加载。插件包名保留 `dsh-industrial-acid-skin`，便于现有安装升级并保留外观偏好。
 
-核心皮肤使用 `ctx.theme.overrideTokens` 和原生扩展槽。2.4.14 兼容 DSH `>=0.2.0-rc.2 <0.2.2-0` 以及 `0.2.2-rc.1`，本版实测环境为 Windows 0.2.2-rc.1。
+核心皮肤使用 `ctx.theme.overrideTokens` 和原生扩展槽。2.4.15 兼容 DSH `>=0.2.0-rc.2 <0.2.2-0` 以及 `0.2.2-rc.1`。
 
-Windows 运行窗口图标沿用 2.4.1 的可撤销实现，停用插件时恢复原图标。可选标题栏适配器支持已核对哈希的原始 0.2.0-rc.2、0.2.1-rc.2、rc.3、rc.5 和 0.2.2-rc.1。可从本版 Release 下载 `dsh-industrial-caption-adapter-2.4.14.zip`。Harness 更新可能覆盖旧适配器，保留旧恢复记录并先检查当前 archive。 [适配器说明](DESKTOP-ADAPTER.md)
+Windows 运行窗口图标沿用 2.4.1 的可撤销实现，停用插件时恢复原图标。可选标题栏适配器支持已核对哈希的原始 0.2.0-rc.2、0.2.1-rc.2、rc.3、rc.5 和 0.2.2-rc.1。适配器继续使用 v2.4.14 的 `dsh-industrial-caption-adapter-2.4.14.zip`。Harness 更新可能覆盖旧适配器，保留旧恢复记录并先检查当前 archive。[下载适配器](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.14) · [适配器说明](DESKTOP-ADAPTER.md)
 
 ## 构建与测试
 

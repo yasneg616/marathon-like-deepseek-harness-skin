@@ -4,9 +4,11 @@
 
 从 Marathon 的大色块、硬边界和工业排版开始：字标切开，按钮收方，工作区放上三位数字。正文留出空间，切换时让颜色沿着界面的方向走。
 
-`v2.4.14` · `Windows / macOS` · `Harness 0.2.0-rc.2 / 0.2.1（含 RC） / 0.2.2-rc.1`
+`v2.4.15` · `Windows / macOS` · `Harness 0.2.0-rc.2 / 0.2.1（含 RC） / 0.2.2-rc.1`
 
-[下载 2.4.14](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.14) · [安装与回退](docs/INSTALL.md) · [本次更新](docs/RELEASE-v2.4.14.md)
+[下载 2.4.15](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.15) · [安装与回退](docs/INSTALL.md) · [本次更新与演示](docs/RELEASE-v2.4.15.md)
+
+**v2.4.15** 的色条浮层可以展开剩余会话、看每条会话的状态，也可以在同一工作区内拖动排序。手动顺序由 Harness 保存，切回经典模式也能看到。
 
 **v2.4.14** 适配 Harness 0.2.2-rc.1，修复工作区首屏和设置面板的样式识别。Windows 竖排窗口按钮适配器增加了已校验的 0.2.2-rc.1 安装包支持。
 
@@ -182,14 +184,14 @@
 
 ## 安装
 
-1. 下载 [v2.4.14 正式版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.14) 中的 `dsh-industrial-acid-skin-2.4.14.tgz`。无需 Node.js。
+1. 下载 [v2.4.15 正式版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.15) 中的 `dsh-industrial-acid-skin-2.4.15.tgz`。无需 Node.js。
 2. Harness「插件 → 添加插件」，粘贴完整下载链接，或输入已下载文件的本机绝对路径：
 
    ```text
-https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v2.4.14/dsh-industrial-acid-skin-2.4.14.tgz
+https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v2.4.15/dsh-industrial-acid-skin-2.4.15.tgz
    ```
 
-3. 启用插件，按提示重启。Windows 升级到 rc.5 后如需竖排窗口按钮，请下载新版可选适配器并按 [说明](docs/DESKTOP-ADAPTER.md) 校验宿主版本与哈希。macOS 最小化与全屏控制可能需要系统辅助功能权限。
+3. 启用插件，按提示重启。Windows 如需竖排窗口按钮，请使用 v2.4.14 的可选适配器，按说明校验宿主版本与哈希。macOS 最小化与全屏控制可能需要系统辅助功能权限。[适配器说明](docs/DESKTOP-ADAPTER.md)
 
 Windows rc.5 已在隔离配置下验证皮肤交互和可选窗口适配器。macOS 窗口交互仍需实机反馈。
 
