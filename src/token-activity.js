@@ -39,7 +39,7 @@ function createTokenActivityStore(ctx) {
   ctx.effect(() => {
     window.addEventListener('storage', onStorage); document.addEventListener('visibilitychange', onVisible);
     const disconnect = ctx.connection?.generation?.subscribe(onVisible);
-    if (ctx.connection?.rpc?.call) { read(); timer = setInterval(read, 15000); }
+    if (ctx.connection?.rpc?.call) { read(); timer = setInterval(read, 300000); }
     else publish({ status: 'unavailable' });
     return () => { disposed = true; if (timer !== undefined) clearInterval(timer); controller?.abort(); disconnect?.(); listeners.clear(); window.removeEventListener('storage', onStorage); document.removeEventListener('visibilitychange', onVisible); };
   }, `${ID}: daily token activity`);

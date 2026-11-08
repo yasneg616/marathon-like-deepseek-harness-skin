@@ -10,6 +10,9 @@ function compactRailColumns(columns) {
   const right=nativeRightTrack(columns);
   return `56px minmax(0px, 1fr) minmax(0px, min(${right}px, max(0px, calc(100% - 456px))))`;
 }
+// Above this node count a transition keeps its colour bands but drops the frozen copy:
+// cloneNode(true) plus two full-tree walks costs more than the transition is worth.
+const SNAPSHOT_NODE_BUDGET=1200;
 const NEXT_SIDEBAR_WIDTH=113;
 function nextSidebarColumns(columns) {
   const right=nativeRightTrack(columns);
@@ -78,21 +81,27 @@ function createAcceptedMotionController(getMotion) {
     sheet.innerHTML='<i></i><i></i><i></i><i></i>';
     // Cover from the sidebar's outer edge, then retreat along the same axis.
     const hidden=direction==='left-right'?'inset(0 100% 0 0)':direction==='right-left'?'inset(0 0 0 100%)':'inset(0 0 100% 0)';
-    const cover=[{clipPath:hidden},{clipPath:'inset(0)'}];
-    current.animate(sheet,cover,duration*.44);
-    if(mode==='open')current.animate(node,cover,duration*.44);
+    // The sheet slides on the compositor; clip-path repaints the whole clipped area
+    // every frame, which collapses on a view holding large images.
+    const axis=direction==='left-right'?'translateX(-100%)':direction==='right-left'?'translateX(100%)':'translateY(-100%)';
+    current.animate(sheet,[{transform:axis},{transform:'none'}],duration*.44);
+    if(mode==='open')current.animate(node,[{clipPath:hidden},{clipPath:'inset(0)'}],duration*.44);
     current.at(duration*.49,()=>{node.dataset.acidMaskPhase='covered';});
     current.at(duration*.54,()=>{
       node.dataset.acidMaskPhase='reveal';
-      const reveal=[{clipPath:'inset(0)'},{clipPath:hidden}];
-      current.animate(sheet,reveal,duration*.46);
-      if(mode==='close')current.animate(node,reveal,duration*.46);
+      current.animate(sheet,[{transform:'none'},{transform:axis}],duration*.46);
+      if(mode==='close')current.animate(node,[{clipPath:'inset(0)'},{clipPath:hidden}],duration*.46);
     });
     return current;
   }
   function snapshot(node) {
     if(!node?.cloneNode)return;
     const rect=node.getBoundingClientRect();if(!rect.width||!rect.height)return;
+    if((node.getElementsByTagName?.('*').length??0)>SNAPSHOT_NODE_BUDGET){
+      const light=node.cloneNode(false);light.setAttribute('aria-hidden','true');light.inert=true;
+      light.removeAttribute('id');light.removeAttribute('data-slot');light.replaceChildren();
+      return {clone:light,rect,display:getComputedStyle(node).display,time:performance.now(),scrolls:[]};
+    }
     const clone=node.cloneNode(true);clone.setAttribute('aria-hidden','true');clone.inert=true;
     const originals=[node,...node.querySelectorAll('*')],copies=[clone,...clone.querySelectorAll('*')];
     const scrolls=originals.flatMap((element,i)=>element.scrollTop||element.scrollLeft?[{node:copies[i],top:element.scrollTop,left:element.scrollLeft}]:[]);
@@ -256,12 +265,24 @@ function createAcceptedMotionController(getMotion) {
     if(root instanceof Element&&root.matches(composerSelector()))decorateComposer(root);
     for(const composer of root.querySelectorAll?.(composerSelector())||[])decorateComposer(composer);
   }
+  // Every mutation used to walk the whole document; a long conversation renders for
+  // hundreds of frames, so the scan is bounded to one pass per 250 ms.
+  let scanScheduled=false,scanLast=0,scanTimer=0;
   function scanPanels() {
+    if(scanScheduled)return;
+    scanScheduled=true;
+    const wait=Math.max(0,250-(Date.now()-scanLast));
+    const advance=()=>{scanScheduled=false;scanLast=Date.now();scanPanelsNow();};
+    if(wait!==0)scanTimer=setTimeout(advance,wait);
+    else if(typeof requestAnimationFrame==='function')requestAnimationFrame(advance);
+    else advance();
+  }
+  function scanPanelsNow() {
     scanShellSurfaces();
     const present=new Set();
     for(const node of document.querySelectorAll(panelSelector)) {
       if(excluded(node))continue;const rect=node.getBoundingClientRect();
-      if(!rect.width||!rect.height||getComputedStyle(node).visibility==='hidden')continue;present.add(node);
+      if(!rect.width||!rect.height||(node.checkVisibility?!node.checkVisibility({visibilityProperty:true}):getComputedStyle(node).visibility==='hidden'))continue;present.add(node);
       if(!panels.has(node)){panels.set(node,{kind:panelKind(node),captured:snapshot(node)});mask(node,{kind:panelKind(node)});}
     }
     for(const[node,record]of panels)if(!present.has(node)) {
@@ -308,9 +329,22 @@ function createAcceptedMotionController(getMotion) {
     });return current;
   }
   prepare(document);scanPanels();
+  // React inserts a message tree layer by layer, so preparing each added node rescans the
+  // same subtree repeatedly. Coalesce per frame and drop descendants covered in-batch.
+  const pendingNodes=new Set();let flushFrame=0;
   const observer=new MutationObserver(records=>{
-    for(const record of records)for(const node of record.addedNodes||[])if(node.nodeType===1)prepare(node);
-    scanPanels();
+    for(const record of records)for(const node of record.addedNodes||[])if(node.nodeType===1)pendingNodes.add(node);
+    if(!flushFrame)flushFrame=requestAnimationFrame(()=>{
+      flushFrame=0;
+      for(const node of pendingNodes){
+        if(!node.isConnected)continue;
+        let covered=false;
+        for(let parent=node.parentElement;parent;parent=parent.parentElement)if(pendingNodes.has(parent)){covered=true;break;}
+        if(!covered)prepare(node);
+      }
+      pendingNodes.clear();
+      scanPanels();
+    });
   });
   observer.observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['open','hidden','aria-expanded','aria-selected','aria-hidden','class','data-state','data-sidebar-collapsed','data-sidebar-right-open','data-sidebar-right-panel']});
   document.addEventListener('pointerover',event=>{const button=event.target.closest('button');if(button&&!excluded(button)&&!button.contains(event.relatedTarget))feedback(button,'hover');},{signal:controller.signal});
@@ -342,7 +376,7 @@ function createAcceptedMotionController(getMotion) {
   const api={revealStage,captureStage,cancel,cancelWorkspace,calibrateWorkspace,mask,
     closeSurface(node,done,kind='menu'){if(node?.dataset.acidClosing)return;return mask(node,{mode:'close',kind,done});},
     reopenSurface(node){surfaces.get(node)?.finish(false);return mask(node,{kind:panelKind(node)});},
-    dispose(){disposed=true;controller.abort();observer.disconnect();geometryObserver.disconnect();cancel();
+    dispose(){disposed=true;controller.abort();observer.disconnect();geometryObserver.disconnect();clearTimeout(scanTimer);scanScheduled=false;cancel();
       for(const button of buttons){button.querySelector(':scope > .acid-fx')?.remove();button.classList.remove('acid-layered','acid-layer-positioned');delete button.dataset.acidFeedback;}
       for(const composer of composers){composer.querySelector(':scope > .acid-composer-fx')?.remove();composer.classList.remove('acid-accepted-composer','acid-composer-focused');}
       for(const[frame,properties]of railFrames)for(const previous of properties){if(previous.value)frame.style.setProperty(previous.name,previous.value,previous.priority);else frame.style.removeProperty(previous.name);}

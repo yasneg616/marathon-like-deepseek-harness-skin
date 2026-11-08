@@ -44,10 +44,10 @@ test('the menu is fully covered before the upward reveal and restores the origin
   const r=runtime(),node=new r.Element();node.style.clipPath='inset(1px)';let completed=0;
   r.controller.mask(node,{kind:'menu',done:()=>completed++});
   assert.equal(node.dataset.acidMaskDirection,'down-up');assert.equal(node.dataset.acidMaskPhase,'cover');
-  const cover=r.animations[0];assert.equal(cover.frames[0].clipPath,'inset(0 0 100% 0)');assert.equal(cover.frames[1].clipPath,'inset(0)');
+  const cover=r.animations[0];assert.equal(cover.frames[0].transform,'translateY(-100%)');assert.equal(cover.frames[1].transform,'none');
   r.advance(249);assert.equal(node.dataset.acidMaskPhase,'covered');assert.equal(completed,0);
   r.advance(22);assert.equal(node.dataset.acidMaskPhase,'reveal');
-  assert.equal(r.animations.at(-1).frames[1].clipPath,'inset(0 0 100% 0)');
+  assert.equal(r.animations.at(-1).frames[1].transform,'translateY(-100%)');
   r.advance(230);assert.equal(completed,1);assert.equal(node.style.clipPath,'inset(1px)');
   assert.equal(r.pending(),0);r.controller.dispose();
 });
@@ -59,14 +59,14 @@ test('reopening cancels a queued close, while disabling motion completes the lat
   assert.equal(closes,1);assert.equal(r.pending(),0);assert.equal(node.dataset.acidClosing,undefined);r.controller.dispose();
 });
 
-for(const [direction,hidden] of [['left-right','inset(0 100% 0 0)'],['right-left','inset(0 0 0 100%)']])test(`${direction} sidebar covers horizontally, reverses, and cancels without committing an old transition`,()=>{
+for(const [direction,axis] of [['left-right','translateX(-100%)'],['right-left','translateX(100%)']])test(`${direction} sidebar covers horizontally, reverses, and cancels without committing an old transition`,()=>{
   const r=runtime(),node=new r.Element();node.style.clipPath='inset(2px)';let completed=0;
   r.controller.mask(node,{kind:'page',mode:'swap',direction,done:()=>completed++});
   assert.equal(node.dataset.acidMaskDirection,direction);
-  assert.deepEqual(Array.from(r.animations[0].frames,frame=>frame.clipPath),[hidden,'inset(0)']);
+  assert.deepEqual(Array.from(r.animations[0].frames,frame=>frame.transform),[axis,'none']);
   r.advance(294);assert.equal(node.dataset.acidMaskPhase,'covered');assert.equal(completed,0);
   r.advance(30);assert.equal(node.dataset.acidMaskPhase,'reveal');
-  assert.deepEqual(Array.from(r.animations.at(-1).frames,frame=>frame.clipPath),['inset(0)',hidden]);
+  assert.deepEqual(Array.from(r.animations.at(-1).frames,frame=>frame.transform),['none',axis]);
   r.controller.mask(node,{kind:'page',mode:'swap',direction,done:()=>completed++});
   assert.ok(r.animations.slice(0,2).every(animation=>animation.cancelled));
   r.advance(600);assert.equal(completed,1);assert.equal(node.style.clipPath,'inset(2px)');
