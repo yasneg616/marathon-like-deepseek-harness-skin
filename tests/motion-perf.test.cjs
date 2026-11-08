@@ -303,9 +303,8 @@ test('inserted buttons are decorated before paint, and the first hover, press an
   stage.setMotion('full');
   const button = stage.button();
   stage.body.append(button);
-  const framesBefore = stage.pendingFrames();
   main.fn([{ addedNodes: [button], removedNodes: [] }]);
-  assert.ok(stage.pendingFrames() >= framesBefore);
+  assert.equal(stage.pendingFrames(), 0);
   assert.equal(button.querySelector(':scope > .acid-fx').querySelectorAll('.acid-hover-corner').length, 4);
   assert.equal(button.dataset.acidFeedback, undefined);
 
@@ -341,82 +340,133 @@ test('inserted buttons are decorated before paint, and the first hover, press an
   controller.dispose();
 });
 
-test('panel scans coalesce to one frame, while a panel that opens and closes inside the frame still exits', () => {
-  const stage = motionHarness();
-  const { controller, main, body } = stage;
-  const dialog = new stage.Element('dialog');
-  dialog.setAttribute('role', 'dialog');
-  body.append(dialog);
-  stage.resetPanelQueries();
-  for (let i = 0; i < 5; i += 1) main.fn([{ addedNodes: [], removedNodes: [] }]);
-  assert.equal(stage.pendingFrames(), 1);
-  assert.equal(stage.panelQueries(), 0);
-  assert.equal(dialog.dataset.acidMaskPhase, undefined);
-  stage.flush();
-  assert.equal(stage.panelQueries(), 1);
-  assert.equal(dialog.dataset.acidMaskPhase, 'cover');
-  assert.equal(dialog.dataset.acidMaskDirection, 'down-up');
-  const openAnimations = stage.animations.length;
-  for (let i = 0; i < 4; i += 1) main.fn([{ addedNodes: [], removedNodes: [] }]);
-  assert.equal(stage.pendingFrames(), 1);
-  stage.flush();
-  assert.equal(stage.animations.length, openAnimations);
-
-  const nested = new stage.Element('dialog');
-  nested.setAttribute('role', 'dialog');
-  const wrap = new stage.Element('div');
-  wrap.append(nested);
-  body.append(wrap);
-  main.fn([{ addedNodes: [wrap], removedNodes: [] }]);
-  assert.equal(nested.dataset.acidMaskPhase, 'cover');
-  wrap.remove();
-  main.fn([{ addedNodes: [], removedNodes: [wrap] }]);
-  assert.equal(stage.pendingFrames(), 0);
-  assert.ok(stage.proxies().some(proxy => proxy.dataset.acidMaskDirection === 'down-up'));
-  const exit = stage.proxies().at(-1);
-  assert.equal(exit.children[0].tag, 'dialog');
-  assert.equal(exit.dataset.acidMaskPhase, 'cover');
-
+function nest(stage, depth) {
   const root = new stage.Element('div');
   let cursor = root;
-  for (let i = 0; i < 60; i += 1) {
+  for (let i = 0; i < depth; i += 1) {
     const next = new stage.Element('div');
     cursor.append(next);
     cursor = next;
   }
-  const deep = new stage.Element('dialog');
-  deep.setAttribute('role', 'dialog');
-  cursor.append(deep);
-  body.append(root);
-  main.fn([{ addedNodes: [root], removedNodes: [] }]);
-  assert.equal(deep.dataset.acidMaskPhase, undefined);
-  stage.flush();
-  assert.equal(deep.dataset.acidMaskPhase, 'cover');
+  return { root, leaf: cursor };
+}
+function placeDialog(stage, parent, position) {
+  const dialog = new stage.Element('dialog');
+  dialog.setAttribute('role', 'dialog');
+  if (position) dialog.style.position = position;
+  parent.append(dialog);
+  return dialog;
+}
+// The mutation callback scans the live document. Delivering the callback after the DOM change is
+// what a MutationObserver does; depth and sibling index are not part of that scan.
+function openThenClose(stage, root, panel, onOpen) {
+  const before = stage.proxies().length;
+  stage.body.append(root);
+  stage.main.fn([{ addedNodes: [root], removedNodes: [] }]);
+  assert.equal(panel.dataset.acidMaskPhase, 'cover');
+  assert.equal(panel.dataset.acidMaskDirection, 'down-up');
+  assert.equal(stage.pendingFrames(), 0);
+  if (onOpen) onOpen();
+  root.remove();
+  stage.main.fn([{ addedNodes: [], removedNodes: [root] }]);
+  assert.equal(stage.proxies().length, before + 1);
+  assert.equal(stage.proxies().at(-1).children[0].tag, 'dialog');
+  assert.equal(stage.proxies().at(-1).dataset.acidMaskPhase, 'cover');
+  assert.equal(stage.pendingFrames(), 0);
+}
+
+test('a connected panel is masked and then exit-proxied in the mutation callbacks, at any depth or sibling index', () => {
+  const stage = motionHarness();
+  const deep = nest(stage, 80);
+  const deepDialog = placeDialog(stage, deep.leaf, 'absolute');
+  openThenClose(stage, deep.root, deepDialog, () => {
+    assert.equal(deepDialog.classList.contains('acid-mask-positioned'), false);
+  });
+
+  const wide = new stage.Element('div');
+  for (let i = 0; i < 80; i += 1) wide.append(new stage.Element('div'));
+  const wideDialog = placeDialog(stage, wide, 'static');
+  openThenClose(stage, wide, wideDialog, () => {
+    assert.equal(wideDialog.classList.contains('acid-mask-positioned'), true);
+  });
+
+  const again = nest(stage, 80);
+  const reopened = placeDialog(stage, again.leaf, 'absolute');
+  openThenClose(stage, again.root, reopened);
+  reopened.dataset.acidMaskPhase = 'stale';
+  stage.body.append(again.root);
+  stage.main.fn([{ addedNodes: [again.root], removedNodes: [] }]);
+  assert.equal(reopened.dataset.acidMaskPhase, 'cover');
+  assert.equal(stage.pendingFrames(), 0);
+
+  stage.resetPanelQueries();
+  stage.main.fn([{ addedNodes: [], removedNodes: [] }]);
+  stage.main.fn([{ addedNodes: [], removedNodes: [] }]);
+  assert.equal(stage.panelQueries(), 2);
+
   let clones = 0;
-  const original = dialog.cloneNode.bind(dialog);
-  dialog.cloneNode = function clone(deep) { clones += 1; return original(deep); };
+  const original = reopened.cloneNode.bind(reopened);
+  reopened.cloneNode = function clone(deep) { clones += 1; return original(deep); };
   stage.setMotion('off');
   stage.fire('pointerdown', { type: 'pointerdown', target: stage.body, button: 0 });
   assert.equal(clones, 0);
   stage.setMotion('quiet');
   stage.fire('pointerdown', { type: 'pointerdown', target: stage.body, button: 0 });
   assert.equal(clones, 1);
-  controller.dispose();
-  stage.flush();
-  assert.equal(deep.dataset.acidMaskPhase, 'cover');
+  stage.controller.dispose();
 });
 
-test('disposing the controller cancels a pending panel scan', () => {
+test('a panel that is already disconnected, hidden, or zero-sized when the callback runs is not given an exit', () => {
   const stage = motionHarness();
-  const dialog = new stage.Element('dialog');
-  dialog.setAttribute('role', 'dialog');
-  stage.body.append(dialog);
+  const detached = nest(stage, 80);
+  const detachedDialog = placeDialog(stage, detached.leaf, 'absolute');
+  stage.body.append(detached.root);
+  detached.root.remove();
+  const before = stage.proxies().length;
+  stage.main.fn([{ addedNodes: [detached.root], removedNodes: [detached.root] }]);
+  assert.equal(detachedDialog.dataset.acidMaskPhase, undefined);
+  assert.equal(stage.proxies().length, before);
+
+  const hidden = placeDialog(stage, stage.body, 'absolute');
+  hidden.style.visibility = 'hidden';
+  stage.main.fn([{ addedNodes: [hidden], removedNodes: [] }]);
+  assert.equal(hidden.dataset.acidMaskPhase, undefined);
+  hidden.remove();
+  stage.main.fn([{ addedNodes: [], removedNodes: [hidden] }]);
+  assert.equal(stage.proxies().length, before);
+  hidden.style.visibility = 'visible';
+  stage.body.append(hidden);
+  stage.main.fn([{ addedNodes: [hidden], removedNodes: [] }]);
+  assert.equal(hidden.dataset.acidMaskPhase, 'cover');
+
+  const empty = placeDialog(stage, stage.body, 'static');
+  empty.rect = { width: 0, height: 40, left: 0, top: 0, right: 0, bottom: 40 };
+  stage.main.fn([{ addedNodes: [empty], removedNodes: [] }]);
+  assert.equal(empty.dataset.acidMaskPhase, undefined);
+  empty.rect = { width: 20, height: 20, left: 0, top: 0, right: 20, bottom: 20 };
   stage.main.fn([{ addedNodes: [], removedNodes: [] }]);
-  assert.equal(stage.pendingFrames(), 1);
-  stage.controller.dispose();
+  assert.equal(empty.dataset.acidMaskPhase, 'cover');
+
+  const owned = new stage.Element('div');
+  owned.dataset.acidMotionOwned = '';
+  const ownedDialog = placeDialog(stage, owned, 'absolute');
+  stage.body.append(owned);
+  stage.main.fn([{ addedNodes: [owned], removedNodes: [] }]);
+  assert.equal(ownedDialog.dataset.acidMaskPhase, undefined);
   assert.equal(stage.pendingFrames(), 0);
-  stage.flush();
+  stage.controller.dispose();
+});
+
+test('after dispose a late panel mutation does not open or exit', () => {
+  const stage = motionHarness();
+  const dialog = placeDialog(stage, stage.body, 'absolute');
+  stage.controller.dispose();
+  stage.main.fn([{ addedNodes: [dialog], removedNodes: [] }]);
+  dialog.remove();
+  stage.main.fn([{ addedNodes: [], removedNodes: [dialog] }]);
   assert.equal(dialog.dataset.acidMaskPhase, undefined);
+  assert.equal(stage.proxies().length, 0);
+  assert.equal(stage.pendingFrames(), 0);
 });
 
 test('column geometry still syncs in the mutation callback instead of waiting for a frame', () => {

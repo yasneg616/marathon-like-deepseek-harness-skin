@@ -313,43 +313,11 @@ function createAcceptedMotionController(getMotion) {
     });return current;
   }
   prepare(document);scanPanels();
-  // A navigation commit is a burst of mutation records. One scan on the next frame is enough for
-  // panels that are still mounted, and it still runs before that frame is painted. A panel that
-  // appears and disappears inside the frame is snapshotted here, and removing a tracked panel
-  // scans immediately so its exit proxy is not lost. The walk is bounded so a long transcript
-  // does not get a second full traversal; anything still mounted is found by the frame scan.
-  let scanFrame;
-  const PANEL_WATCH_BUDGET=48;
-  const scheduleScan=()=>{if(scanFrame!==undefined||disposed)return;scanFrame=requestAnimationFrame(()=>{scanFrame=undefined;if(!disposed)scanPanels();});};
-  const flushScan=()=>{if(scanFrame!==undefined){cancelAnimationFrame(scanFrame);scanFrame=undefined;}if(!disposed)scanPanels();};
-  function trackAddedPanel(node){
-    if(!(node instanceof Element)||!node.isConnected||excluded(node)||panels.has(node)||!node.matches?.(panelSelector))return;
-    const rect=node.getBoundingClientRect();
-    if(!rect.width||!rect.height||getComputedStyle(node).visibility==='hidden')return;
-    panels.set(node,{kind:panelKind(node),captured:snapshot(node)});
-    mask(node,{kind:panelKind(node)});
-  }
-  function watchAdded(node){
-    let left=PANEL_WATCH_BUDGET;
-    const visit=current=>{
-      if(left<=0||!(current instanceof Element)||excluded(current))return;
-      left-=1;trackAddedPanel(current);
-      for(const child of [...current.children||[]]){if(left<=0)return;visit(child);}
-    };
-    visit(node);
-  }
-  function removesTracked(records){
-    if(!panels.size)return false;
-    for(const record of records)for(const node of record.removedNodes||[]){
-      if(node?.nodeType!==1)continue;
-      if(panels.has(node))return true;
-      for(const panel of panels.keys())if(node.contains?.(panel))return true;
-    }
-    return false;
-  }
+  // Scan in the mutation callback. The callback already sees the DOM after the records, and a
+  // panel is found by a document query, not by how deep or how far along it sits in the added tree.
   const observer=new MutationObserver(records=>{
-    for(const record of records)for(const node of record.addedNodes||[])if(node.nodeType===1){prepare(node);watchAdded(node);}
-    if(removesTracked(records))flushScan();else scheduleScan();
+    for(const record of records)for(const node of record.addedNodes||[])if(node.nodeType===1)prepare(node);
+    scanPanels();
   });
   observer.observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['open','hidden','aria-expanded','aria-selected','aria-hidden','class','data-state','data-sidebar-collapsed','data-sidebar-right-open','data-sidebar-right-panel']});
   document.addEventListener('pointerover',event=>{const button=event.target.closest('button');if(button&&!excluded(button)&&!button.contains(event.relatedTarget))feedback(button,'hover');},{signal:controller.signal});
@@ -381,7 +349,7 @@ function createAcceptedMotionController(getMotion) {
   const api={revealStage,captureStage,cancel,cancelWorkspace,calibrateWorkspace,mask,
     closeSurface(node,done,kind='menu'){if(node?.dataset.acidClosing)return;return mask(node,{mode:'close',kind,done});},
     reopenSurface(node){surfaces.get(node)?.finish(false);return mask(node,{kind:panelKind(node)});},
-    dispose(){disposed=true;controller.abort();observer.disconnect();geometryObserver.disconnect();if(scanFrame!==undefined){cancelAnimationFrame(scanFrame);scanFrame=undefined;}cancel();
+    dispose(){disposed=true;controller.abort();observer.disconnect();geometryObserver.disconnect();cancel();
       for(const button of buttons){button.querySelector(':scope > .acid-fx')?.remove();button.classList.remove('acid-layered','acid-layer-positioned');delete button.dataset.acidFeedback;}
       for(const composer of composers){composer.querySelector(':scope > .acid-composer-fx')?.remove();composer.classList.remove('acid-accepted-composer','acid-composer-focused');}
       for(const[frame,properties]of railFrames)for(const previous of properties){if(previous.value)frame.style.setProperty(previous.name,previous.value,previous.priority);else frame.style.removeProperty(previous.name);}
