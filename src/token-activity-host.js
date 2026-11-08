@@ -2,7 +2,7 @@ import { foldTokenActivity, tokenActivityCalendar, TOKEN_ACTIVITY_ZONE } from '.
 
 // The query seam handles compression, migrations, live logs and exact fork cuts.
 // Only daily counters cross the connection; no messages or paths are returned.
-export function createTokenActivityAggregator(ctx) {
+export function createTokenActivityAggregator(ctx, rescanIntervalMs = 60000) {
   const cache = new Map();
   let pending;
   async function snapshot(signal) {
@@ -42,11 +42,15 @@ export function createTokenActivityAggregator(ctx) {
     return { generatedAt: now, timeZone: TOKEN_ACTIVITY_ZONE, sessions: records.length, failedSessions,
       days: calendar.map(day => ({ ...day, ...(totals.get(day.date) ?? { input: 0, output: 0, requests: 0, missingUsage: 0 }) })) };
   }
+  // The live session has no revision to diff against, so it is re-read on every call;
+  // one bounded rescan per minute keeps that off the host main thread.
+  let lastValue, lastAt = 0;
   return { snapshot(signal) {
-    // Share one bounded scan when multiple application windows poll together.
-    if (!pending) pending = snapshot(signal).finally(() => { pending = undefined; });
+    // Share one bounded scan between windows.
+    if (lastValue !== undefined && rescanIntervalMs > 0 && Date.now() - lastAt < rescanIntervalMs) return Promise.resolve(lastValue);
+    if (!pending) pending = snapshot(signal).then(value => { lastValue = value; lastAt = Date.now(); return value; }).finally(() => { pending = undefined; });
     return pending;
-  }, clear() { cache.clear(); } };
+  }, clear() { cache.clear(); lastValue = undefined; lastAt = 0; } };
 }
 
 export function installTokenActivityHost(ctx) {

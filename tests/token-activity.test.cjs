@@ -48,7 +48,7 @@ test('Host includes all workspaces and subagents, releases observations, and rep
         events:id==='a'?[event(0,today,100,10)]:[event(0,today,100,10),event(1,today,200,20)], [Symbol.dispose](){closed++;}};
     }
   }};
-  const aggregator = createTokenActivityAggregator(ctx), first = await aggregator.snapshot();
+  const aggregator = createTokenActivityAggregator(ctx, 0), first = await aggregator.snapshot();
   const todayRow = first.days.find(day=>day.today);
   assert.equal(todayRow.input,300); assert.equal(todayRow.output,30); assert.equal(first.failedSessions,1);
   assert.equal(first.sessions,3); assert.equal(closed,2); assert.equal(read,3);

@@ -208,17 +208,10 @@ window.__ModuleLoader__.load({
         syncAppearance();
         root.style.setProperty('--acid-header-max', `${height}px`);
         document.head.appendChild(style);
-        // Host stylesheets are injected around the same time and carry each module's complete
-        // class list, so the first resolution can already be correct. They may arrive slightly
-        // after this plugin, so newly added <style> elements are watched too; a resolution that
-        // gains modules triggers one repaint. Token streaming only adds text nodes and elements,
-        // which are ignored here, so the expensive path is not taken on every keystroke.
-        // Host stylesheets are injected lazily, one per module, as bundles load. The skin holds
-        // the paint back until every module it was authored against has appeared, so a late
-        // bundle only ever adds to a correct picture; an incomplete one is never shown.
-        // A sweep is coalesced to one animation frame, and only <style> insertions count, so
-        // token streaming (text nodes and elements) never reaches the rewrite path.
-        let sweep = 0;
+        // Host stylesheets arrive lazily, one module per bundle, and carry each module's
+        // complete class list; a resolution that gains modules triggers one repaint.
+        // Token streaming adds only text nodes and elements, which never reach that path.
+        let sweep = 0, lastSweep = -Infinity;
         const hostStyle = node => node?.nodeType === 1 && node.tagName === 'STYLE' && node !== style;
         const observer = new MutationObserver(records => {
           if (sweep) return;
@@ -229,11 +222,13 @@ window.__ModuleLoader__.load({
               .some(node => hostStyle(node) || [...node.querySelectorAll?.('style') || []].some(hostStyle));
           });
           if (!relevant) return;
-          sweep = requestAnimationFrame(() => { sweep = 0; refreshStyles(); });
+          // A rewrite re-parses the whole injected stylesheet; keep it off the render path.
+          if (Date.now() - lastSweep < 1000) return;
+          sweep = requestAnimationFrame(() => { sweep = 0; lastSweep = Date.now(); refreshStyles(); });
         });
-        observer.observe(document.head, { childList: true, subtree: true, characterData: true });
+        observer.observe(document.head, { childList: true, subtree: true });
         // Some bundles append their stylesheet to <body> instead of <head>.
-        observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+        observer.observe(document.body, { childList: true, subtree: true });
         // A missing structural module must not leave the initial stylesheet blank indefinitely.
         // Explicitly retry once after the bounded four-second grace period.
         const settleTimer = setTimeout(refreshStyles, 4100);
