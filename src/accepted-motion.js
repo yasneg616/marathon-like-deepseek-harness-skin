@@ -176,6 +176,8 @@ function createAcceptedMotionController(getMotion) {
     if(geometryDirection&&pendingStage&&!frame.hasAttribute('data-dragging'))revealStage('columns',geometryDirection);
   }
   function captureShellSurfaces() {
+    // Off never draws the clone. Proxy already returns immediately; skipping the copy avoids the stall.
+    if(getMotion()==='off')return;
     for(const[node,record]of shellSurfaces)if(record.state!=='closed')record.captured=snapshot(node);
     for(const record of dockBodies.values())record.captured=snapshot(record.body);
   }
@@ -183,6 +185,8 @@ function createAcceptedMotionController(getMotion) {
     return target.closest?.('.acid-sidebar-toggle,[data-sidebar-right-expand],[data-sidebar-right-toggle],[data-sidebar-right-mode],button[aria-label^="在侧边栏"]');
   }
   function captureStage(shell=false) {
+    // A stage snapshot only feeds the old-page proxy. Motion off drops it, including one captured earlier.
+    if(getMotion()==='off'){pendingStage=undefined;return;}
     pendingStage=snapshot(document.querySelector(shell?moduleSelector('.mP3x-q_frame'):moduleSelector('.mP3x-q_centerCol')));
     if(pendingStage)pendingStage.shell=shell;
   }
@@ -275,6 +279,7 @@ function createAcceptedMotionController(getMotion) {
     for(const node of composers)if(!node.isConnected)composers.delete(node);
   }
   function capturePanels(event) {
+    if(getMotion()==='off')return;
     if(event.type==='pointerdown'||event.key==='Escape'||event.key==='Enter'||event.key===' ')captureShellSurfaces();
     for(const[node,record]of panels) {
       if(event.type==='keydown'&&event.key!=='Escape')continue;
@@ -308,6 +313,8 @@ function createAcceptedMotionController(getMotion) {
     });return current;
   }
   prepare(document);scanPanels();
+  // Scan in the mutation callback. The callback already sees the DOM after the records, and a
+  // panel is found by a document query, not by how deep or how far along it sits in the added tree.
   const observer=new MutationObserver(records=>{
     for(const record of records)for(const node of record.addedNodes||[])if(node.nodeType===1)prepare(node);
     scanPanels();

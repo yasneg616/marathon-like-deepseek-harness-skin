@@ -181,3 +181,109 @@ test('custom workspace colours override identity without changing numbering or t
   assert.equal(api.identityInk('#123ABC'),'#0B0C0D');
   for(const color of ['#000000','#FFFFFF','#777777','#123ABC'])assert.ok(api.contrast(api.identityInk(color,true),color)>=4.5);
 });
+
+test('next-strip decoration follows native rebuilds and in-place session changes on every render',()=>{
+  const store={};
+  const layouts=[];
+  const memory=[];
+  let stateIndex=0,refIndex=0,memoIndex=0,api;
+  const states=[];
+  const refs=[];
+  const memos=[];
+  const React={
+    createElement:(type,props,...children)=>({type,props,children}),
+    useState(initial){
+      const index=stateIndex++;
+      if(!(index in states))states[index]=typeof initial==='function'?initial():initial;
+      return [states[index],value=>{states[index]=typeof value==='function'?value(states[index]):value;}];
+    },
+    useRef(initial){const index=refIndex++;return refs[index]||(refs[index]={current:initial});},
+    useMemo(fn,deps){
+      const index=memoIndex++;
+      const slot=memos[index]||(memos[index]={});
+      const same=Array.isArray(slot.deps)&&Array.isArray(deps)&&slot.deps.length===deps.length&&deps.every((dep,i)=>Object.is(dep,slot.deps[i]));
+      if(!same){slot.value=fn();slot.deps=deps?deps.slice():deps;}
+      return slot.value;
+    },
+    useSyncExternalStore:(_subscribe,getSnapshot)=>getSnapshot(),
+    useEffect(){},
+    useLayoutEffect(fn,deps){layouts.push({fn,deps});}
+  };
+  function workspaceGroup(id,title){
+    const titleNode={textContent:title,dataset:{}};
+    const row={
+      dataset:{rowKey:'workspace:'+id},attrs:{},
+      classList:{contains:()=>false},
+      getAttribute:name=>row.attrs[name]??null,
+      setAttribute:(name,value)=>{row.attrs[name]=value;},
+      removeAttribute:name=>{delete row.attrs[name];},
+      querySelector:selector=>String(selector).includes('title')?titleNode:null
+    };
+    const group={
+      classList:{contains:name=>name==='GAkraW_groupSection'},
+      style:{gridColumn:'',gridRow:'',vars:{},setProperty(name,value){this.vars[name]=value;},removeProperty(name){delete this.vars[name];}},
+      dataset:{},
+      querySelector:selector=>String(selector).includes('workspace')||String(selector).includes('row-key')||String(selector).includes(':scope')?row:null,
+      querySelectorAll:()=>[]
+    };
+    return {group,row};
+  }
+  const first=workspaceGroup('a','Alpha');
+  const list={children:[first.group],attrs:{},setAttribute:(name,value)=>{list.attrs[name]=value;},querySelectorAll:()=>[]};
+  states[0]=list;states[1]=0;states[2]=null;
+  const items=[{workspaceId:'a',title:'Alpha',sessionIds:['s1','s2']}];
+  const numbers={a:1};
+  const statuses=new Map([['s1',{running:true}]]);
+  const attributes=new Map();
+  const document={
+    documentElement:{setAttribute:(name,value)=>attributes.set(name,value),removeAttribute:name=>attributes.delete(name),getAttribute:name=>attributes.get(name)??null},
+    querySelector(){return null;},querySelectorAll(){return [];}
+  };
+  const code=fs.readFileSync(path.join(__dirname,'../lib/client.js'),'utf8').replace("return { inject: ['slots'","return { SidebarNext, inject: ['slots'");
+  vm.runInNewContext(code,{
+    document,localStorage:{getItem:key=>store[key]??null,setItem:(key,value)=>{store[key]=String(value);}},
+    window:{__ModuleLoader__:{load:module=>api=module.factory(name=>name==='react'?React:{createPortal:element=>element,flushSync:fn=>fn()})}}
+  });
+  const props={items,numbers,workspaceId:'a',colors:{},t:key=>key,statusSource:{getSnapshot:()=>statuses,subscribe:()=>()=>{}}};
+  const commit=()=>{
+    layouts.forEach((effect,index)=>{
+      if(Array.isArray(effect.deps)&&effect.deps.length===0)return;
+      const slot=memory[index]||(memory[index]={});
+      const deps=effect.deps;
+      const same=Array.isArray(deps)&&Array.isArray(slot.deps)&&deps.length===slot.deps.length&&deps.every((dep,i)=>Object.is(dep,slot.deps[i]));
+      if(same)return;
+      slot.cleanup?.();
+      slot.deps=Array.isArray(deps)?deps.slice():deps;
+      slot.cleanup=effect.fn()||undefined;
+    });
+  };
+  const render=()=>{stateIndex=refIndex=memoIndex=0;layouts.length=0;api.SidebarNext(props);commit();};
+  render();
+  assert.equal(list.attrs['data-acid-ws-grid'],'');
+  assert.equal(first.group.style.gridColumn,'1');
+  assert.equal(first.group.style.gridRow,'1 / span 2');
+  assert.equal(first.group.style.vars['--acid-ws-id'],'#C6F500');
+  assert.equal(first.group.style.vars['--acid-ws-id-fore'],'#0B0C0D');
+  assert.equal(first.group.style.vars['--acid-ws-fill'],'0.167');
+  assert.equal(first.group.dataset.acidWsStatus,'working');
+  assert.equal(first.group.dataset.acidWsCount,'02');
+  assert.equal(first.row.attrs.tabindex,'0');
+  assert.equal(first.row.attrs['aria-label'],'001 Alpha · ws.working');
+  assert.equal(attributes.get('data-acid-sidebar'),'next');
+
+  const rebuilt=workspaceGroup('a','Renamed');
+  list.children=[rebuilt.group];
+  render();
+  assert.equal(rebuilt.group.style.gridColumn,'1');
+  assert.equal(rebuilt.group.dataset.acidWsStatus,'working');
+  assert.equal(rebuilt.row.dataset.acidCount,'02');
+  assert.equal(rebuilt.row.attrs.tabindex,'0');
+  assert.equal(rebuilt.row.attrs['aria-label'],'001 Renamed · ws.working');
+  assert.equal(first.group.style.gridColumn,'1');
+
+  items[0].sessionIds.push('s3');
+  render();
+  assert.equal(rebuilt.group.style.vars['--acid-ws-fill'],'0.250');
+  assert.equal(rebuilt.row.dataset.acidCount,'03');
+  assert.equal(rebuilt.group.dataset.acidWsCount,'03');
+});

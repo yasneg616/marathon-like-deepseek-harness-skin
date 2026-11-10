@@ -126,7 +126,8 @@ function Masthead(props){
   // The classic list is the only layout whose reorder never announces itself: a drag leaves the
   // persisted order alone, so the numbers drift away from what is on screen. The rendered list is
   // read instead, and a settled permutation that differs from the stored one is adopted; the bump
-  // re-renders the rail and the picker with the new numbers. Painting stays immediate.
+  // re-renders the rail and the picker with the new numbers. Chips and ordinals paint on the next
+  // frame, before the browser paints it; adopting a dragged order stays on the short settle.
   // The classic list is also where the colour belongs: the collapsed rail is invisible whenever the
   // sidebar is open, so every workspace row carries its own chip, and right-clicking the row opens
   // the same dialog. Both write through setColorTarget, the state the picker swatch already uses.
@@ -159,7 +160,10 @@ function Masthead(props){
         else row.append(chip);
       }
     };
-    const changed=()=>{paint();decorate();clearTimeout(timer);timer=setTimeout(settle,240);};
+    // One paint per frame. The native rows only need to match the list at the next paint, and the
+    // debounced settle below is what adopts a reorder.
+    let frame=0;
+    const changed=()=>{clearTimeout(timer);timer=setTimeout(settle,240);if(frame)return;frame=requestAnimationFrame(()=>{frame=0;paint();decorate();});};
     const list=document.querySelector('[data-slot="sidebar.workspaces"]');
     const observer=new MutationObserver(changed);
     observer.observe(list||document.body,{childList:true,subtree:true});
@@ -172,7 +176,7 @@ function Masthead(props){
     };
     document.addEventListener('contextmenu',context,true);
     changed();
-    return()=>{observer.disconnect();clearTimeout(timer);document.removeEventListener('contextmenu',context,true);for(const chip of document.querySelectorAll('[data-acid-ws-chip]'))chip.remove();};
+    return()=>{observer.disconnect();clearTimeout(timer);if(frame)cancelAnimationFrame(frame);document.removeEventListener('contextmenu',context,true);for(const chip of document.querySelectorAll('[data-acid-ws-chip]'))chip.remove();};
   },[items,appearance.workspaceColors,classic]);
   React.useEffect(()=>()=>cancelWorkspaceHeader(),[]);
   // Closing is answered by the bridge, which reports nothing back; the other two return the
