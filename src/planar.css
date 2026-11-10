@@ -186,3 +186,11 @@ html[data-industrial-acid] .acid-context-title,#workspace-name,.workspace-name-s
 /* give ACTIVE WORKSPACE more room vs brand */
 html[data-industrial-acid] .acid-masthead[data-native-controls=false]{grid-template-columns:minmax(0,0.75fr) minmax(420px,1.25fr) 48px}
 html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-native-controls=false]{grid-template-columns:minmax(0,0.7fr) minmax(400px,1.3fr) 48px}
+/* v3e: cap the wordmark by the masthead height, not by the viewport width. The v3c rule set
+   max-height:100% against an auto-height parent, so the SVG scaled with the column and its grid
+   item painted the masthead backgrounds over the page once the window passed ~2100px. */
+html[data-industrial-acid] .acid-masthead{grid-template-rows:minmax(0,1fr)}
+html[data-industrial-acid] .acid-wordmark-svg>svg{display:block;width:auto;max-width:min(100%,600px);max-height:88px}
+@media(min-width:1900px){html[data-industrial-acid] .acid-wordmark-svg>svg{max-height:103px}}
+@media(max-width:1190px){html[data-industrial-acid] .acid-wordmark-svg>svg{max-height:82px}}
+@media(max-width:720px){html[data-industrial-acid] .acid-wordmark-svg>svg{max-height:37px}}
