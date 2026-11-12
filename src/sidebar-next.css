@@ -2,8 +2,21 @@
 html[data-industrial-acid]{--acid-card:color-mix(in srgb,var(--acid-sidebar-fore) 86%,var(--acid-sidebar-bg));--acid-card-ink:var(--acid-sidebar-bg);--acid-card-dim:color-mix(in srgb,var(--acid-sidebar-bg) 62%,var(--acid-card));--acid-ws-unit:26px}
 /* 1 — single sidebar mode: the wide/rail switch is retired. */
 html[data-acid-sidebar=next] .acid-sidebar-toggle,html[data-acid-sidebar=next] .wtg9ga_toggle{display:none!important}
-/* Native commands stay mounted (shortcuts, motion) but are proxied by the stack. */
+/* The icon stack owns navigation while the drawer is closed. */
 html[data-acid-sidebar=next] .wtg9ga_root>.wtg9ga_newSession,html[data-acid-sidebar=next] .wtg9ga_root>.wtg9ga_panelList{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;opacity:0!important;pointer-events:none!important;margin:0!important}
+html[data-acid-sidebar=next] .wtg9ga_scrollRegion{margin:0}
+html[data-acid-sidebar=next] .wtg9ga_scrollArea{grid-template: minmax(0,1fr) / 0 minmax(0,1fr) 0;margin:0}
+html[data-acid-sidebar=next] .wtg9ga_scrollArea:before,html[data-acid-sidebar=next] .wtg9ga_scrollArea:after{display:none}
+html[data-acid-sidebar=next] .wtg9ga_scrollArea>.wtg9ga_regionArea{grid-area:1/2}
+html[data-acid-sidebar=next] .wtg9ga_scrollArea>.wtg9ga_panelList{display:none}
+html[data-acid-sidebar=next] .wtg9ga_root:has(>.wtg9ga_footArea[data-acid-drawer=open]) .wtg9ga_scrollArea>.wtg9ga_panelList{position:fixed;display:flex;bottom:34px;left:min(320px,calc(100vw - 24px));width:min(200px,calc(100vw - 320px));max-height:calc(100dvh - var(--acid-header-height) - 46px);overflow:auto;margin:0;padding:8px;background:var(--acid-next-bg);border:1px solid var(--acid-next-line);z-index:81;box-sizing:border-box}
+@media(max-width:540px){html[data-acid-sidebar=next] .wtg9ga_root:has(>.wtg9ga_footArea[data-acid-drawer=open]) .wtg9ga_scrollArea>.wtg9ga_panelList{left:auto;right:0;bottom:34px;width:108px}}
+html[data-acid-sidebar=next] .wtg9ga_scrollArea .wtg9ga_panelEntry{border-inline:0}
+html[data-acid-sidebar=next] .wtg9ga_scrollArea .wtg9ga_panelRow{min-height:30px;margin:0;padding:0 2px;gap:3px;border-inline:0;font-size:11px;color:var(--acid-next-fore)}
+html[data-acid-sidebar=next] .wtg9ga_scrollArea .wtg9ga_panelUnpin{position:static;flex:0 0 16px;width:16px;padding:0;color:var(--acid-next-fore)}
+html[data-acid-sidebar=next] .wtg9ga_scrollArea .wtg9ga_panelEntry:is(:hover,:focus-within),html[data-acid-sidebar=next] .wtg9ga_scrollArea .wtg9ga_moreAnchor .wtg9ga_panelRow:is(:hover,[aria-expanded=true]){background:var(--acid-next-block)}
+html[data-acid-sidebar=next] .wtg9ga_scrollArea .wtg9ga_panelEntryActive{background:var(--acid-next-block);box-shadow:inset 2px 0 var(--acid-lime)}
+html[data-acid-sidebar=next] .wtg9ga_scrollFade{display:none}
 html[data-acid-sidebar=next] .wtg9ga_regionArea{border-top:0;margin-top:0;padding-top:0}
 html[data-acid-sidebar=next] .GAkraW_sectionHeader{height:30px;min-height:30px;margin:0 0 6px;padding:0 0 0 2px;border-bottom:1px solid var(--acid-sidebar-rule)}
 html[data-acid-sidebar=next] .GAkraW_sectionLabel{font:700 10px/1 var(--acid-mono);letter-spacing:.14em;text-transform:uppercase}
@@ -11,7 +24,7 @@ html[data-acid-sidebar=next] .GAkraW_sectionLabel{font:700 10px/1 var(--acid-mon
 html[data-acid-sidebar=next] [class*=_card_]:has(>.wnFoaW_hoverContent){display:none!important}
 html[data-acid-sidebar=next] [data-slot="sidebar.workspaces"] [class$="_exits"][aria-hidden="true"],html[data-acid-sidebar=next] .GAkraW_fade{display:none!important}
 /* 2 — v3 rail: 113px, two 46px columns, 5px gaps, 16px inset, half-strip offset. */
-html[data-industrial-acid]{--acid-next-bg:#1E2022;--acid-next-block:#0B0C0D;--acid-next-line:rgba(226,228,224,.22);--acid-next-ink:#0B0C0D;--acid-next-card:#E4E5E1;--acid-next-card-row:#D2D4CF;--acid-next-hazard:var(--acid-lime);--acid-next-hazard-ink:var(--acid-accent-fore)}
+html[data-industrial-acid]{--acid-next-bg:#1E2022;--acid-next-fore:#E4E5E1;--acid-next-block:#0B0C0D;--acid-next-line:rgba(226,228,224,.22);--acid-next-ink:#0B0C0D;--acid-next-card:#E4E5E1;--acid-next-card-row:#D2D4CF;--acid-next-hazard:var(--acid-lime);--acid-next-hazard-ink:var(--acid-accent-fore)}
 html[data-acid-sidebar=next] .mP3x-q_frame:not([data-sidebar-collapsed]){grid-template-columns:var(--acid-next-columns,113px minmax(0,1fr) 0px)!important;--dsh-windows-sidebar-width:113px!important}
 html[data-acid-sidebar=next] .mP3x-q_frame:not([data-sidebar-collapsed])>.mP3x-q_handle[data-side=sidebar]{display:none!important}
 html[data-acid-sidebar=next] .mP3x-q_sidebarCol{width:113px!important;min-width:0!important;overflow:visible!important;position:relative;z-index:6;background:var(--acid-next-bg)!important;border-right:1px solid var(--acid-next-line)}

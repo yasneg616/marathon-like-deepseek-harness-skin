@@ -1,10 +1,10 @@
 # Windows 竖排窗口按钮适配器 / 2.4.14
 
-这是皮肤运行包之外的可选工具。先在 Harness 中安装并启用 `dsh-industrial-acid-skin-2.4.14.tgz`。需要右上角竖排窗口按钮时，再使用此适配器。
+这是皮肤运行包之外的可选工具。先在 Harness 中安装并启用皮肤。使用 Harness `0.2.2-rc.2` 时，从 `main` 构建皮肤并使用同一提交的适配器。需要右上角竖排窗口按钮时，再使用此适配器。
 
 如果 Harness 更新覆盖了旧适配器，可将新版 ZIP 解压到新目录，在检查通过后重新安装；保留旧目录及原有恢复记录。
 
-需要 Windows、Node.js 22 或更新版本，以及已核对哈希的原始 DeepSeek Harness 0.2.0-rc.2、0.2.1-rc.2、rc.3、rc.5 或 0.2.2-rc.1。不同哈希会拒绝写入。已验证的 Windows 0.2.2-rc.1 原始 archive SHA256 为 `5fa8a6b21bceb8f3e99e30efa2270efd0cc773a11e42aa0488f804a64b34e637`。
+需要 Windows、Node.js 22 或更新版本，以及已核对哈希的原始 DeepSeek Harness 0.2.0-rc.2、0.2.1-rc.2、rc.3、rc.5、0.2.2-rc.1 或 0.2.2-rc.2。不同哈希会拒绝写入。已验证的 Windows 0.2.2-rc.2 原始 archive SHA256 为 `49fd1b087190d594b15c44fe6394c6ffd591200aba76e209b5769498f83076ae`。
 
 ## 安装
 
@@ -18,7 +18,7 @@ node tools/desktop-bridge.cjs check
 node tools/desktop-bridge.cjs install
 ```
 
-重新启动 Harness。最小化、最大化／还原、关闭会使用皮肤右上角的竖排按钮。关闭沿用应用原有的关闭到后台策略；原生应用／编辑菜单和窗口拖动保留。停用皮肤时会显示备用窗口按钮。
+重新启动 Harness。最小化、最大化／还原、关闭会使用皮肤右上角的竖排按钮。关闭沿用应用原有的关闭到后台策略；右键顶栏字标可打开原生应用菜单，顶栏支持拖动窗口。停用皮肤时会显示备用窗口按钮。
 
 工具只修改 `resources/app.asar` 中两个桌面入口。写入前会在应用安装目录的 `_backups/` 创建原始备份，并在解压目录的 `validation/desktop-bridge.json` 保存恢复记录。保留这两个位置；ZIP 不携带任何机器的应用 archive 或备份。
 

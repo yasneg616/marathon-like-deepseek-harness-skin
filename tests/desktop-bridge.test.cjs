@@ -22,7 +22,7 @@ test('caption transform preserves desktop guards and requires every known source
   const main=overlay+'\n\t\tipcMain.handle(DESKTOP_IPC.windowsMenu,\n'+appearance+'\n// unrelated desktop security';
   const preload='function createProductApi() {\n\treturn {\n};}\n\tsyncWindowsAppearance();\n// unrelated isolated bridge';
   const changed=transform(main,preload);
-  assert.ok(changed['lib/main.js'].includes('titleBarOverlay: false'));
+  assert.match(changed['lib/main.js'], /titleBarOverlay: false,\n\t\t\troundedCorners: false/);
   assert.ok(changed['lib/main.js'].includes(MAIN_IPC));
   assert.ok(changed['lib/main.js'].includes('// unrelated desktop security'));
   assert.ok(!changed['lib/main.js'].includes('setTitleBarOverlay('));

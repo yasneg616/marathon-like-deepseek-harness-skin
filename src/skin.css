@@ -23,7 +23,7 @@ html[data-industrial-acid] .wnFoaW_sessionRow.wnFoaW_selected{background:var(--a
 html[data-industrial-acid] .wnFoaW_sessionRow.wnFoaW_selected .wnFoaW_title{color:var(--acid-sidebar-active-fore)}
 html[data-industrial-acid] .wtg9ga_newSession{background:var(--acid-sidebar-new-bg);color:var(--acid-sidebar-new-fore);border:1px solid var(--acid-sidebar-rule);border-radius:2px;font-weight:700}
 html[data-industrial-acid] .wtg9ga_newSession:hover{background:var(--acid-blue);color:var(--acid-blue-fore)}
-html[data-industrial-acid] .wtg9ga_panelActive{background:var(--acid-sidebar-active);color:var(--acid-sidebar-active-fore);--dsw-alias-label-primary:var(--acid-sidebar-active-fore)}
+html[data-industrial-acid] .wtg9ga_panelActive,html[data-industrial-acid] .wtg9ga_panelEntryActive{background:var(--acid-sidebar-active);color:var(--acid-sidebar-active-fore);--dsw-alias-label-primary:var(--acid-sidebar-active-fore)}
 html[data-industrial-acid] [data-slot=sidebar] [aria-current=page],html[data-industrial-acid] [data-slot=sidebar] [aria-selected=true]{color:var(--acid-sidebar-active-fore);background:var(--acid-sidebar-active)}
 html[data-industrial-acid] .wtg9ga_regionArea{border-top:1px solid var(--acid-sidebar-rule);margin-top:12px;padding-top:12px}
 html[data-industrial-acid] .wtg9ga_footArea{border-top:1px solid var(--acid-sidebar-rule);padding-top:8px}

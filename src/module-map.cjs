@@ -125,6 +125,11 @@ function mapModules(css, candidates) {
     const signature = new Set([...locals, ...extra]);
     // SettingsRoot dropped the content wrapper in 0.2.2. Keep styling it on older builds.
     if (prefix === 'AnXs9G') signature.delete('content');
+    // rc.2 moved the workspace fade and active state into the shared sidebar scroller.
+    if (prefix === 'GAkraW') signature.delete('fade');
+    if (prefix === 'wtg9ga') {
+      for (const local of ['panelActive', 'panelEntry', 'panelEntryActive', 'panelUnpin', 'scrollRegion', 'scrollArea', 'scrollFade']) signature.delete(local);
+    }
     const hit = resolvePrefix(signature, candidates);
     if (hit) mapping.set(prefix, hit); // Unchanged hashes still count as resolved for first paint.
   }

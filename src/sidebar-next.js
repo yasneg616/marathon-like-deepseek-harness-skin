@@ -160,8 +160,9 @@ function nextSidebarList(){
 function nativeCommands(){
   const root=document.querySelector(moduleSelector('.mP3x-q_frame .wtg9ga_root'));
   if(!root)return [];
-  const panels=[...root.querySelectorAll(moduleSelector('.wtg9ga_panelList .wtg9ga_panelRow'))];
-  return [root.querySelector(moduleSelector('.wtg9ga_newSession')),...panels].filter(Boolean).slice(0,3);
+  const start=root.querySelector(moduleSelector('.wtg9ga_newSession'));
+  const panels=[...root.querySelectorAll(moduleSelector('.wtg9ga_panelList .wtg9ga_panelRow:not(.wtg9ga_moreAnchor *)'))];
+  return [start,...panels].filter(Boolean).slice(0,3);
 }
 function sessionRows(group){
   return [...group.querySelectorAll('[data-row-key^="session:"][role="treeitem"]')].map(row=>({
@@ -179,7 +180,7 @@ function CommandStack({tick}){
   return h('div',{className:'acid-ws-commands',role:'group','aria-label':'commands','data-tick':tick},...commands.map((button,i)=>{
     const kind=['new','plugins','automations'][i];
     const label=button.querySelector(moduleSelector('.wtg9ga_newSessionLabel,.wtg9ga_panelTitle'))?.textContent||button.getAttribute('aria-label')||kind;
-    const active=button.classList.contains(moduleClass('wtg9ga_panelActive'));
+    const active=button.getAttribute('aria-current')==='page'||button.classList.contains(moduleClass('wtg9ga_panelActive'));
     return h('button',{key:i,type:'button',className:'acid-ws-command','data-command':kind,'aria-pressed':i?active:undefined,'aria-label':label,title:label,
       onClick:()=>{button.click();}},h('svg',{width:16,height:16,viewBox:'0 0 16 16',fill:'none',stroke:'currentColor',strokeWidth:1.3,strokeLinecap:'square','aria-hidden':true},h('path',{d:COMMAND_ICONS[kind]})));
   }));

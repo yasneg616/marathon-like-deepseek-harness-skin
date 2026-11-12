@@ -12,7 +12,8 @@ const SUPPORTED_DESKTOPS = Object.freeze({
   '47874618bf5b3011fcaac10cd4c85f69da333e70d4f99b921207c78d0999512a': '0.2.1-rc.2',
   '04b32e3a872826ba15cfb2081c6a929a8d4ecaa65e09a2543e5a6b30e2eff1f0': '0.2.1-rc.3',
   'e1b6f25fa937da98086c3e77af77aa14791105963c4d337a1c42179d232c6915': '0.2.1-rc.5',
-  '5fa8a6b21bceb8f3e99e30efa2270efd0cc773a11e42aa0488f804a64b34e637': '0.2.2-rc.1'
+  '5fa8a6b21bceb8f3e99e30efa2270efd0cc773a11e42aa0488f804a64b34e637': '0.2.2-rc.1',
+  '49fd1b087190d594b15c44fe6394c6ffd591200aba76e209b5769498f83076ae': '0.2.2-rc.2'
 });
 const CHANNEL = 'dsh-desktop:industrial-window-controls';
 const sha = data => crypto.createHash('sha256').update(data).digest('hex');
@@ -75,7 +76,7 @@ function replaceOnce(source, before, after) {
 function transform(main, preload) {
   main = replaceOnce(main,
     'titleBarOverlay: {\n\t\t\t\theight: 40,\n\t\t\t\tcolor: chromeFallbackFill(),\n\t\t\t\tsymbolColor: nativeTheme.shouldUseDarkColors ? "#f9fafb" : "#0f1115"\n\t\t\t}',
-    'titleBarOverlay: false');
+    'titleBarOverlay: false,\n\t\t\troundedCorners: false');
   main = replaceOnce(main, '\t\tipcMain.handle(DESKTOP_IPC.windowsMenu,', MAIN_IPC + '\t\tipcMain.handle(DESKTOP_IPC.windowsMenu,');
   main = replaceOnce(main, '\t\t\tif (validColor(color) && validColor(symbolColor)) mainWindow.setTitleBarOverlay({\n\t\t\t\tcolor,\n\t\t\t\tsymbolColor\n\t\t\t});',
     '\t\t\t// The HTML caption uses the same theme tokens; native overlay is disabled.');

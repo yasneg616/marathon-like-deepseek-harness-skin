@@ -61,6 +61,7 @@ function Masthead(props){
   const classic=appearance.sidebarStyle==='classic';
   const context=React.useRef(null),previous=React.useRef(null);
   const [picker,setPicker]=React.useState(false),[colorTarget,setColorTarget]=React.useState(null),[nativeState,setNativeState]=React.useState(null);
+  const [paletteOpen,setPaletteOpen]=React.useState(false);
   const [,setOrderRevision]=React.useState(0);
   const copy=React.useRef(props.t);copy.current=props.t;
   const native=window.dshDesktop?.windowControls;
@@ -191,10 +192,9 @@ function Masthead(props){
       if(result?.ok)setNativeState(result.value);
     }catch{}
   };
-  const openMenu=(name,event)=>{if(!native?.menu)return;const rect=event.currentTarget.getBoundingClientRect();native.menu(name,rect.left,rect.bottom).catch(()=>{});};
-  return h(React.Fragment,null,h('div',{className:'acid-mac-native-slot','aria-hidden':true}),h('header',{className:'acid-masthead','data-native-controls':native?'true':'false','aria-label':'DeepSeek Harness'},
-    h('div',{className:'acid-wordmark'},h('button',{type:'button',className:'acid-brand-home','aria-label':'DeepSeek Harness',onClick:props.goHome},h(SkinSymbol,{className:'acid-brand-symbol'}),h('span',{className:'acid-wordmark-svg',dangerouslySetInnerHTML:{__html:MASTHEAD}}))),
-    native?h('div',{className:'acid-menus'},h('button',{type:'button',onClick:event=>openMenu('application',event)},h('span',{'aria-hidden':true},'01'),document.documentElement.lang.startsWith('zh')?'应用':'Application'),h('button',{type:'button',onClick:event=>openMenu('edit',event)},h('span',{'aria-hidden':true},'02'),document.documentElement.lang.startsWith('zh')?'编辑':'Edit')):null,
+  return h(React.Fragment,null,h('div',{className:'acid-mac-native-slot','aria-hidden':true}),h('header',{className:'acid-masthead','data-native-controls':native?'true':'false','data-acid-masthead-actions':'','data-acid-caption':winChrome?'':undefined,'aria-label':'DeepSeek Harness'},
+    h('div',{className:'acid-wordmark'},h('button',{type:'button',className:'acid-brand-home','aria-label':'DeepSeek Harness',onClick:props.goHome,onContextMenu:native?.menu?event=>{event.preventDefault();native.menu('application',event.clientX,event.clientY).catch(()=>{});}:undefined},h(SkinSymbol,{className:'acid-brand-symbol'}),h('span',{className:'acid-wordmark-svg',dangerouslySetInnerHTML:{__html:MASTHEAD}}))),
+    h('div',{className:'acid-menus'},h('button',{type:'button','aria-haspopup':'dialog',onClick:()=>setPaletteOpen(true)},h('span',{'aria-hidden':true},'01'),props.t('palette')),h('button',{type:'button',title:props.t('sidebarStyle'),'aria-pressed':classic,onClick:()=>props.setSidebarStyle(classic?'next':'classic')},h('span',{'aria-hidden':true},'02'),props.t('workspace'))),
     h('button',{ref:context,type:'button',className:'acid-context workspace-display','data-acid-identity':identityColor||undefined,style:identityColor?{'--acid-ws-context':identityColor,'--acid-ws-context-fore':foreground(identityColor)}:undefined,onClick:()=>setPicker(true),disabled:items.length===0,'aria-label':props.t('workspace')},
       h('span',{className:'workspace-counter'},h('strong',{className:'acid-context-number workspace-index',id:'workspace-index'},'—')),
       h('span',{className:'workspace-detail'},h('span',{className:'acid-meta'},'ACTIVE WORKSPACE'),h('span',{className:'workspace-name-slot'},h('span',{className:'acid-context-title',id:'workspace-name',title:workspace?.title},props.t('none')))),h('span',{className:'acid-workspace-arrow','aria-hidden':true},'↗')),
@@ -213,6 +213,7 @@ function Masthead(props){
       if(id===workspace?.workspaceId){props.goHome();return;}
       props.motion()?.captureStage();props.pickWorkspace(id);
     }}):null,
+    paletteOpen?h(NativeDialog,{title:props.t('palette'),onClose:()=>setPaletteOpen(false)},h(props.paletteSettings,{t:props.t,prefix:'acid-masthead-palette'})):null,
     picker?h(NativeDialog,{title:props.t('workspace'),className:'acid-workspace-dialog',onClose:()=>setPicker(false)},...ordered.map((item,i)=>{
       // Every row keeps its native pick target and gains the one thing the classic layout never
       // had: a swatch that opens the colour field for that workspace. The swatch is a sibling, not
