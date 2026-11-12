@@ -1,6 +1,6 @@
 # 安装与开发
 
-当前正式版 **v2.4.15** 为新版色条浮层加入会话展开、状态点和拖动排序。[更新说明与演示](RELEASE-v2.4.15.md)
+当前正式版 **v2.4.16** 支持 Harness 0.2.2-rc.2。[更新说明](RELEASE-v2.4.16.md)
 
 历史的 [v2.4.10-rc.1](RELEASE-v2.4.10-rc.1.md) 使用不同的 macOS 原生红黄绿留白方案，仅供追溯。
 
@@ -32,11 +32,11 @@
 
 ## 安装
 
-1. 下载 v2.4.15 的 `dsh-industrial-acid-skin-2.4.15.tgz` 运行包。[当前发行版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.15) · [历史版本](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases)
+1. 下载 v2.4.16 的 `dsh-industrial-acid-skin-2.4.16.tgz` 运行包。[当前发行版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.16) · [历史版本](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases)
 2. 在 Harness「插件 → 添加插件」的**包名或地址**输入框粘贴下方的 `.tgz` 完整 URL 后安装，完成后点击「立即启用」（提示重启时重启）：
 
    ```text
-   https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v2.4.15/dsh-industrial-acid-skin-2.4.15.tgz
+   https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v2.4.16/dsh-industrial-acid-skin-2.4.16.tgz
    ```
 
    或先从 Release 下载 `.tgz`，输入下载文件的**本机绝对路径**。Harness 的输入框接受 npm 包名、Git 地址、tarball URL 或本地路径。只输入文件名会触发 npm 查询。
@@ -44,9 +44,9 @@
 
 运行包内置字体、SVG 和编译后的客户端，皮肤资源可离线加载。插件包名保留 `dsh-industrial-acid-skin`，便于现有安装升级并保留外观偏好。
 
-核心皮肤使用 `ctx.theme.overrideTokens` 和原生扩展槽。2.4.15 兼容 DSH `>=0.2.0-rc.2 <0.2.2-0` 以及 `0.2.2-rc.1`。
+核心皮肤使用 `ctx.theme.overrideTokens` 和原生扩展槽。2.4.16 兼容 DSH `>=0.2.0-rc.2 <0.2.2-0` 以及 `0.2.2-rc.1`、`0.2.2-rc.2`。
 
-Windows 运行窗口图标沿用 2.4.1 的可撤销实现，停用插件时恢复原图标。可选标题栏适配器支持已核对哈希的原始 0.2.0-rc.2、0.2.1-rc.2、rc.3、rc.5 和 0.2.2-rc.1。适配器继续使用 v2.4.14 的 `dsh-industrial-caption-adapter-2.4.14.zip`。Harness 更新可能覆盖旧适配器，保留旧恢复记录并先检查当前 archive。[下载适配器](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.14) · [适配器说明](DESKTOP-ADAPTER.md)
+Windows 运行窗口图标沿用 2.4.1 的可撤销实现，停用插件时恢复原图标。可选标题栏适配器支持已核对哈希的原始 0.2.0-rc.2、0.2.1-rc.2、rc.3、rc.5、0.2.2-rc.1 和 0.2.2-rc.2。适配器文件为 `dsh-industrial-caption-adapter-2.4.16.zip`。Harness 更新可能覆盖旧适配器，保留旧恢复记录并先检查当前 archive。[下载适配器](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.16) · [适配器说明](DESKTOP-ADAPTER.md)
 
 ## 构建与测试
 
@@ -103,12 +103,12 @@ node tools/uninstall.cjs
 
 ## 可选：Windows 桌面标题栏适配器
 
-适配器将原生窗口操作接入皮肤的竖排按钮，并保留原生应用/编辑菜单、窗口拖动及关闭确认。它会修改本机 `resources/app.asar` 中的两个桌面入口，因此请先完全退出 Harness。
+适配器将原生窗口操作接入皮肤的竖排按钮，支持右键字标打开原生应用菜单，并保留窗口拖动和原有关闭行为。它会修改本机 `resources/app.asar` 中的两个桌面入口，因此请先完全退出 Harness。
 
 在 PowerShell 中指定实际安装目录：
 
 ```powershell
-$env:DSH_DESKTOP_DIR = Join-Path $env:LOCALAPPDATA 'Programs\DeepSeek Harness'
+$env:DSH_DESKTOP_DIR = Join-Path $env:LOCALAPPDATA 'Programs\DeepSeek Harness Desktop'
 node tools/desktop-bridge.cjs install
 ```
 
@@ -120,6 +120,7 @@ node tools/desktop-bridge.cjs install
 0.2.1-rc.3  04b32e3a872826ba15cfb2081c6a929a8d4ecaa65e09a2543e5a6b30e2eff1f0
 0.2.1-rc.5  e1b6f25fa937da98086c3e77af77aa14791105963c4d337a1c42179d232c6915
 0.2.2-rc.1  5fa8a6b21bceb8f3e99e30efa2270efd0cc773a11e42aa0488f804a64b34e637
+0.2.2-rc.2  49fd1b087190d594b15c44fe6394c6ffd591200aba76e209b5769498f83076ae
 ```
 
 写入前自动备份到安装目录的 `_backups/`，校验未改动文件并记录本机恢复路径。版本或哈希不匹配时拒绝写入。停用皮肤后提供横向窗口按钮回退；安装到其他机器时，需要在那里重新生成备份。

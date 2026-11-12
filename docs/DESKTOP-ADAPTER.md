@@ -1,6 +1,6 @@
-# Windows 竖排窗口按钮适配器 / 2.4.14
+# Windows 竖排窗口按钮适配器 / 2.4.16
 
-这是皮肤运行包之外的可选工具。先在 Harness 中安装并启用皮肤。使用 Harness `0.2.2-rc.2` 时，从 `main` 构建皮肤并使用同一提交的适配器。需要右上角竖排窗口按钮时，再使用此适配器。
+这是皮肤运行包之外的可选工具。先在 Harness 中安装并启用皮肤。使用 Harness `0.2.2-rc.2` 时，请使用 v2.4.16 发布的皮肤和适配器。需要右上角竖排窗口按钮时，再使用此适配器。
 
 如果 Harness 更新覆盖了旧适配器，可将新版 ZIP 解压到新目录，在检查通过后重新安装；保留旧目录及原有恢复记录。
 
@@ -13,7 +13,7 @@
 3. 在解压目录打开 PowerShell，指定实际安装路径并运行：
 
 ```powershell
-$env:DSH_DESKTOP_DIR = Join-Path $env:LOCALAPPDATA 'Programs\DeepSeek Harness'
+$env:DSH_DESKTOP_DIR = Join-Path $env:LOCALAPPDATA 'Programs\DeepSeek Harness Desktop'
 node tools/desktop-bridge.cjs check
 node tools/desktop-bridge.cjs install
 ```
@@ -27,7 +27,7 @@ node tools/desktop-bridge.cjs install
 完全退出 Harness，在同一解压目录和相同安装路径下运行：
 
 ```powershell
-$env:DSH_DESKTOP_DIR = Join-Path $env:LOCALAPPDATA 'Programs\DeepSeek Harness'
+$env:DSH_DESKTOP_DIR = Join-Path $env:LOCALAPPDATA 'Programs\DeepSeek Harness Desktop'
 node tools/desktop-bridge.cjs restore
 ```
 
