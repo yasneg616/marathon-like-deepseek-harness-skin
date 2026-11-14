@@ -4,11 +4,11 @@
 
 从 Marathon 的大色块、硬边界和工业排版开始：字标切开，按钮收方，工作区放上三位数字。正文留出空间，切换时让颜色沿着界面的方向走。
 
-`v2.4.16` · `Windows / macOS` · `Harness 0.2.0-rc.2 / 0.2.1（含 RC） / 0.2.2-rc.1 / 0.2.2-rc.2`
+`v2.4.17` · `Windows / macOS` · `Harness 0.2.0-rc.2 / 0.2.1（含 RC） / 0.2.2-rc.1 / 0.2.2-rc.2 / 0.2.2-rc.3`
 
-[下载 2.4.16](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.16) · [安装与回退](docs/INSTALL.md) · [本次更新](docs/RELEASE-v2.4.16.md)
+[下载 2.4.17](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.17) · [安装与回退](docs/INSTALL.md) · [本次更新](docs/RELEASE-v2.4.17.md)
 
-**v2.4.16** 适配 Harness 0.2.2-rc.2，恢复三键色条侧栏和首页布局，并更新 Windows 竖排窗口按钮适配器。
+**v2.4.17** 适配 Harness 0.2.2-rc.3，修复新版侧栏重复显示「新会话」，让色条和三颗图标按钮回到原位。Windows 竖排窗口按钮适配器也支持 rc.3。
 
 **v2.4.15** 的色条浮层可以展开剩余会话、看每条会话的状态，也可以在同一工作区内拖动排序。手动顺序由 Harness 保存，切回经典模式也能看到。
 
@@ -50,7 +50,7 @@
 
 ![MORE 展开收起、更多菜单与调色盘联动](docs/media/22-more-palette.gif)
 
-**输入框和窗口按钮。** 消息输入框恢复矩形边框、切角、信号灯与聚焦反馈。右上角的最小化、最大化／还原、关闭按竖向排列；Windows 原生操作需要安装 Release 中的可选标题栏适配器，现已支持核对过哈希的 `0.2.1-rc.3`。
+**输入框和窗口按钮。** 消息输入框恢复矩形边框、切角、信号灯与聚焦反馈。右上角的最小化、最大化／还原、关闭按竖向排列；Windows 原生操作需要安装 Release 中的可选标题栏适配器，现已支持核对过哈希的 `0.2.2-rc.3`。
 
 ![消息输入框聚焦时的边框、厚角和状态灯](docs/media/composer-2.4.6.png)
 
@@ -186,14 +186,14 @@
 
 ## 安装
 
-1. 下载 [v2.4.16 正式版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.16) 中的 `dsh-industrial-acid-skin-2.4.16.tgz`。无需 Node.js。
+1. 下载 [v2.4.17 正式版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.17) 中的 `dsh-industrial-acid-skin-2.4.17.tgz`。无需 Node.js。
 2. Harness「插件 → 添加插件」，粘贴完整下载链接，或输入已下载文件的本机绝对路径：
 
    ```text
-https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v2.4.16/dsh-industrial-acid-skin-2.4.16.tgz
+https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v2.4.17/dsh-industrial-acid-skin-2.4.17.tgz
    ```
 
-3. 启用插件，按提示重启。Windows 如需竖排窗口按钮，请使用 v2.4.16 的可选适配器，按说明校验宿主版本与哈希。macOS 最小化与全屏控制可能需要系统辅助功能权限。[适配器说明](docs/DESKTOP-ADAPTER.md)
+3. 启用插件，按提示重启。Windows 如需竖排窗口按钮，请使用 v2.4.17 的可选适配器，按说明校验宿主版本与哈希。macOS 最小化与全屏控制可能需要系统辅助功能权限。[适配器说明](docs/DESKTOP-ADAPTER.md)
 
 Windows rc.5 已在隔离配置下验证皮肤交互和可选窗口适配器。macOS 窗口交互仍需实机反馈。
 

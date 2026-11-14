@@ -3,7 +3,7 @@ html[data-industrial-acid]{--acid-card:color-mix(in srgb,var(--acid-sidebar-fore
 /* 1 — single sidebar mode: the wide/rail switch is retired. */
 html[data-acid-sidebar=next] .acid-sidebar-toggle,html[data-acid-sidebar=next] .wtg9ga_toggle{display:none!important}
 /* The icon stack owns navigation while the drawer is closed. */
-html[data-acid-sidebar=next] .wtg9ga_root>.wtg9ga_newSession,html[data-acid-sidebar=next] .wtg9ga_root>.wtg9ga_panelList{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;opacity:0!important;pointer-events:none!important;margin:0!important}
+html[data-acid-sidebar=next] .wtg9ga_root>.wtg9ga_newSession,html[data-acid-sidebar=next] .wtg9ga_root>.wtg9ga_newSessionRow,html[data-acid-sidebar=next] .wtg9ga_root>.wtg9ga_panelList{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;opacity:0!important;pointer-events:none!important;margin:0!important}
 html[data-acid-sidebar=next] .wtg9ga_scrollRegion{margin:0}
 html[data-acid-sidebar=next] .wtg9ga_scrollArea{grid-template: minmax(0,1fr) / 0 minmax(0,1fr) 0;margin:0}
 html[data-acid-sidebar=next] .wtg9ga_scrollArea:before,html[data-acid-sidebar=next] .wtg9ga_scrollArea:after{display:none}

@@ -128,7 +128,7 @@ function mapModules(css, candidates) {
     // rc.2 moved the workspace fade and active state into the shared sidebar scroller.
     if (prefix === 'GAkraW') signature.delete('fade');
     if (prefix === 'wtg9ga') {
-      for (const local of ['panelActive', 'panelEntry', 'panelEntryActive', 'panelUnpin', 'scrollRegion', 'scrollArea', 'scrollFade']) signature.delete(local);
+      for (const local of ['newSessionRow', 'panelActive', 'panelEntry', 'panelEntryActive', 'panelUnpin', 'scrollRegion', 'scrollArea', 'scrollFade']) signature.delete(local);
     }
     const hit = resolvePrefix(signature, candidates);
     if (hit) mapping.set(prefix, hit); // Unchanged hashes still count as resolved for first paint.
