@@ -8,6 +8,8 @@
 
 [下载 2.4.17](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.17) · [安装与回退](docs/INSTALL.md) · [本次更新](docs/RELEASE-v2.4.17.md)
 
+`main` 上的 v2.4.18 增加 Harness `0.2.2-rc.5` 支持，包含皮肤和可选的 Windows 竖排窗口按钮适配器。使用 `npm run build` 和 `npm pack` 可以从源码生成皮肤安装包。
+
 **v2.4.17** 适配 Harness 0.2.2-rc.3，修复新版侧栏重复显示「新会话」，让色条和三颗图标按钮回到原位。Windows 竖排窗口按钮适配器也支持 rc.3。
 
 **v2.4.15** 的色条浮层可以展开剩余会话、看每条会话的状态，也可以在同一工作区内拖动排序。手动顺序由 Harness 保存，切回经典模式也能看到。

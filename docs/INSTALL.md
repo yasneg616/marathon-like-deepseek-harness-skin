@@ -2,6 +2,8 @@
 
 当前正式版 **v2.4.17** 支持 Harness 0.2.2-rc.3。[更新说明](RELEASE-v2.4.17.md)
 
+Harness `0.2.2-rc.5` 用户可在 `main` 上运行 `npm run build` 和 `npm pack` 生成 v2.4.18 安装包，再按照下方步骤导入本地 `.tgz`。
+
 历史的 [v2.4.10-rc.1](RELEASE-v2.4.10-rc.1.md) 使用不同的 macOS 原生红黄绿留白方案，仅供追溯。
 
 ## 2.4.9 工作区管理与独立配色
@@ -122,6 +124,7 @@ node tools/desktop-bridge.cjs install
 0.2.2-rc.1  5fa8a6b21bceb8f3e99e30efa2270efd0cc773a11e42aa0488f804a64b34e637
 0.2.2-rc.2  49fd1b087190d594b15c44fe6394c6ffd591200aba76e209b5769498f83076ae
 0.2.2-rc.3  14cfd81c9135bf0afb89417543c94f9ecfe09266574452a9b106890c698725ae
+0.2.2-rc.5  5ec8acd9e72b93b6680c953c1be44a729fd3a5170e472e8025690a1713d20f69
 ```
 
 写入前自动备份到安装目录的 `_backups/`，校验未改动文件并记录本机恢复路径。版本或哈希不匹配时拒绝写入。停用皮肤后提供横向窗口按钮回退；安装到其他机器时，需要在那里重新生成备份。

@@ -273,7 +273,9 @@ test('next-strip decoration follows native rebuilds and in-place session changes
 
   const rebuilt=workspaceGroup('a','Renamed');
   list.children=[rebuilt.group];
+  attributes.delete('data-acid-sidebar');
   render();
+  assert.equal(attributes.get('data-acid-sidebar'),'next');
   assert.equal(rebuilt.group.style.gridColumn,'1');
   assert.equal(rebuilt.group.dataset.acidWsStatus,'working');
   assert.equal(rebuilt.row.dataset.acidCount,'02');

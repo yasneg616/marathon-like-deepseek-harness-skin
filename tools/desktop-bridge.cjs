@@ -14,7 +14,8 @@ const SUPPORTED_DESKTOPS = Object.freeze({
   'e1b6f25fa937da98086c3e77af77aa14791105963c4d337a1c42179d232c6915': '0.2.1-rc.5',
   '5fa8a6b21bceb8f3e99e30efa2270efd0cc773a11e42aa0488f804a64b34e637': '0.2.2-rc.1',
   '49fd1b087190d594b15c44fe6394c6ffd591200aba76e209b5769498f83076ae': '0.2.2-rc.2',
-  '14cfd81c9135bf0afb89417543c94f9ecfe09266574452a9b106890c698725ae': '0.2.2-rc.3'
+  '14cfd81c9135bf0afb89417543c94f9ecfe09266574452a9b106890c698725ae': '0.2.2-rc.3',
+  '5ec8acd9e72b93b6680c953c1be44a729fd3a5170e472e8025690a1713d20f69': '0.2.2-rc.5'
 });
 const CHANNEL = 'dsh-desktop:industrial-window-controls';
 const sha = data => crypto.createHash('sha256').update(data).digest('hex');

@@ -1,16 +1,16 @@
-# Windows 竖排窗口按钮适配器 / 2.4.17
+# Windows 竖排窗口按钮适配器
 
-这是皮肤运行包之外的可选工具。先在 Harness 中安装并启用皮肤。使用 Harness `0.2.2-rc.3` 时，请使用 v2.4.17 发布的皮肤和适配器。需要右上角竖排窗口按钮时，再使用此适配器。
+这是皮肤运行包之外的可选工具。先在 Harness 中安装并启用皮肤。使用 Harness `0.2.2-rc.5` 时，请使用 v2.4.18 的皮肤和 `main` 中的适配器。需要右上角竖排窗口按钮时，再使用此适配器。
 
 如果 Harness 更新覆盖了旧适配器，可将新版 ZIP 解压到新目录，在检查通过后重新安装；保留旧目录及原有恢复记录。
 
-需要 Windows、Node.js 22 或更新版本，以及已核对哈希的原始 DeepSeek Harness 0.2.0-rc.2、0.2.1-rc.2、rc.3、rc.5、0.2.2-rc.1、0.2.2-rc.2 或 0.2.2-rc.3。不同哈希会拒绝写入。已验证的 Windows 0.2.2-rc.3 原始 archive SHA256 为 `14cfd81c9135bf0afb89417543c94f9ecfe09266574452a9b106890c698725ae`。已验证的 Windows 0.2.2-rc.2 原始 archive SHA256 为 `49fd1b087190d594b15c44fe6394c6ffd591200aba76e209b5769498f83076ae`。
+需要 Windows、Node.js 22 或更新版本，以及已核对哈希的原始 DeepSeek Harness 安装。[支持的版本和 SHA-256](INSTALL.md#可选windows-桌面标题栏适配器)。Windows x64 `0.2.2-rc.5` 的原始 `app.asar` SHA-256 为 `5ec8acd9e72b93b6680c953c1be44a729fd3a5170e472e8025690a1713d20f69`。不同哈希会拒绝写入。
 
 ## 安装
 
-1. 将适配器 ZIP 解压到一个准备保留的文件夹。
+1. 将适配器 ZIP 解压到一个准备保留的文件夹，或使用 Git 仓库目录中的 `tools/desktop-bridge.cjs`。
 2. 完全退出 Harness，包括后台运行的进程。
-3. 在解压目录打开 PowerShell，指定实际安装路径并运行：
+3. 在解压目录或仓库根目录打开 PowerShell，指定实际安装路径并运行：
 
 ```powershell
 $env:DSH_DESKTOP_DIR = Join-Path $env:LOCALAPPDATA 'Programs\DeepSeek Harness Desktop'
