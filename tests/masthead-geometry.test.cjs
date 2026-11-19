@@ -16,3 +16,10 @@ test('the wordmark is capped by the masthead height instead of growing with the 
   assert.match(css, /\.acid-masthead\{grid-template-rows:minmax\(0,1fr\)\}/);
   assert.match(css, /@media\(min-width:1900px\)\{html\[data-industrial-acid\] \.acid-wordmark-svg>svg\{max-height:103px\}\}/);
 });
+
+test('Windows native buttons reserve space without replacing the masthead action columns', () => {
+  const windowsFallback = /html\[data-industrial-acid\]\[data-windows-titlebar\] \.acid-masthead(?:\[[^\]]+\])*\[data-native-controls=false\]\{([^{}]*)\}/g;
+  const rules = [...css.matchAll(windowsFallback)].map(match => match[1]);
+  assert.ok(rules.some(rule => /padding-right:[^;]*env\(titlebar-area-width,/.test(rule)));
+  assert.ok(rules.every(rule => !rule.includes('grid-template-columns')));
+});

@@ -40,7 +40,7 @@ html[data-industrial-acid] .acid-context{display:flex;flex-direction:row;align-i
 .workspace-name-ghost{position:absolute;inset:0;pointer-events:none}
 .acid-workspace-arrow{font:28px var(--acid-mono);color:var(--acid-context-fore)}
 .workspace-switch-line{position:absolute;bottom:10px;left:25px;right:25px;height:3px;background:linear-gradient(to right,var(--acid-context-number) 0 69%,transparent 69% 73%,var(--acid-blue) 73%);opacity:0;pointer-events:none}
-.acid-window-controls{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));grid-template-columns:1fr;width:48px;align-self:stretch;background:var(--dsw-alias-bg-base);border-left:1px solid var(--acid-rule);-webkit-app-region:no-drag;z-index:30}
+.acid-window-controls{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));grid-template-columns:1fr;min-width:0;align-self:stretch;background:var(--dsw-alias-bg-base);border-left:1px solid var(--acid-rule);-webkit-app-region:no-drag;z-index:30}
 .acid-window-controls button{padding:0;width:100%;height:100%;min-height:0;color:var(--dsw-alias-label-primary);background:transparent;border:0;border-bottom:1px solid var(--acid-accent-display);font:18px/1 var(--acid-mono);cursor:pointer;-webkit-app-region:no-drag}
 .acid-window-controls button:last-child{border-bottom:0}.acid-window-controls button:last-child:hover{color:#fff;background:#c5352d}
 /* macOS keeps the system traffic lights in the top-left, underneath this masthead, and exposes
@@ -51,7 +51,6 @@ html[data-industrial-acid] .acid-context{display:flex;flex-direction:row;align-i
 html[data-industrial-acid][data-windows-titlebar] .acid-masthead{grid-template-columns:minmax(0,1fr) minmax(320px,1.15fr) 48px;padding-right:0}
 html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-native-controls=true]{grid-template-columns:minmax(0,.7fr) minmax(90px,140px) minmax(0,1.3fr) 48px}
 html[data-industrial-acid][data-windows-titlebar] .acid-menus button{white-space:nowrap;padding:8px}
-html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-native-controls=false]{grid-template-columns:minmax(0,0.7fr) minmax(360px,1.3fr) 48px}
 html[data-industrial-acid][data-windows-titlebar] .acid-window-controls{display:grid;height:100%;border-left:1px solid var(--acid-accent-display);background:var(--dsw-alias-bg-base)}
 html[data-industrial-acid][data-windows-titlebar] .acid-window-controls button{border-bottom-color:var(--acid-accent-display)}
 html[data-industrial-acid] [data-windows-menu]{display:none!important}
@@ -167,7 +166,6 @@ html[data-industrial-acid] .acid-wordmark{overflow:visible}
 
 /* v3c: 2-col masthead (no native menus) — keep brand/context adjacent without paint overflow */
 html[data-industrial-acid] .acid-masthead[data-native-controls=false]{grid-template-columns:minmax(0,0.9fr) minmax(360px,1.1fr) 48px}
-html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-native-controls=false]{grid-template-columns:minmax(0,0.85fr) minmax(340px,1.15fr) 48px}
 html[data-industrial-acid] .acid-wordmark{min-width:0;max-width:100%;overflow:visible}html[data-industrial-acid] .acid-brand-home,html[data-industrial-acid] .acid-wordmark-svg{min-width:0;max-width:100%;overflow:hidden}
 html[data-industrial-acid] .acid-wordmark-svg>svg{display:block;width:auto;max-width:100%;max-height:100%}
 html[data-industrial-acid] .acid-context{min-width:0;overflow:visible}
@@ -185,7 +183,6 @@ html[data-industrial-acid] .workspace-detail{display:flex;flex-direction:column;
 html[data-industrial-acid] .acid-context-title,#workspace-name,.workspace-name-slot .acid-context-title,.workspace-name-ghost{line-height:1.25;overflow:visible!important;text-overflow:clip!important;white-space:normal!important;overflow-wrap:anywhere;word-break:break-word;max-width:none}
 /* give ACTIVE WORKSPACE more room vs brand */
 html[data-industrial-acid] .acid-masthead[data-native-controls=false]{grid-template-columns:minmax(0,0.75fr) minmax(420px,1.25fr) 48px}
-html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-native-controls=false]{grid-template-columns:minmax(0,0.7fr) minmax(400px,1.3fr) 48px}
 /* v3e: cap the wordmark by the masthead height, not by the viewport width. The v3c rule set
    max-height:100% against an auto-height parent, so the SVG scaled with the column and its grid
    item painted the masthead backgrounds over the page once the window passed ~2100px. */
@@ -197,6 +194,7 @@ html[data-industrial-acid] .acid-wordmark-svg>svg{display:block;width:auto;max-w
 
 html[data-industrial-acid] .acid-masthead[data-acid-masthead-actions]{grid-template-columns:minmax(0,.54fr) clamp(118px,11vw,140px) minmax(0,1fr);padding-right:0}
 html[data-industrial-acid] .acid-masthead[data-acid-masthead-actions][data-acid-caption]{grid-template-columns:minmax(0,.54fr) clamp(118px,11vw,140px) minmax(0,1fr) 48px}
+html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-acid-masthead-actions][data-native-controls=false]{padding-right:max(0px,calc(100% - env(titlebar-area-x,0px) - env(titlebar-area-width,100%)))}
 html[data-industrial-acid] .acid-masthead[data-acid-masthead-actions] .acid-menus button{justify-content:center;gap:4px;padding:6px;font-size:11px;white-space:nowrap}
 html[data-industrial-acid] .acid-masthead[data-acid-masthead-actions] .acid-menus{grid-template-columns:1fr 1fr;grid-template-rows:1fr}
 @media(min-width:1191px) and (max-width:1899px){html[data-acid-sidebar=next]{--acid-header-height:124px}}

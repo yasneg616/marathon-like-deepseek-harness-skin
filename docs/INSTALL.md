@@ -2,7 +2,7 @@
 
 当前正式版 **v2.4.17** 支持 Harness 0.2.2-rc.3。[更新说明](RELEASE-v2.4.17.md)
 
-Harness `0.2.2-rc.5` 用户可在 `main` 上运行 `npm run build` 和 `npm pack` 生成 v2.4.18 安装包，再按照下方步骤导入本地 `.tgz`。
+Harness `0.2.2-rc.5` 用户可在 `main` 上运行 `npm run build` 和 `npm pack` 生成 v2.4.19 安装包，再按照下方步骤导入本地 `.tgz`。
 
 历史的 [v2.4.10-rc.1](RELEASE-v2.4.10-rc.1.md) 使用不同的 macOS 原生红黄绿留白方案，仅供追溯。
 
