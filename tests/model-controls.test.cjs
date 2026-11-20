@@ -34,6 +34,21 @@ test('unavailable providers and stale efforts retain durable values without sile
   assert.equal(view.effortLabel,'Legacy');assert.equal(view.levels.length,0);
   assert.equal(api.effortSelection(null,{id:'max'}),undefined);
 });
+test('the model slot declares the options child slot so plugin rows keep an outlet', () => {
+  // The host renderer only hands a component its renderSlot when the registration declares that
+  // child slot. Without the declaration, plugins bound to conversation.input.model.options (the
+  // agent-team switch, for instance) register successfully but never render.
+  const registered = [];
+  const scope = { slots: {
+    inject: (_name, factory) => factory(),
+    register: (options, Component) => { registered.push({ options, Component }); return () => {}; }
+  } };
+  api.installModelControls({ inject: (_deps, factory) => factory(scope) }, () => ({}));
+  assert.equal(registered.length, 1);
+  assert.equal(registered[0].options.name, 'conversation.input.model');
+  assert.deepEqual(normalize(registered[0].options.children), { 'conversation.input.model.options': { kind: 'list', scope: 'session' } });
+});
+
 test('popover remains within the usable viewport on a narrow, short window', () => {
   const position=api.modelPopoverPlacement({top:400,bottom:432,right:306},{height:480},{width:320,height:600},136);
   assert.equal(position.width,296);assert.ok(position.left>=12);assert.ok(position.left+position.width<=308);
