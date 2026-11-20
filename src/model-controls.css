@@ -95,3 +95,14 @@ html[data-industrial-acid] [data-slot="conversation.input.right"]{display:flex!i
 html[data-industrial-acid] .GRgSLq_standardControls,html[data-industrial-acid] .GRgSLq_trailing{display:flex!important;align-items:center!important;gap:8px;padding-right:12px;min-height:36px;box-sizing:border-box}
 html[data-industrial-acid] .GRgSLq_standardControls .acid-model-controls,html[data-industrial-acid] .GRgSLq_trailing .acid-model-controls{margin:0;padding-right:0}
 html[data-industrial-acid] .GRgSLq_primary,html[data-industrial-acid] .GRgSLq_trailing>button,html[data-industrial-acid] .GRgSLq_standardControls>button{align-self:center}
+/* Options row contributed by plugins through conversation.input.model.options (e.g. agent-team).
+   The host slot outlet renders a display:contents anchor, so the row box has to be styled through
+   its child rather than the anchor itself. */
+.acid-model-team{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--acid-rule)}
+.acid-model-team:has(>[data-slot]:empty){display:none}
+.acid-model-team [data-slot]>div{--dsw-radius-md:0;--dsw-radius-full:0;--dsw-alias-brand-primary:var(--acid-accent-display);--dsw-alias-switch-thumb:var(--acid-paper);--dsw-alias-label-primary-foreground:var(--acid-ink);border:1px solid var(--acid-rule);border-left:4px solid transparent;background:transparent;min-height:52px;padding:9px 12px;gap:12px;font-size:14px;font-weight:600}
+.acid-model-team [data-slot]>div:has([aria-checked=true]){border-left-color:var(--acid-accent-display)}
+.acid-model-team [data-slot] [class*=infoButton]{color:var(--acid-accent-display)}
+.acid-model-team [data-slot] button[role=switch]{border:0!important;border-radius:0!important;padding:2px!important;box-shadow:inset 0 0 0 1px var(--acid-rule)!important;background:var(--dsw-alias-bg-layer-2)!important}
+.acid-model-team [data-slot] button[role=switch][aria-checked=true]{background:var(--acid-accent-display)!important;box-shadow:inset 0 0 0 1px var(--acid-ink)!important}
+.acid-model-team [data-slot] button[role=switch] span{border-radius:0!important}

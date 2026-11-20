@@ -82,7 +82,7 @@ function ReasonEnergy({ motion, appearance, levels, position, readout, compact =
   return compact ? null : h('span', { ref: owner, className: 'acid-max-canvas-owner', 'aria-hidden': true });
 }
 
-function IndustrialModelControls({ locked, available, directory, load, select, t, useAppearance }) {
+function IndustrialModelControls({ locked, available, directory, load, select, t, renderSlot, useAppearance }) {
   const state = React.useSyncExternalStore(fn => directory.subscribe(fn), () => directory.getSnapshot());
   const appearance = useAppearance(), motion = appearance.effectiveMotion;
   const accent = appearance.palettes[appearance.mode].accent;
@@ -190,6 +190,12 @@ function IndustrialModelControls({ locked, available, directory, load, select, t
       if (event.shiftKey && event.target === controls[0] || !event.shiftKey && event.target === controls.at(-1)) { event.preventDefault(); close(true); }
     }
   }
+  // Plugins such as agent-team register rows into this slot. The host renderer only hands a
+  // component its renderSlot when the entry declares that child slot, so the model popover has to
+  // forward the options row itself or those plugins stay unreachable.
+  const optionsRow = () => typeof renderSlot !== 'function' ? null
+    : h('div', { className:'acid-model-team' }, renderSlot('conversation.input.model.options',
+      { locked:disabled, dismiss:()=>close(true), reportFailure:message=>setError(String(message)) }));
   const modal = open ? h('section', { ref: panel, id, role: 'dialog', 'aria-label': t('models.title'), 'aria-modal': false,
     className: 'acid-model-popover', onKeyDown: onKey,
     style: position ? { ...position, visibility: 'visible' } : { visibility: 'hidden', top: 0, left: 0 } },
@@ -227,6 +233,7 @@ function IndustrialModelControls({ locked, available, directory, load, select, t
     snapshot.index < 0 && snapshot.levels.length ? h('p',{className:'acid-model-notice'},t('models.unavailable')) : null,
     (error || state.error) ? h('div', { className:'acid-model-error', role:'alert' }, error || state.error,
       h('button',{type:'button',disabled:busy,onClick:()=>{setError('');load();}},t('models.retry'))) : null,
+    optionsRow(),
     h('footer', { className:'acid-model-note', role:'status' }, busy ? t('models.saving') : t('models.next'))) : null;
   return h('div', { ref: anchor, className:'acid-model-controls', 'data-model-provider':state.current?.provider,
     'data-model-id':state.current?.model, 'data-model-effort':snapshot.effort, 'data-model-status':state.status, 'data-energy-motion':motion },
@@ -245,6 +252,7 @@ function installModelControls(ctx, useAppearance) {
   ctx.inject(['modelDirectories','sessions','remote','remote.session'], scope => {
     scope.slots.inject('conversation.input.model', () => scope.slots.register({
       name:'conversation.input.model', id:'industrial.model-controls', locale:'industrial.acid', priority:-100,
+      children:{'conversation.input.model.options':{kind:'list',scope:'session'}},
       inject:sessionId => {
         const directory = scope.modelDirectories.directoryFor(sessionId);
         const available = scope.sessions.subagentAddress(sessionId) === undefined;
