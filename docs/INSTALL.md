@@ -1,8 +1,8 @@
 # 安装与开发
 
-当前正式版 **v2.4.17** 支持 Harness 0.2.2-rc.3。[更新说明](RELEASE-v2.4.17.md)
+当前正式版 **v3.0.0** 支持 Harness 0.2.0-rc.2 至 0.2.2-rc.5（rc.4 除外）。[更新说明](RELEASE-v3.0.0.md)
 
-Harness `0.2.2-rc.5` 用户可在 `main` 上运行 `npm run build` 和 `npm pack` 生成 v2.4.19 安装包，再按照下方步骤导入本地 `.tgz`。
+从 2.x 升级会保留工作区编号、颜色、侧栏样式、动效档位与用量界限。
 
 历史的 [v2.4.10-rc.1](RELEASE-v2.4.10-rc.1.md) 使用不同的 macOS 原生红黄绿留白方案，仅供追溯。
 
@@ -34,11 +34,11 @@ Harness `0.2.2-rc.5` 用户可在 `main` 上运行 `npm run build` 和 `npm pack
 
 ## 安装
 
-1. 下载 v2.4.17 的 `dsh-industrial-acid-skin-2.4.17.tgz` 运行包。[当前发行版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.17) · [历史版本](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases)
+1. 下载 v3.0.0 的 `dsh-industrial-acid-skin-3.0.0.tgz` 运行包。[当前发行版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v3.0.0) · [历史版本](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases)
 2. 在 Harness「插件 → 添加插件」的**包名或地址**输入框粘贴下方的 `.tgz` 完整 URL 后安装，完成后点击「立即启用」（提示重启时重启）：
 
    ```text
-   https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v2.4.17/dsh-industrial-acid-skin-2.4.17.tgz
+   https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v3.0.0/dsh-industrial-acid-skin-3.0.0.tgz
    ```
 
    或先从 Release 下载 `.tgz`，输入下载文件的**本机绝对路径**。Harness 的输入框接受 npm 包名、Git 地址、tarball URL 或本地路径。只输入文件名会触发 npm 查询。
@@ -46,9 +46,9 @@ Harness `0.2.2-rc.5` 用户可在 `main` 上运行 `npm run build` 和 `npm pack
 
 运行包内置字体、SVG 和编译后的客户端，皮肤资源可离线加载。插件包名保留 `dsh-industrial-acid-skin`，便于现有安装升级并保留外观偏好。
 
-核心皮肤使用 `ctx.theme.overrideTokens` 和原生扩展槽。2.4.17 兼容 DSH `>=0.2.0-rc.2 <0.2.2-0` 以及 `0.2.2-rc.1`、`0.2.2-rc.2` 和 `0.2.2-rc.3`。
+核心皮肤使用 `ctx.theme.overrideTokens` 和原生扩展槽。3.0.0 兼容 DSH `>=0.2.0-rc.2 <0.2.2-0` 以及 `0.2.2-rc.1`、`0.2.2-rc.2`、`0.2.2-rc.3` 和 `0.2.2-rc.5`。
 
-Windows 运行窗口图标沿用 2.4.1 的可撤销实现，停用插件时恢复原图标。可选标题栏适配器支持已核对哈希的原始 0.2.0-rc.2、0.2.1-rc.2、rc.3、rc.5、0.2.2-rc.1、0.2.2-rc.2 和 0.2.2-rc.3。适配器文件为 `dsh-industrial-caption-adapter-2.4.17.zip`。Harness 更新可能覆盖旧适配器，保留旧恢复记录并先检查当前 archive。[下载适配器](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.17) · [适配器说明](DESKTOP-ADAPTER.md)
+Windows 运行窗口图标沿用 2.4.1 的可撤销实现，停用插件时恢复原图标。可选标题栏适配器支持已核对哈希的原始 0.2.0-rc.2、0.2.1-rc.2、rc.3、rc.5、0.2.2-rc.1、0.2.2-rc.2 和 0.2.2-rc.3。适配器目前仍为 v2.4.17 发布的 `dsh-industrial-caption-adapter-2.4.17.zip`，3.0.0 没有更新适配器。Harness 更新可能覆盖旧适配器，保留旧恢复记录并先检查当前 archive。[下载适配器](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.17) · [适配器说明](DESKTOP-ADAPTER.md)
 
 ## 构建与测试
 

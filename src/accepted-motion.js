@@ -3,6 +3,7 @@ let activeAcceptedMotion;
 // Resolved per use: at module scope the app tree does not exist yet, so a frozen value here
 // would silently disable composer decoration for the whole session.
 const composerSelector=()=>moduleSelector('[data-composer-card=true],.RlGAzG_card');
+const KEY_BUTTONS='.acid-masthead button,.acid-ws-command,.acid-drawer-handle,.acid-thin-expand,.acid-dialog button';
 const ACCEPTED_MOTION = Object.freeze({hover:300,press:380,page:600,workspace:560,menu:500,dialog:600,composer:360,trace:500,signal:1200});
 function acceptedDuration(kind, motion) { return motion === 'off' ? 0 : Math.round(ACCEPTED_MOTION[kind] * (motion === 'quiet' ? .3 : 1)); }
 function nativeRightTrack(columns) { return Number(/minmax\(0px,\s*([\d.]+)px\)\s*$/.exec(columns)?.[1]??0); }
@@ -11,9 +12,11 @@ function compactRailColumns(columns) {
   return `56px minmax(0px, 1fr) minmax(0px, min(${right}px, max(0px, calc(100% - 456px))))`;
 }
 const NEXT_SIDEBAR_WIDTH=113;
+function nextSidebarRight(columns) {
+  return `minmax(0px, min(${nativeRightTrack(columns)}px, max(0px, calc(100% - ${NEXT_SIDEBAR_WIDTH+400}px))))`;
+}
 function nextSidebarColumns(columns) {
-  const right=nativeRightTrack(columns);
-  return `${NEXT_SIDEBAR_WIDTH}px minmax(0px, 1fr) minmax(0px, min(${right}px, max(0px, calc(100% - ${NEXT_SIDEBAR_WIDTH+400}px))))`;
+  return `${NEXT_SIDEBAR_WIDTH}px minmax(0px, 1fr) ${nextSidebarRight(columns)}`;
 }
 function surfaceUnion(before,after,top=0) {
   const left=Math.min(before.left,after.left),right=Math.max(before.left+before.width,after.left+after.width);
@@ -25,6 +28,23 @@ function nativePaneKey(pane,panel) {
   return `${panel?.getAttribute('data-sidebar-right-session')??''}:${kind}:${pane.getAttribute('data-dockkit-'+kind)}`;
 }
 
+// Mask v3 (print slab). Columns per event: workspace 4, page and side panels 3, dialog 2, menus 1.
+const MASK_COLUMNS=Object.freeze({workspace:4,page:3,columns:3,dialog:2,trace:1,menu:1,hover:1});
+const MASK_TIMING=Object.freeze({4:{enter:150,hold:90,exit:180},3:{enter:120,hold:45,exit:135},2:{enter:75,hold:30,exit:105},1:{enter:60,hold:15,exit:90}});
+const MASK_STAGGER=30,MASK_EASE='cubic-bezier(.7,0,.2,1)';
+// [enters from, leaves towards]: the slab falls in and keeps going, so the new surface shows from the leading edge.
+const MASK_SHUTTER=Object.freeze({'down-up':['inset(0 0 100% 0)','inset(100% 0 0 0)'],'left-right':['inset(0 100% 0 0)','inset(0 0 0 100%)'],'right-left':['inset(0 0 0 100%)','inset(0 100% 0 0)']});
+const MASK_BARCODE='<svg class="acid-mask-barcode" viewBox="0 0 28 14" aria-hidden="true"><path d="M1 0v14M4 0v14M6 0v14M10 0v14M11 0v14M15 0v14M18 0v14M19 0v14M23 0v14M26 0v14" stroke="currentColor" stroke-width="1.4"/></svg>';
+function maskText(value){return String(value??'').replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[ch]).slice(0,40);}
+// info: {number, label, mark} — the workspace number for the colour column, the HUD line, and the
+// workspace mark markup. Missing parts simply leave that column plain.
+function maskFaces(cols,info={}){
+  const colour={kind:'colour',html:cols===4&&info.number?`<b class="acid-mask-number">${maskText(info.number)}</b>`:''};
+  const dither={kind:'dither',html:''};
+  const hud={kind:'hud',html:`<span class="acid-mask-hud"><span class="acid-mask-plus"></span>${MASK_BARCODE}<span class="acid-mask-label">${maskText(info.label||'SIGNAL')}</span></span>`};
+  const mark={kind:'mark',html:`${info.mark||''}<span class="acid-mask-plus"></span>`};
+  return [colour,dither,hud,mark].slice(0,cols);
+}
 function createAcceptedMotionController(getMotion) {
   const runs = new Set(), surfaces = new WeakMap(), buttonRuns = new WeakMap();
   const buttons = new Set(), composers = new Set(), statuses = new Map(), panels = new Map();
@@ -58,10 +78,17 @@ function createAcceptedMotionController(getMotion) {
     runs.add(current);current.at(duration,()=>current.finish());return current;
   }
   function excluded(node) { return node?.closest?.('[data-acid-motion-owned],.acid-fx'); }
-  function mask(node, {mode='open',kind='menu',direction='down-up',done=()=>{}}={}) {
+  // Mask v3, the print slab: the shutter stays, but every column is printed from the one workspace
+  // colour (solid + number, 1-bit dither, ink HUD with registration, barcode and destination, the
+  // workspace mark). Bigger events get more columns. Columns fall in a 30ms wave and keep falling
+  // away, so content shows from the leading edge instead of waiting for a retreat.
+  function mask(node, {mode='open',kind='menu',direction='down-up',done=()=>{},info={}}={}) {
     const previous=surfaces.get(node);previous?.finish(false);
-    const duration=acceptedDuration(kind,getMotion());
-    if(!node||!duration||disposed){done();return;}
+    const motion=getMotion();
+    if(!node||motion==='off'||disposed){done();return;}
+    const quiet=motion==='quiet',cols=quiet?1:(MASK_COLUMNS[kind]??1),pace=MASK_TIMING[cols],scale=quiet?.6:1;
+    const enter=Math.round(pace.enter*scale),hold=Math.round(pace.hold*scale),exit=Math.round(pace.exit*scale),stagger=quiet?0:MASK_STAGGER;
+    const coveredAt=enter+(cols-1)*stagger,revealAt=coveredAt+hold,duration=revealAt+exit+(cols-1)*stagger;
     const original={clip:node.style.clipPath,positioned:node.classList.contains('acid-mask-positioned')};
     if(getComputedStyle(node).position==='static')node.classList.add('acid-mask-positioned');
     const current=run(node,duration,()=>{
@@ -70,23 +97,25 @@ function createAcceptedMotionController(getMotion) {
     });
     current.restore=()=>{node.style.clipPath=original.clip;if(!original.positioned)node.classList.remove('acid-mask-positioned');delete node.dataset.acidClosing;};
     const end=current.finish;current.finish=(commit=true)=>{if(current.ended)return;if(!commit)current.restore();end(commit);};
-    current.mustCommit=mode==='close';
+    current.mustCommit=mode==='close';current.coveredAt=coveredAt;
     if(mode==='close'&&panels.has(node))panels.get(node).suppressClose=true;
     surfaces.set(node,current);node.dataset.acidMaskDirection=direction;node.dataset.acidMaskPhase='cover';
     if(mode==='close')node.dataset.acidClosing='true';
-    const sheet=current.temp('acid-approved-mask');
-    sheet.innerHTML='<i></i><i></i><i></i><i></i>';
-    // Cover from the sidebar's outer edge, then retreat along the same axis.
-    const hidden=direction==='left-right'?'inset(0 100% 0 0)':direction==='right-left'?'inset(0 0 0 100%)':'inset(0 0 100% 0)';
-    const cover=[{clipPath:hidden},{clipPath:'inset(0)'}];
-    current.animate(sheet,cover,duration*.44);
-    if(mode==='open')current.animate(node,cover,duration*.44);
-    current.at(duration*.49,()=>{node.dataset.acidMaskPhase='covered';});
-    current.at(duration*.54,()=>{
+    const sheet=current.temp('acid-approved-mask');sheet.dataset.cols=String(cols);sheet.dataset.kind=kind;
+    const [from,to]=MASK_SHUTTER[direction]??MASK_SHUTTER['down-up'];
+    const columns=maskFaces(cols,info).map(face=>{const column=current.temp('acid-mask-col',sheet);column.dataset.face=face.kind;column.innerHTML=face.html;return column;});
+    // Horizontal shutters run from the edge they enter at, so the wave starts on that side.
+    const order=direction==='right-left'?[...columns].reverse():columns;
+    order.forEach((column,i)=>current.animate(column,[{clipPath:from},{clipPath:'inset(0)'}],enter,i*stagger,MASK_EASE));
+    if(mode==='open')current.animate(node,[{clipPath:from},{clipPath:'inset(0)'}],coveredAt,0,MASK_EASE);
+    current.at(coveredAt,()=>{node.dataset.acidMaskPhase='covered';});
+    current.at(revealAt,()=>{
       node.dataset.acidMaskPhase='reveal';
-      const reveal=[{clipPath:'inset(0)'},{clipPath:hidden}];
-      current.animate(sheet,reveal,duration*.46);
-      if(mode==='close')current.animate(node,reveal,duration*.46);
+      // one-frame tear on the ink column as the slab leaves
+      const hud=columns.find(column=>column.dataset.face==='hud')?.querySelector?.('.acid-mask-hud');
+      if(hud)current.animate(hud,[{transform:'none'},{transform:'translateX(5px)',offset:.34},{transform:'translateX(-3px)',offset:.67},{transform:'none'}],60,0,'steps(1,end)');
+      order.forEach((column,i)=>current.animate(column,[{clipPath:'inset(0)'},{clipPath:to}],exit,i*stagger,MASK_EASE));
+      if(mode==='close')current.animate(node,[{clipPath:'inset(0)'},{clipPath:to}],exit+(cols-1)*stagger,0,MASK_EASE);
     });
     return current;
   }
@@ -106,7 +135,7 @@ function createAcceptedMotionController(getMotion) {
     }
     return {clone,rect,display:getComputedStyle(node).display,time:performance.now(),scrolls};
   }
-  function proxy(captured,kind,mode='close',bounds=captured?.rect,direction='down-up') {
+  function proxy(captured,kind,mode='close',bounds=captured?.rect,direction='down-up',info={}) {
     if(!captured||getMotion()==='off'||disposed)return;
     const holder=document.createElement('div');holder.className='acid-transition-proxy';holder.dataset.acidMotionOwned='';
     holder.setAttribute('aria-hidden','true');holder.inert=true;
@@ -115,7 +144,7 @@ function createAcceptedMotionController(getMotion) {
     Object.assign(clone.style,{position:'absolute',inset:'auto',left:captured.rect.left-bounds.left+'px',top:captured.rect.top-bounds.top+'px',width:captured.rect.width+'px',height:captured.rect.height+'px',margin:'0',maxHeight:'none',display:captured.display,clipPath:'none',visibility:'visible'});
     holder.append(clone);document.body.append(holder);
     for(const scroll of captured.scrolls??[]){scroll.node.scrollTop=scroll.top;scroll.node.scrollLeft=scroll.left;}
-    const current=mask(holder,{mode,kind,direction,done:()=>holder.remove()});
+    const current=mask(holder,{mode,kind,direction,info,done:()=>holder.remove()});
     if(current)current.nodes.push(holder);else holder.remove();return current;
   }
   function swapSurface(record,node,label,direction='down-up') {
@@ -125,14 +154,14 @@ function createAcceptedMotionController(getMotion) {
       const next=node?.getBoundingClientRect()??captured.rect;
       const top=document.querySelector('.acid-masthead')?.getBoundingClientRect().bottom??0;
       record.run=proxy(captured,'page','swap',surfaceUnion(captured.rect,next,top),direction);
-      record.run?.at(acceptedDuration('page',getMotion())*.49,()=>captured.clone.remove());
+      record.run?.at(record.run.coveredAt,()=>captured.clone.remove());
     }else if(node)record.run=mask(node,{mode:'swap',kind:'page',direction});
     if(record.run)record.run.owner.dataset.transition=label;
     record.captured=undefined;
   }
   function syncCompactRail(frame) {
     // NEXT: the narrow strip sidebar keeps the native right panel track.
-    const properties={'--acid-next-columns':nextSidebarColumns(frame.style.gridTemplateColumns)};
+    const properties={'--acid-next-columns':nextSidebarColumns(frame.style.gridTemplateColumns),'--acid-next-right':nextSidebarRight(frame.style.gridTemplateColumns)};
     if(document.documentElement?.hasAttribute('data-windows-titlebar')){properties['--acid-rail-columns']=compactRailColumns(frame.style.gridTemplateColumns);properties['--acid-rail-right-width']=nativeRightTrack(frame.style.gridTemplateColumns)+'px';}
     if(!railFrames.has(frame))railFrames.set(frame,Object.keys(properties).map(name=>({name,value:frame.style.getPropertyValue(name),priority:frame.style.getPropertyPriority(name)})));
     for(const[name,value]of Object.entries(properties))if(frame.style.getPropertyValue(name)!==value)frame.style.setProperty(name,value);
@@ -145,7 +174,11 @@ function createAcceptedMotionController(getMotion) {
     const sidebar=frame.querySelector(moduleSelector('.mP3x-q_sidebarCol'));
     if(sidebar){
       const state=frame.hasAttribute('data-sidebar-collapsed')?'rail':'wide',previous=shellSurfaces.get(sidebar);
-      if(previous&&previous.state!==state){previous.state=state;swapSurface(previous,sidebar,'sidebar-'+state,'left-right');geometryDirection='left-right';}
+      // NEXT strips / thin lines animate their own fold (railMorph); they never take the mask.
+      const folding=/^(next|thin)$/.test(document.documentElement.getAttribute('data-acid-sidebar')??'');
+      if(previous&&previous.state!==state){previous.state=state;
+        if(folding){previous.run?.finish(false);previous.captured=undefined;if(pendingStage?.shell)pendingStage=undefined;}
+        else{swapSurface(previous,sidebar,'sidebar-'+state,'left-right');geometryDirection='left-right';}}
       else if(!previous)shellSurfaces.set(sidebar,{state});
     }
     const changedPanels=new Set(),visiblePanels=new Set();
@@ -190,8 +223,9 @@ function createAcceptedMotionController(getMotion) {
     pendingStage=snapshot(document.querySelector(shell?moduleSelector('.mP3x-q_frame'):moduleSelector('.mP3x-q_centerCol')));
     if(pendingStage)pendingStage.shell=shell;
   }
-  function revealStage(kind='page',direction='down-up') {
+  function revealStage(kind='page',direction='down-up',info={}) {
     routeRun?.finish(false);
+    const maskKind=kind==='workspace'?'workspace':'page';
     const stage=document.querySelector(moduleSelector('.mP3x-q_centerCol'));if(!stage||getMotion()==='off'||disposed)return;
     if(pendingStage&&performance.now()-pendingStage.time<2000) {
       const captured=pendingStage;pendingStage=null;
@@ -199,9 +233,9 @@ function createAcceptedMotionController(getMotion) {
       // switches underneath it immediately, without intercepting its action.
       const top=document.querySelector('.acid-masthead')?.getBoundingClientRect().bottom??0;
       const bounds=captured.shell?surfaceUnion(captured.rect,stage.getBoundingClientRect(),top):captured.rect;
-      routeRun=proxy(captured,'page','swap',bounds,direction);
-      routeRun?.at(acceptedDuration('page',getMotion())*.49,()=>captured.clone.remove());
-    } else routeRun=mask(stage,{mode:'swap',kind:'page',direction});
+      routeRun=proxy(captured,maskKind,'swap',bounds,direction,info);
+      routeRun?.at(routeRun.coveredAt,()=>captured.clone.remove());
+    } else routeRun=mask(stage,{mode:'swap',kind:maskKind,direction,info});
     if(routeRun)routeRun.owner.dataset.transition=kind;
   }
   function decorateButton(button) {
@@ -214,19 +248,20 @@ function createAcceptedMotionController(getMotion) {
     button.prepend(layer);
     return true;
   }
+  // Hover belongs to the keys that matter (masthead, rail commands, drawer, dialogs, composer); the
+  // corners snap in two steps and CSS holds them while hovered. A press is one short flash.
+  function keyButton(button){return !!button.closest?.(`${KEY_BUTTONS},${composerSelector()}`);}
   function feedback(button, kind='press') {
     if(button.disabled||getMotion()==='off'||disposed||!decorateButton(button))return;
+    if(kind==='hover'&&!keyButton(button))return;
     buttonRuns.get(button)?.finish(false);
-    const current=run(button,acceptedDuration(kind,getMotion()));buttonRuns.set(button,current);
+    const duration=Math.round((kind==='hover'?120:160)*(getMotion()==='quiet'?.6:1));
+    const current=run(button,duration);buttonRuns.set(button,current);
     button.dataset.acidFeedback=kind;
     if(kind==='hover') {
-      button.querySelectorAll(':scope > .acid-fx .acid-hover-corner').forEach((corner,i)=>current.animate(corner,[
-        {opacity:0,transform:`translate(${i%2?6:-6}px,${i>1?6:-6}px)`},{opacity:1,transform:'none',offset:.65},{opacity:0,transform:'none'}],acceptedDuration(kind,getMotion())));
-      current.animate(button.querySelector('.acid-hover-line'),[{opacity:0,transform:'scaleX(0)'},{opacity:1,transform:'scaleX(1)',offset:.75},{opacity:0}],acceptedDuration(kind,getMotion()));
-    } else {
-      current.animate(button.querySelector('.acid-press-fill'),[{clipPath:'inset(0 50%)',opacity:.7},{clipPath:'inset(0)',opacity:.65,offset:.6},{opacity:0}],acceptedDuration(kind,getMotion()));
-      current.animate(button.querySelector('.acid-press-outline'),[{opacity:0,transform:'scale(.98)'},{opacity:1,transform:'scale(1.08)',offset:.6},{opacity:0,transform:'scale(1.12)'}],acceptedDuration(kind,getMotion()));
-    }
+      button.dataset.acidKey='';
+      button.querySelectorAll(':scope > .acid-fx .acid-hover-corner').forEach(corner=>current.animate(corner,[{opacity:0,transform:'scale(1.4)'},{opacity:1,transform:'none'}],duration,0,'steps(2,end)'));
+    } else current.animate(button.querySelector('.acid-press-fill'),[{opacity:.85},{opacity:.85,offset:.4},{opacity:0}],duration,0,'linear');
   }
   function decorateComposer(node) {
     if(excluded(node)||composers.has(node))return;composers.add(node);node.classList.add('acid-accepted-composer');

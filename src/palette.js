@@ -35,6 +35,14 @@ function normalizePalettes(value) {
     Object.entries(DEFAULT_PALETTES[mode]).map(([key, fallback]) => [key, normalizeHex(value?.[mode]?.[key], fallback)])
   )]));
 }
+// The active (or hovered) workspace's identity colour takes over the acid accent in both modes.
+// Only the accent moves: signal, reading canvas and text stay the user's, and makeScheme keeps
+// every derived foreground readable for whatever colour arrives here.
+function accentPalettes(palettes, accent) {
+  const hex = normalizeHex(accent, null);
+  if (!hex) return palettes;
+  return Object.fromEntries(['day', 'night'].map(mode => [mode, { ...palettes[mode], accent: hex }]));
+}
 function normalizeCanvas(value) { return ['paper', 'night', 'adaptive'].includes(value) ? value : 'paper'; }
 function resolveMode(canvas, nativeScheme = 'light') {
   return canvas === 'night' || (canvas === 'adaptive' && nativeScheme === 'dark') ? 'night' : 'day';

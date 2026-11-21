@@ -211,3 +211,77 @@ html[data-industrial-acid] [data-phase=hero] .WOwLGG_headline{justify-content:fl
 html[data-industrial-acid] [data-phase=hero] .WOwLGG_headline [class$=_titleGroup]{justify-content:flex-start}
 html[data-industrial-acid] [data-phase=hero] [data-composer-card=true]{min-height:156px}
 html[data-industrial-acid] [data-phase=hero] [data-composer-card=true] .GRgSLq_input{min-height:76px}
+/* HUD masthead (v4): one colour slab (wordmark + workspace) that follows the current or previewed
+   workspace, a quiet HUD (counts + an ops wall of the other workspaces' states), two HUD keys and the
+   caption column. Older masthead rules stay in place underneath; this block overrides them. */
+html[data-industrial-acid][data-acid-masthead=hud]{--acid-header-height:96px!important}
+html[data-industrial-acid] .acid-masthead[data-acid-hud]{--hud-slab:var(--acid-ws-context,var(--acid-lime));--hud-ink:var(--acid-ws-context-fore,var(--acid-accent-fore));--hud-ground:#0E0F0F;--hud-raised:#1A1C1C;--hud-line:#3A3D3D;--hud-text:#ECECE8;--hud-muted:#9A9E9C;grid-template-columns:236px 456px minmax(0,1fr) 136px!important;grid-template-areas:"brand ctx hud keys";grid-template-rows:minmax(0,1fr)!important;padding-right:0!important;background:var(--hud-ground);border-bottom:2px solid var(--hud-slab)!important}
+html[data-industrial-acid] .acid-masthead[data-acid-hud][data-acid-caption]{grid-template-columns:236px 456px minmax(0,1fr) 136px 40px!important;grid-template-areas:"brand ctx hud keys win"}
+.acid-masthead[data-acid-hud]>.acid-wordmark{grid-area:brand}.acid-masthead[data-acid-hud]>.acid-context{grid-area:ctx}.acid-masthead[data-acid-hud]>.acid-hud{grid-area:hud}.acid-masthead[data-acid-hud]>.acid-menus{grid-area:keys}.acid-masthead[data-acid-hud]>.acid-window-controls{grid-area:win}
+/* the slab: wordmark and workspace share one colour */
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-wordmark{position:relative;padding:0 16px 0 20px!important;gap:0!important;background:var(--hud-slab)!important;color:var(--hud-ink)!important}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-wordmark:after{content:''!important;display:block!important;position:absolute;left:auto;right:0;top:16px;bottom:16px;width:1px;height:auto;background:currentColor!important;opacity:.35}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-brand-home{display:flex;align-items:center;gap:10px;width:100%;height:100%;color:inherit}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-wordmark .acid-brand-symbol{width:38px!important;height:38px!important}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-wordmark-svg{flex:1;min-width:0}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-wordmark-svg>svg{width:100%!important;max-height:52px!important}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-context{position:relative;display:flex!important;align-items:stretch!important;gap:12px!important;padding:0 14px!important;border:0!important;background:var(--hud-slab)!important;color:var(--hud-ink)!important;overflow:hidden!important;text-align:left}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-context :is(.workspace-glyph,.acid-meta,.acid-context-title,.acid-context-path){color:var(--hud-ink)!important}
+/* the number bleeds off the bottom edge, poster style */
+html[data-industrial-acid] .acid-masthead[data-acid-hud] :is(.workspace-counter,.acid-context-number){font-size:104px!important;line-height:1!important}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .workspace-counter{display:flex;align-self:flex-end;inline-size:2.18em;block-size:1em;margin-bottom:-.3em;color:var(--hud-ink)!important}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .workspace-detail{flex:1;min-width:0;justify-content:center!important;gap:6px!important;padding:10px 0}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .workspace-detail .acid-meta{font:700 9px/1 var(--acid-mono)!important;letter-spacing:.08em}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] #workspace-name{display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden!important;white-space:normal!important;font:700 16px/1.08 var(--acid-mono)!important;text-transform:uppercase;word-break:break-word}
+.acid-context-path{display:block;min-width:0;font:500 9px/1.2 var(--acid-mono);letter-spacing:.02em;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-workspace-arrow{display:none!important}
+.acid-context-mark{position:relative;flex:none;align-self:center;width:68px;height:80px}
+.acid-context-mark>.acid-ws-mark-host{display:block;width:34px;height:40px;transform:scale(2);transform-origin:0 0;--mk-fg:var(--hud-ink);--mk-bg:var(--hud-slab)}
+.acid-context-reg{position:absolute;left:-6px;top:-6px;width:80px;height:92px;pointer-events:none}
+/* the HUD: counts on top, the ops wall below */
+.acid-hud{position:relative;display:grid;grid-template-rows:minmax(0,1fr) minmax(0,1fr);min-width:0;background:var(--hud-ground);color:var(--hud-text)}
+.acid-hud-fields{display:flex;align-items:center;min-width:0;overflow:hidden}
+.acid-hud-field{display:flex;flex-direction:column;gap:6px;min-width:0;padding:0 12px;border-left:1px solid var(--hud-line)}
+.acid-hud-field>span{font:500 9px/1 var(--acid-mono);letter-spacing:.08em;color:var(--hud-muted);white-space:nowrap}
+.acid-hud-field>b{font:700 13px/1 var(--acid-mono);letter-spacing:.04em;white-space:nowrap}
+.acid-hud-ops{display:flex;align-items:center;gap:14px;min-width:0;padding:0 12px;border-top:1px solid var(--hud-line);border-left:1px solid var(--hud-line);overflow:hidden}
+.acid-hud-label,.acid-hud-quiet,.acid-hud-more{flex:none;font:700 9px/1 var(--acid-mono);letter-spacing:.08em;color:var(--hud-muted)}
+.acid-hud-quiet{font-weight:500}
+.acid-hud-op{display:flex;align-items:center;gap:6px;flex:none;padding:0;border:0;background:none;color:var(--hud-text);cursor:pointer;-webkit-app-region:no-drag}
+.acid-hud-op-mark{display:block;flex:none;width:26px;height:30px;padding:3px 4px;box-sizing:border-box;overflow:hidden;background:var(--acid-ws-id);color:#0B0C0D;--mk-fg:#0B0C0D;--mk-bg:var(--acid-ws-id)}
+.acid-hud-op-mark>.acid-ws-mark{transform:scale(.53);transform-origin:0 0}
+.acid-hud-op[data-state=done] .acid-hud-op-mark{background:var(--acid-next-idle,#3A3D40);color:var(--acid-next-idle-ink,#B4B8B1);--mk-fg:var(--acid-next-idle-ink,#B4B8B1);--mk-bg:var(--acid-next-idle,#3A3D40)}
+.acid-hud-op-text{display:flex;flex-direction:column;gap:3px;text-align:left}
+.acid-hud-op-text>b{font:700 11px/1 var(--acid-mono)}
+.acid-hud-op-text>span{font:500 8px/1 var(--acid-mono);letter-spacing:.08em;color:var(--hud-muted);white-space:nowrap}
+.acid-hud-op[data-state=attention] .acid-hud-op-text>span{color:var(--acid-ws-id)}
+.acid-hud-op:hover .acid-hud-op-text>b{text-decoration:underline}
+.acid-hud-op:focus-visible{outline:2px solid var(--hud-text);outline-offset:2px}
+/* the two keys */
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-menus{display:grid!important;grid-template-columns:1fr 1fr!important;grid-template-rows:1fr!important;background:var(--hud-ground)!important;color:var(--hud-text)!important}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-menus button{position:relative;display:flex!important;flex-direction:column;align-items:center;justify-content:center!important;gap:8px!important;padding:0!important;border:0!important;border-left:1px solid var(--hud-line)!important;background:transparent;color:var(--hud-text)!important}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-menus button:hover{background:var(--hud-raised)!important}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-menus button:focus-visible{outline:2px solid var(--hud-text);outline-offset:-4px}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-menus .acid-hud-serial{position:absolute;left:7px;top:7px;font:500 8px/1 var(--acid-mono)!important;color:var(--hud-muted)!important}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-menus .acid-hud-icon{display:block;color:var(--hud-text)!important;line-height:0}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-menus .acid-hud-key{font:400 11px/1 var(--dsw-font-family)!important;color:var(--hud-text)!important;white-space:nowrap}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-window-controls{background:#0B0C0D!important;border-left:1px solid var(--hud-line)!important}
+html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-window-controls button{border-bottom-color:var(--hud-line)!important;color:var(--hud-text)!important;font-size:15px!important}
+@media(max-width:1190px){
+  html[data-industrial-acid] .acid-masthead[data-acid-hud]{grid-template-columns:196px 396px minmax(0,1fr) 120px!important}
+  html[data-industrial-acid] .acid-masthead[data-acid-hud][data-acid-caption]{grid-template-columns:196px 396px minmax(0,1fr) 120px 40px!important}
+  html[data-industrial-acid] .acid-masthead[data-acid-hud] :is(.workspace-counter,.acid-context-number){font-size:88px!important}
+  .acid-hud-field:nth-child(n+4){display:none}
+}
+@media(max-width:980px){
+  html[data-industrial-acid] .acid-masthead[data-acid-hud]{grid-template-columns:176px minmax(0,1fr) 112px!important;grid-template-areas:"brand ctx keys"}
+  html[data-industrial-acid] .acid-masthead[data-acid-hud][data-acid-caption]{grid-template-columns:176px minmax(0,1fr) 112px 40px!important;grid-template-areas:"brand ctx keys win"}
+  .acid-masthead[data-acid-hud] .acid-hud{display:none}
+}
+@media(max-width:720px){
+  html[data-industrial-acid][data-acid-masthead=hud]{--acid-header-height:84px!important}
+  html[data-industrial-acid] .acid-masthead[data-acid-hud]{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)!important;grid-template-areas:"brand ctx"}
+  html[data-industrial-acid] .acid-masthead[data-acid-hud][data-acid-caption]{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr) 36px!important;grid-template-areas:"brand ctx win"}
+  .acid-masthead[data-acid-hud] :is(.acid-menus,.acid-context-mark){display:none!important}
+  html[data-industrial-acid] .acid-masthead[data-acid-hud] :is(.workspace-counter,.acid-context-number){font-size:64px!important}
+}

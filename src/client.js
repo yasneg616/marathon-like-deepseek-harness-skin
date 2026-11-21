@@ -81,16 +81,23 @@ window.__ModuleLoader__.load({
     const PALETTE_PREF = `${ID}:palettes`;
     const MOTION_PREF = `${ID}:motion`;
     const SIDEBAR_PREF = `${ID}:sidebar-style`;
+    const WORKSPACE_ACCENT_PREF = `${ID}:workspace-accent`;
+    const COLOR_SET_PREF = `${ID}:workspace-color-set`;
+    const normalizeWorkspaceAccent = value => value === 'off' ? 'off' : 'on';
     const normalizeSidebar = value => value === 'classic' ? 'classic' : 'next';
     const NS = 'industrial.acid';
     /*__PALETTE_CORE__*/
     /*__TOKEN_ACTIVITY_CORE__*/
     /*__MARATHON_CORE__*/
     const dictionaries = {
-      zh: { 'workspace': '工作区', 'none': '未选择工作区', 'plugins': '插件', 'settings': '设置', 'canvas': '皮肤外观', 'canvas.description': '白天与黑天切换整套皮肤；跟随应用使用原有外观设置。', 'paper': '白天', 'night': '黑天', 'adaptive': '跟随应用', 'local': '本地工作区', 'palette': '调色盘', 'palette.description': '调整即生效，白天与黑天分别保存。', 'accent': '酸性色', 'signal': '交互色', 'surface': '阅读背景', 'text': '正文色', 'acid': '经典酸性', 'orange': '工业橙', 'polar': '极地信号', 'reset': '恢复默认', 'contrast': '正文对比度', 'adjusted': '已增强正文对比度，实际颜色', 'hex': 'HEX 色值', 'motion': '动效', 'full': '完整', 'quiet': '克制', 'off': '停止' },
-      en: { 'workspace': 'WORKSPACE', 'none': 'No workspace selected', 'plugins': 'Plugins', 'settings': 'Settings', 'canvas': 'Skin appearance', 'canvas.description': 'Day and night switch the entire skin. Follow app uses the existing appearance setting.', 'paper': 'Day', 'night': 'Night', 'adaptive': 'Follow app', 'local': 'LOCAL WORKSPACE', 'palette': 'Palette', 'palette.description': 'Updates immediately. Day and night palettes are saved separately.', 'accent': 'Acid accent', 'signal': 'Interaction', 'surface': 'Reading canvas', 'text': 'Text', 'acid': 'Classic acid', 'orange': 'Industrial orange', 'polar': 'Polar signal', 'reset': 'Reset palette', 'contrast': 'Text contrast', 'adjusted': 'Text contrast enhanced; effective color', 'hex': 'HEX color', 'motion': 'Motion', 'full': 'Full', 'quiet': 'Quiet', 'off': 'Off' }
+      zh: { 'workspace': '工作区', 'none': '未选择工作区', 'plugins': '插件', 'settings': '设置', 'canvas': '皮肤外观', 'canvas.description': '白天与黑天切换整套皮肤；跟随应用使用原有外观设置。', 'paper': '白天', 'night': '黑天', 'adaptive': '跟随应用', 'local': '本地工作区', 'palette': '调色盘', 'palette.description': '调整即生效，白天与黑天分别保存。', 'accent': '待机色', 'signal': '交互色', 'surface': '阅读背景', 'text': '正文色', 'acid': '经典酸性', 'orange': '工业橙', 'polar': '极地信号', 'reset': '恢复默认', 'contrast': '正文对比度', 'adjusted': '已增强正文对比度，实际颜色', 'hex': 'HEX 色值', 'motion': '动效', 'full': '完整', 'quiet': '克制', 'off': '停止' },
+      en: { 'workspace': 'WORKSPACE', 'none': 'No workspace selected', 'plugins': 'Plugins', 'settings': 'Settings', 'canvas': 'Skin appearance', 'canvas.description': 'Day and night switch the entire skin. Follow app uses the existing appearance setting.', 'paper': 'Day', 'night': 'Night', 'adaptive': 'Follow app', 'local': 'LOCAL WORKSPACE', 'palette': 'Palette', 'palette.description': 'Updates immediately. Day and night palettes are saved separately.', 'accent': 'Standby color', 'signal': 'Interaction', 'surface': 'Reading canvas', 'text': 'Text', 'acid': 'Classic acid', 'orange': 'Industrial orange', 'polar': 'Polar signal', 'reset': 'Reset palette', 'contrast': 'Text contrast', 'adjusted': 'Text contrast enhanced; effective color', 'hex': 'HEX color', 'motion': 'Motion', 'full': 'Full', 'quiet': 'Quiet', 'off': 'Off' }
     };
 
+    Object.assign(dictionaries.zh, { 'wsAccent': '工作区配色', 'wsAccent.description': '整套皮肤跟随当前工作区的颜色；悬停其他色条时只点亮那一条。关闭后固定使用待机色。', 'wsAccent.on': '跟随工作区', 'wsAccent.off': '固定调色盘', 'ws.collapse': '收起为色线', 'ws.expand': '展开工作区' });
+    Object.assign(dictionaries.en, { 'wsAccent': 'Workspace colors', 'wsAccent.description': 'The whole skin follows the current workspace color; hovering another strip lights only that strip. Off keeps the standby color.', 'wsAccent.on': 'Follow workspace', 'wsAccent.off': 'Fixed palette', 'ws.collapse': 'Collapse to lines', 'ws.expand': 'Expand workspaces' });
+    Object.assign(dictionaries.zh, { 'cs.title': '配色系统', 'cs.key': '配色', 'cs.workspaces': '工作区色票', 'cs.sets': '色票组 · 新工作区自动分到的颜色', 'cs.neon': '霓虹', 'cs.industrial': '工业', 'cs.polar': '极地', 'cs.resetAuto': '恢复自动', 'cs.canvas': '阅读画布', 'cs.signal': '互动与待机', 'signal.description': '按钮、链接、焦点框', 'standby.description': '没有选任何工作区时（首页、设置）使用', 'cs.followNote': '固定＝全局使用待机色', 'cs.live': '改动即时生效', 'sys.label': '系统抽屉' });
+    Object.assign(dictionaries.en, { 'cs.title': 'Color system', 'cs.key': 'Colors', 'cs.workspaces': 'Workspace colors', 'cs.sets': 'Color set · colors new workspaces are dealt', 'cs.neon': 'Neon', 'cs.industrial': 'Industrial', 'cs.polar': 'Polar', 'cs.resetAuto': 'Back to auto', 'cs.canvas': 'Reading canvas', 'cs.signal': 'Signal & standby', 'signal.description': 'Buttons, links, focus rings', 'standby.description': 'Used when no workspace is open (home, settings)', 'cs.followNote': 'Fixed = the standby color everywhere', 'cs.live': 'Changes apply immediately', 'sys.label': 'System drawer' });
     Object.assign(dictionaries.zh, { 'ws.color': '工作区颜色', 'ws.color.reset': '恢复默认', 'ws.working': '工作中', 'ws.done': '完成未读', 'ws.attention': '等待确认', 'sidebarStyle': '工作区样式', 'sidebarStyle.description': '切换后立即生效，并保留现有工作区和会话。', 'sidebarStyle.next': '新版色条', 'sidebarStyle.classic': '经典工作区' });
     Object.assign(dictionaries.en, { 'ws.color': 'Workspace color', 'ws.color.reset': 'Reset color', 'ws.working': 'Working', 'ws.done': 'Unread completion', 'ws.attention': 'Needs input', 'sidebarStyle': 'Workspace style', 'sidebarStyle.description': 'Applies immediately and keeps existing workspaces and conversations.', 'sidebarStyle.next': 'Color strips', 'sidebarStyle.classic': 'Classic workspaces' });
 
@@ -114,7 +121,7 @@ window.__ModuleLoader__.load({
     }
 
     function apply(ctx, config = {}) {
-      let preferences = { canvas: normalizeCanvas(config.canvas), palettes: normalizePalettes(), motion: 'full', sidebarStyle: 'next', workspaceColors: {} };
+      let preferences = { canvas: normalizeCanvas(config.canvas), palettes: normalizePalettes(), motion: 'full', sidebarStyle: 'next', workspaceColors: {}, workspaceAccent: 'on', colorSet: 'neon' };
       try {
         const stored = localStorage.getItem(PREF);
         if (['paper', 'night', 'adaptive'].includes(stored)) preferences.canvas = stored;
@@ -123,6 +130,19 @@ window.__ModuleLoader__.load({
       try { const storedMotion=localStorage.getItem(MOTION_PREF);if(['full','quiet','off'].includes(storedMotion))preferences.motion=storedMotion; } catch {}
       try { preferences.sidebarStyle = normalizeSidebar(localStorage.getItem(SIDEBAR_PREF)); } catch {}
       try { preferences.workspaceColors = normalizeWorkspaceColors(JSON.parse(localStorage.getItem(WORKSPACE_COLORS_PREF))); } catch {}
+      try { preferences.workspaceAccent = normalizeWorkspaceAccent(localStorage.getItem(WORKSPACE_ACCENT_PREF)); } catch {}
+      try { preferences.colorSet = normalizeColorSet(localStorage.getItem(COLOR_SET_PREF)); } catch {}
+      setIdentitySet(preferences.colorSet);
+      // Runtime only: the colour of the current workspace, or of the strip being hovered. It never
+      // reaches storage, so the saved palette stays the user's acid default.
+      let workspaceAccent = null;
+      // Memoised so subscribers only re-render when the palette or the accent actually changed.
+      let accentMemo = { palettes: null, accent: null, value: null };
+      const effectivePalettes = () => {
+        if (preferences.workspaceAccent !== 'on' || !workspaceAccent) return preferences.palettes;
+        if (accentMemo.palettes !== preferences.palettes || accentMemo.accent !== workspaceAccent) accentMemo = { palettes: preferences.palettes, accent: workspaceAccent, value: accentPalettes(preferences.palettes, workspaceAccent) };
+        return accentMemo.value;
+      };
       // Strips need the native workspace rows; classic lists may have selected flat grouping.
       const activateSidebar=style=>{if(style==='next')ctx.uiWorkspace?.view?.setGroupBy?.('workspace');};
       ctx.effect(()=>activateSidebar(preferences.sidebarStyle),`${ID}: workspace grouping`);
@@ -133,7 +153,7 @@ window.__ModuleLoader__.load({
       let refreshTokens, ownedStyle;
       const listeners = new Set();
       const themeSnapshot = () => ctx.theme.getTheme();
-      let view = { ...preferences, effectiveMotion: getMotion(), mode: resolveMode(preferences.canvas, themeSnapshot().active.colorScheme) };
+      let view = { ...preferences, effectiveMotion: getMotion(), mode: resolveMode(preferences.canvas, themeSnapshot().active.colorScheme), effectivePalettes: preferences.palettes };
       const subscribe = listener => { listeners.add(listener); return () => listeners.delete(listener); };
       const getSnapshot = () => view;
       const useAppearance = () => React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
@@ -146,7 +166,8 @@ window.__ModuleLoader__.load({
       };
       function syncAppearance(snapshot = themeSnapshot()) {
         const mode = resolveMode(preferences.canvas, snapshot.active.colorScheme);
-        const scheme = makeScheme(mode, preferences.palettes[mode]);
+        const palettes = effectivePalettes();
+        const scheme = makeScheme(mode, palettes[mode]);
         if (ownedStyle) {
           paintStyle(ownedStyle, 'html[data-industrial-acid]{' + Object.entries(scheme.variables).map(([key, value]) => `${key}:${value}`).join(';') + '}');
           document.documentElement.setAttribute('data-industrial-canvas', preferences.canvas);
@@ -154,22 +175,24 @@ window.__ModuleLoader__.load({
           document.documentElement.setAttribute('data-industrial-motion',getMotion());
           if(getMotion()==='off')motionController?.cancel();
         }
-        if (view.canvas !== preferences.canvas || view.palettes !== preferences.palettes || view.mode !== mode || view.motion !== preferences.motion || view.effectiveMotion !== getMotion() || view.sidebarStyle !== preferences.sidebarStyle || view.workspaceColors !== preferences.workspaceColors) {
-          view = { ...preferences, mode, effectiveMotion: getMotion() };
+        if (view.canvas !== preferences.canvas || view.palettes !== preferences.palettes || view.mode !== mode || view.motion !== preferences.motion || view.effectiveMotion !== getMotion() || view.sidebarStyle !== preferences.sidebarStyle || view.workspaceColors !== preferences.workspaceColors || view.workspaceAccent !== preferences.workspaceAccent || view.colorSet !== preferences.colorSet || view.effectivePalettes !== palettes) {
+          view = { ...preferences, mode, effectiveMotion: getMotion(), effectivePalettes: palettes };
           for (const listener of listeners) listener();
         }
       }
       function updateAppearance(next) {
-        const updated = { canvas: normalizeCanvas(next.canvas ?? preferences.canvas), palettes: normalizePalettes(next.palettes ?? preferences.palettes), motion: ['full','quiet','off'].includes(next.motion)?next.motion:preferences.motion, sidebarStyle: normalizeSidebar(next.sidebarStyle ?? preferences.sidebarStyle), workspaceColors: normalizeWorkspaceColors(next.workspaceColors ?? preferences.workspaceColors) };
+        const updated = { canvas: normalizeCanvas(next.canvas ?? preferences.canvas), palettes: normalizePalettes(next.palettes ?? preferences.palettes), motion: ['full','quiet','off'].includes(next.motion)?next.motion:preferences.motion, sidebarStyle: normalizeSidebar(next.sidebarStyle ?? preferences.sidebarStyle), workspaceColors: normalizeWorkspaceColors(next.workspaceColors ?? preferences.workspaceColors), workspaceAccent: normalizeWorkspaceAccent(next.workspaceAccent ?? preferences.workspaceAccent), colorSet: normalizeColorSet(next.colorSet ?? preferences.colorSet) };
         if(next.sidebarStyle==='next')activateSidebar('next');
         if (JSON.stringify(updated) === JSON.stringify(preferences)) return;
-        preferences = updated;
+        preferences = updated;setIdentitySet(preferences.colorSet);
         try {
           localStorage.setItem(PREF, preferences.canvas);
           localStorage.setItem(PALETTE_PREF, JSON.stringify(preferences.palettes));
           localStorage.setItem(MOTION_PREF, preferences.motion);
           localStorage.setItem(SIDEBAR_PREF, preferences.sidebarStyle);
           localStorage.setItem(WORKSPACE_COLORS_PREF, JSON.stringify(preferences.workspaceColors));
+          localStorage.setItem(WORKSPACE_ACCENT_PREF, preferences.workspaceAccent);
+          localStorage.setItem(COLOR_SET_PREF, preferences.colorSet);
         } catch { /* Changes remain usable in this session if storage is blocked. */ }
         refreshTokens?.();
       }
@@ -177,6 +200,13 @@ window.__ModuleLoader__.load({
         const colors={...preferences.workspaceColors};
         if(color===null)delete colors[id];else{const hex=normalizeHex(color,null);if(!hex)return;colors[id]=hex;}
         updateAppearance({workspaceColors:colors});
+      };
+      // The masthead reports the current workspace (or hover preview) colour; null returns to the palette.
+      const setWorkspaceAccent=color=>{
+        const hex=normalizeHex(color,null);
+        if(hex===workspaceAccent)return;
+        workspaceAccent=hex;
+        if(preferences.workspaceAccent==='on')(refreshTokens??syncAppearance)();
       };
 
       const activityStore = createTokenActivityStore(ctx);
@@ -252,9 +282,10 @@ window.__ModuleLoader__.load({
       ctx.on('theme/change', syncAppearance);
       ctx.effect(() => {
         const onStorage = event => {
-          if (event.key !== PREF && event.key !== PALETTE_PREF && event.key !== MOTION_PREF && event.key !== SIDEBAR_PREF && event.key !== WORKSPACE_COLORS_PREF && event.key !== null) return;
+          if (event.key !== PREF && event.key !== PALETTE_PREF && event.key !== MOTION_PREF && event.key !== SIDEBAR_PREF && event.key !== WORKSPACE_COLORS_PREF && event.key !== WORKSPACE_ACCENT_PREF && event.key !== COLOR_SET_PREF && event.key !== null) return;
           try {
-            preferences = { canvas: normalizeCanvas(localStorage.getItem(PREF) ?? config.canvas), palettes: normalizePalettes(JSON.parse(localStorage.getItem(PALETTE_PREF))), motion: ['full','quiet','off'].includes(localStorage.getItem(MOTION_PREF))?localStorage.getItem(MOTION_PREF):'full', sidebarStyle: normalizeSidebar(localStorage.getItem(SIDEBAR_PREF)), workspaceColors: normalizeWorkspaceColors(JSON.parse(localStorage.getItem(WORKSPACE_COLORS_PREF))) };
+            preferences = { canvas: normalizeCanvas(localStorage.getItem(PREF) ?? config.canvas), palettes: normalizePalettes(JSON.parse(localStorage.getItem(PALETTE_PREF))), motion: ['full','quiet','off'].includes(localStorage.getItem(MOTION_PREF))?localStorage.getItem(MOTION_PREF):'full', sidebarStyle: normalizeSidebar(localStorage.getItem(SIDEBAR_PREF)), workspaceColors: normalizeWorkspaceColors(JSON.parse(localStorage.getItem(WORKSPACE_COLORS_PREF))), workspaceAccent: normalizeWorkspaceAccent(localStorage.getItem(WORKSPACE_ACCENT_PREF)), colorSet: normalizeColorSet(localStorage.getItem(COLOR_SET_PREF)) };
+            setIdentitySet(preferences.colorSet);
             if(event.key===SIDEBAR_PREF||event.key===null)activateSidebar(preferences.sidebarStyle);
             refreshTokens?.();
           } catch { /* Keep the last usable colors after malformed external data. */ }
@@ -263,9 +294,9 @@ window.__ModuleLoader__.load({
         return () => { window.removeEventListener('storage', onStorage); listeners.clear(); };
       }, `${ID}: palette storage subscription`);
       ctx.effect(() => {
-        let dispose = ctx.theme.overrideTokens(ID, tokenOverrides(preferences.canvas, preferences.palettes));
+        let dispose = ctx.theme.overrideTokens(ID, tokenOverrides(preferences.canvas, effectivePalettes()));
         refreshTokens = () => {
-          const next = ctx.theme.overrideTokens(ID, tokenOverrides(preferences.canvas, preferences.palettes));
+          const next = ctx.theme.overrideTokens(ID, tokenOverrides(preferences.canvas, effectivePalettes()));
           dispose();
           dispose = next;
           syncAppearance();
@@ -279,6 +310,7 @@ window.__ModuleLoader__.load({
       }
       function AppearanceFooter({ wide, t }) {
         const state = useAppearance();const [paletteOpen,setPaletteOpen]=React.useState(false);
+        const tokens=React.useSyncExternalStore(activityStore.subscribe,activityStore.getSnapshot,activityStore.getSnapshot),sys=sysStatus(tokens);
         const [pinned,setPinned]=React.useState(false),drawer=React.useRef(null),bodyId=React.useId();
         const [rail,setRail]=React.useState(document.documentElement.getAttribute('data-acid-sidebar')==='next'),transition=React.useRef(null);
         React.useLayoutEffect(()=>{const root=document.documentElement,sync=()=>setRail(root.getAttribute('data-acid-sidebar')==='next');const observer=new MutationObserver(sync);observer.observe(root,{attributes:true,attributeFilter:['data-acid-sidebar']});sync();return()=>observer.disconnect();},[]);
@@ -293,9 +325,13 @@ window.__ModuleLoader__.load({
         if(!wide||state.sidebarStyle==='classic'||!rail)return h('div', { className: 'acid-footer' }, h(TokenActivity, { wide, t, store: activityStore, useAppearance }),modes,palette,dialog);
         return h('div', { className: 'acid-footer' }, h(TokenActivity, { wide, t, store: activityStore, useAppearance }),
           h('div',{ref:drawer,className:'acid-drawer',onKeyDown:event=>{if(event.key==='Escape'){changeDrawer(false);event.currentTarget.querySelector('.acid-drawer-handle')?.focus();}}},
-            h('button',{type:'button',className:'acid-drawer-handle','aria-label':`MORE — ${t('canvas')} / ${t('palette')}`,'aria-expanded':pinned,'aria-controls':bodyId,onClick:()=>changeDrawer(!!drawer.current?.closest(moduleSelector('.wtg9ga_footArea'))?.dataset.acidClosing||!pinned)},
-              h('span',{className:'acid-drawer-label'},'MORE',h('span',{className:'acid-drawer-chevron','aria-hidden':true},'⌃'))),
-            h('div',{id:bodyId,className:'acid-drawer-body'},h(DrawerTools),modes,palette)),dialog);
+            h('button',{type:'button',className:'acid-drawer-handle','data-state':pinned?'open':sys.alert?'alert':'idle','aria-label':`SYS — ${t('sys.label')}${sys.alert?` · ${sys.alertText}`:''}`,'aria-expanded':pinned,'aria-controls':bodyId,onClick:()=>changeDrawer(!!drawer.current?.closest(moduleSelector('.wtg9ga_footArea'))?.dataset.acidClosing||!pinned)},
+              h('span',{className:'acid-drawer-label'},!pinned&&sys.alert?`SYS ! ${sys.alertText}`:'SYS'),
+              h('span',{className:'acid-drawer-grip','aria-hidden':true}),
+              pinned?null:h('span',{className:'acid-drawer-meter','aria-hidden':true},...[0,1,2].map(k=>h('i',{key:k,'data-on':k<sys.level?'':undefined}))),
+              h('span',{className:'acid-drawer-chevron','aria-hidden':true},pinned?'⌄ CLOSE':'⌃')),
+            // Colours moved to the masthead's 01 COLOR SYSTEM; the drawer keeps system things.
+            h('div',{id:bodyId,className:'acid-drawer-body'},h(DrawerTools),modes)),dialog);
       }
       function CanvasRow({ t, prefix='acid' }) {
         const state = useAppearance(), palette = state.palettes[state.mode], scheme = makeScheme(state.mode, palette);
@@ -306,6 +342,7 @@ window.__ModuleLoader__.load({
             h('div', null, h('label', { htmlFor: `${prefix}-canvas` }, t('canvas')), h('p', null, t('canvas.description'))),
             h('select', { id: `${prefix}-canvas`, value: state.canvas, onChange: event => updateAppearance({ canvas: event.target.value }) }, ...['paper', 'night', 'adaptive'].map(value => h('option', { key: value, value }, t(value))))),
           h('div', { className: 'acid-setting-row' },h('label',{htmlFor:`${prefix}-motion`},t('motion')),h('select',{id:`${prefix}-motion`,value:state.motion,onChange:event=>updateAppearance({motion:event.target.value})},...['full','quiet','off'].map(value=>h('option',{key:value,value},t(value))))),
+          h('div', { className: 'acid-setting-row' },h('div',null,h('label',{htmlFor:`${prefix}-ws-accent`},t('wsAccent')),h('p',null,t('wsAccent.description'))),h('select',{id:`${prefix}-ws-accent`,value:state.workspaceAccent,onChange:event=>updateAppearance({workspaceAccent:event.target.value})},...['on','off'].map(value=>h('option',{key:value,value},t(`wsAccent.${value}`))))),
           h('div', { className: 'acid-setting-row' },h('div',null,h('label',{htmlFor:`${prefix}-sidebar-style`},t('sidebarStyle')),h('p',null,t('sidebarStyle.description'))),h('select',{id:`${prefix}-sidebar-style`,value:state.sidebarStyle,onChange:event=>updateAppearance({sidebarStyle:event.target.value})},...['next','classic'].map(value=>h('option',{key:value,value},t(`sidebarStyle.${value}`))))),
           h('div', { className: 'acid-palette-head' }, h('div', null, h('strong', null, `${t(state.mode === 'day' ? 'paper' : 'night')} / ${t('palette')}`), h('p', null, t('palette.description'))), h('button', { type: 'button', 'data-palette-reset': true, onClick: () => setPalette(DEFAULT_PALETTES[state.mode]) }, t('reset'))),
           h('div', { className: 'acid-palette-presets', role: 'group', 'aria-label': t('palette') }, ...Object.entries(presets).map(([key, colors]) => h('button', { key, type: 'button', 'data-palette-preset': key, 'aria-pressed': JSON.stringify(palette) === JSON.stringify(colors[state.mode]), onClick: () => setPalette(colors[state.mode]) }, h('span', { className: 'acid-preset-dot', style: { background: colors[state.mode].accent }, 'aria-hidden': true }), t(key)))),
@@ -320,7 +357,7 @@ window.__ModuleLoader__.load({
       ctx.effect(()=>{marathonDirector=createMarathonDirector({getMotion,getScope:()=>marathonStore.get().scope});const dispose=installMarathonProtocol({store:marathonStore,director:marathonDirector});return()=>{dispose();marathonDirector=undefined;};},`${ID}: secret terminal protocol`);
       ctx.effect(()=>{if(getMotion()==='off')return;const intro=document.createElement('div');intro.className='acid-intro';intro.setAttribute('aria-hidden','true');intro.innerHTML='<div class=acid-intro-name>DEEPSEEK<span>HARNESS</span></div><div class=acid-intro-bar></div>';document.body.append(intro);const timer=setTimeout(()=>intro.remove(),1250);return()=>{clearTimeout(timer);intro.remove();};},`${ID}: opening sequence`);
       const register = (name, id, Component, extra = {}) => ctx.slots.inject(name, () => ctx.slots.register({ name, id, locale: NS, ...extra }, Component));
-      register('shell.overlay', 'industrial.masthead', props=>h(Masthead,{...props,hostRpc:(method,payload)=>ctx.connection.rpc.call('/api',method,payload),statusSource:workspaceStatus,useAppearance,setWorkspaceColor,getMotion,paletteSettings:CanvasRow,setSidebarStyle:sidebarStyle=>updateAppearance({sidebarStyle}),motion:()=>motionController,toggleSidebar:()=>ctx.layout.toggleSidebar(),goHome:()=>ctx.layout.selectPanel(null),pickWorkspace:id=>ctx.uiWorkspace.openWorkspace(id).catch(()=>{})}), { order: -1000 });
+      register('shell.overlay', 'industrial.masthead', props=>h(Masthead,{...props,tokenStore:activityStore,updateAppearance,hostRpc:(method,payload)=>ctx.connection.rpc.call('/api',method,payload),statusSource:workspaceStatus,useAppearance,setWorkspaceColor,setWorkspaceAccent,getMotion,paletteSettings:CanvasRow,setSidebarStyle:sidebarStyle=>updateAppearance({sidebarStyle}),motion:()=>motionController,toggleSidebar:()=>ctx.layout.toggleSidebar(),goHome:()=>ctx.layout.selectPanel(null),pickWorkspace:id=>ctx.uiWorkspace.openWorkspace(id).catch(()=>{})}), { order: -1000 });
       register('conversation.hero.brand.mark', 'industrial.hero', HeroMark, { priority: -50 });
       register('sidebar.footer.action', 'industrial.signature', AppearanceFooter, { order: 1000 });
       register('settings.header', 'industrial.settings-header', SettingsHeader, { priority: -50 });

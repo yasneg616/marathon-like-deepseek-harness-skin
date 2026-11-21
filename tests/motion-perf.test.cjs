@@ -301,7 +301,8 @@ test('inserted buttons are decorated before paint, and the first hover, press an
   assert.equal(disabled.dataset.acidFeedback, undefined);
 
   stage.setMotion('full');
-  const button = stage.button();
+  // Hover feedback is reserved for key buttons (masthead, rail commands, drawer, dialogs, composer).
+  const button = stage.button({ closest(selector) { return String(selector).includes('.acid-ws-command') ? this : Object.getPrototypeOf(this).closest.call(this, selector); } });
   stage.body.append(button);
   main.fn([{ addedNodes: [button], removedNodes: [] }]);
   assert.equal(stage.pendingFrames(), 0);
@@ -310,24 +311,23 @@ test('inserted buttons are decorated before paint, and the first hover, press an
 
   fire('pointerover', { target: button, relatedTarget: null });
   assert.equal(button.dataset.acidFeedback, 'hover');
+  assert.equal(button.dataset.acidKey, '');
   const corners = animations.filter(entry => entry.node.classes.has('acid-hover-corner'));
   assert.equal(corners.length, 4);
   assert.equal(corners[0].animation.frames[0].opacity, 0);
   assert.equal(corners[0].animation.frames[1].opacity, 1);
   assert.equal(corners[0].animation.frames[1].transform, 'none');
-  assert.equal(corners[0].animation.options.duration, 300);
-  const line = animations.find(entry => entry.node.classes.has('acid-hover-line'));
-  assert.equal(line.animation.frames[0].transform, 'scaleX(0)');
-  assert.equal(line.animation.frames[1].transform, 'scaleX(1)');
+  assert.equal(corners[0].animation.options.duration, 120);
+  assert.equal(corners[0].animation.options.easing, 'steps(2,end)');
+  assert.equal(animations.find(entry => entry.node.classes.has('acid-hover-line')), undefined, 'no underline sweep');
 
   fire('pointerdown', { type: 'pointerdown', target: button, button: 0 });
   assert.equal(button.dataset.acidFeedback, 'press');
   const fill = animations.find(entry => entry.node.classes.has('acid-press-fill'));
-  assert.equal(fill.animation.frames[0].clipPath, 'inset(0 50%)');
-  assert.equal(fill.animation.frames[1].clipPath, 'inset(0)');
-  assert.equal(fill.animation.options.duration, 380);
-  const outline = animations.find(entry => entry.node.classes.has('acid-press-outline'));
-  assert.equal(outline.animation.frames[1].transform, 'scale(1.08)');
+  assert.equal(fill.animation.frames[0].opacity, .85);
+  assert.equal(fill.animation.frames.at(-1).opacity, 0);
+  assert.equal(fill.animation.options.duration, 160);
+  assert.equal(animations.find(entry => entry.node.classes.has('acid-press-outline')), undefined, 'one flash, no outline');
 
   stage.setMotion('quiet');
   const keyed = stage.button();
@@ -336,7 +336,7 @@ test('inserted buttons are decorated before paint, and the first hover, press an
   fire('click', { target: keyed, detail: 0 });
   assert.equal(keyed.dataset.acidFeedback, 'press');
   const quiet = animations.filter(entry => entry.node.parent === keyed.querySelector(':scope > .acid-fx') && entry.node.classes.has('acid-press-fill')).at(-1);
-  assert.equal(quiet.animation.options.duration, 114);
+  assert.equal(quiet.animation.options.duration, 96);
   controller.dispose();
 });
 
@@ -536,6 +536,8 @@ test('classic workspace chips and ordinals paint once per frame and settle after
     createElement: (type, props, ...children) => ({ type, props, children }),
     useState: value => [typeof value === 'function' ? value() : value, () => {}],
     useRef: value => ({ current: value }),
+    useMemo: fn => fn(),
+    useSyncExternalStore: (_subscribe, snapshot) => snapshot(),
     useLayoutEffect() {},
     useEffect(fn) { effects.push(fn); }
   };

@@ -256,15 +256,15 @@ test('workspace strips rank pending input over work over unread completion, usin
   assert.equal(listener, undefined); assert.equal(relay.getSnapshot().size, 0);
 });
 
-test('strip loops are owned by the skin, use ink on identity colours and stop when motion is off', () => {
+test('workspace marks carry the session state and stop when motion is off', () => {
   const css = fs.readFileSync(path.join(root, 'src/sidebar-next.css'), 'utf8');
-  for (const state of ['working', 'attention', 'done']) {
-    const rule = css.split(`[data-acid-ws-status=${state}] .wnFoaW_projectRow:after{`)[1]?.split('}')[0] ?? '';
-    assert.ok(rule.includes(`animation:acid-ws-${state}`), state);
-    assert.ok(rule.includes('%230B0C0D'), `${state} badge uses strip ink`);
-  }
-  assert.ok(css.includes('motion=off] [data-acid-ws-strip][data-acid-ws-status] .wnFoaW_projectRow:after{animation:none!important}'));
-  assert.ok(css.includes('prefers-reduced-motion:reduce){[data-acid-ws-strip][data-acid-ws-status] .wnFoaW_projectRow:after{animation:none!important}'));
+  assert.ok(!css.includes('.wnFoaW_projectRow:after{background:url('), 'the old centre badges are gone');
+  assert.ok(css.includes('.acid-ws-mark[data-state=attention]{'), 'waiting inverts the mark');
+  assert.ok(css.includes('.acid-ws-mark[data-state=done]{'), 'done frames the mark');
+  for (const family of ['totem', 'data', 'hazard', 'registration']) assert.ok(css.includes(`[data-state=working][data-family=${family}]`), family);
+  assert.ok(css.includes('html[data-industrial-motion=off] .acid-ws-mark,html[data-industrial-motion=off] .acid-ws-mark *{animation:none!important}'));
+  assert.ok(css.includes('prefers-reduced-motion:reduce){.acid-ws-mark,.acid-ws-mark *{animation:none!important}'));
+  assert.ok(css.includes(':not([data-acid-ws-status=working]):not([data-acid-ws-status=attention]){background:var(--acid-next-idle)'), 'running strips keep their colour');
 });
 
 test('secret terminal styles stay in their own namespace and never redefine skin tokens', () => {

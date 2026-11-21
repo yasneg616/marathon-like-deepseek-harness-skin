@@ -1,7 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 function load(){
   let api;
-  const code=fs.readFileSync(path.join(__dirname,'../lib/client.js'),'utf8').replace("return { inject: ['slots'","return { assignIdentity, stripPlacement, IDENTITY_COLORS, inject: ['slots'");
+  const code=fs.readFileSync(path.join(__dirname,'../lib/client.js'),'utf8').replace("return { inject: ['slots'","return { assignIdentity, stripPlacement, IDENTITY_COLORS, markHtml, markFamily, markSeed, MARK_FAMILIES, inject: ['slots'");
   vm.runInNewContext(code,{window:{__ModuleLoader__:{load:module=>api=module.factory(()=>({createElement:(...args)=>args}))}}});
   return api;
 }
@@ -288,4 +288,64 @@ test('next-strip decoration follows native rebuilds and in-place session changes
   assert.equal(rebuilt.group.style.vars['--acid-ws-fill'],'0.250');
   assert.equal(rebuilt.row.dataset.acidCount,'03');
   assert.equal(rebuilt.group.dataset.acidWsCount,'03');
+});
+test('workspace marks: families are dealt out like colours, shapes follow the id, states are drawn on the mark',()=>{
+  const {markHtml,markFamily,markSeed,MARK_FAMILIES}=load();
+  assert.deepEqual([0,1,2,3].map(markFamily),[...MARK_FAMILIES],'the first four workspaces get four different families');
+  assert.equal(new Set([0,1,2,3,4,5,6,7].map(markFamily)).size,4);
+  assert.equal(markSeed('ws-a'),markSeed('ws-a'));assert.notEqual(markSeed('ws-a'),markSeed('ws-b'));
+  for(const family of MARK_FAMILIES){
+    const idle=markHtml(family,markSeed('x'),undefined);
+    assert.equal(idle,markHtml(family,markSeed('x'),undefined),family+' is deterministic');
+    assert.match(idle,new RegExp(`data-family="${family}" data-state="idle"`));
+    assert.doesNotMatch(idle,/<script|\son\w+=/i);
+  }
+  assert.match(markHtml('totem',1,'working'),/acid-ws-mark-scan/);
+  assert.match(markHtml('data',1,'done'),/acid-ws-mark-badge/);
+  assert.match(markHtml('hazard',1,'attention'),/data-state="attention"/);
+  assert.match(markHtml('nope',1,'bogus'),/data-family="totem" data-state="idle"/);
+});
+function loadWith(names,react={}){
+  let api;
+  const code=fs.readFileSync(path.join(__dirname,'../lib/client.js'),'utf8').replace("return { inject: ['slots'",`return { ${names.join(', ')}, inject: ['slots'`);
+  vm.runInNewContext(code,{window:{__ModuleLoader__:{load:module=>api=module.factory(()=>({createElement:(...args)=>args,useState:value=>[value,()=>{}],...react}))}}});
+  return api;
+}
+test('colour sets recolour AUTO workspaces in place and never touch a custom colour',()=>{
+  const {setIdentitySet,workspaceIdentity,IDENTITY_SETS,normalizeColorSet}=loadWith(['setIdentitySet','workspaceIdentity','IDENTITY_SETS','normalizeColorSet']);
+  assert.equal(normalizeColorSet('polar'),'polar');assert.equal(normalizeColorSet('nope'),'neon');assert.equal(normalizeColorSet(undefined),'neon');
+  for(const colors of Object.values(IDENTITY_SETS))assert.equal(colors.length,10);
+  setIdentitySet('polar');
+  const polar=workspaceIdentity(['a','b'],{a:1,b:2},{b:'#123456'});
+  assert.equal(polar.a,IDENTITY_SETS.polar[0]);assert.equal(polar.b,'#123456');
+  setIdentitySet('industrial');
+  const industrial=workspaceIdentity(['a','b'],{a:1,b:2},{b:'#123456'});
+  assert.equal(industrial.a,IDENTITY_SETS.industrial[0]);assert.equal(industrial.b,'#123456');
+  setIdentitySet('neon');
+});
+test('SYS handle: token level against the three thresholds; hazard only past the top one or on a lost feed',()=>{
+  const {sysStatus,tokenActivityCalendar}=loadWith(['sysStatus','tokenActivityCalendar']);
+  const today=tokenActivityCalendar().find(day=>day.today).date,thresholds=[1e6,1e7,5e7];
+  const view=(input,status='ready')=>({thresholds,status,data:{days:[{date:today,input,output:0}]}});
+  assert.deepEqual({...sysStatus(view(2.4e6))},{level:1,alert:false,alertText:''});
+  assert.equal(sysStatus(view(2e7)).level,2);
+  const over=sysStatus(view(6e7));assert.equal(over.level,3);assert.equal(over.alert,true);assert.match(over.alertText,/\+$/);
+  assert.equal(sysStatus(view(10,'stale')).alertText,'SYNC');
+  assert.deepEqual({...sysStatus({status:'unavailable',thresholds})},{level:0,alert:false,alertText:''},'a host without the feed never alarms');
+});
+test('the color system lists every workspace with its mark, offers the three sets and writes choices back',()=>{
+  const {ColorSystem}=loadWith(['ColorSystem']);
+  const updates=[],picked=[];
+  const tree=ColorSystem({t:key=>key,appearance:{mode:'night',palettes:{night:{accent:'#D5FF00',signal:'#7957FF',surface:'#0C100F',text:'#EDEFE7'}},canvas:'night',workspaceAccent:'on',colorSet:'neon',workspaceColors:{b:'#123456'}},
+    updateAppearance:next=>updates.push(next),items:[{workspaceId:'a',title:'Alpha',path:'D:\a'},{workspaceId:'b',title:'Beta'}],numbers:{a:1,b:2},identity:{a:'#C6F500',b:'#123456'},marks:{a:{family:'totem',seed:1},b:{family:'data',seed:2}},activity:{a:'working'},setWorkspaceColor:(id,color)=>picked.push([id,color])});
+  const all=[];const visit=node=>{if(!Array.isArray(node))return;all.push(node);node.slice(2).forEach(visit);};visit(tree);
+  const byClass=name=>all.filter(node=>node[1]?.className===name);
+  assert.equal(byClass('acid-cs-set').length,3);
+  assert.equal(byClass('acid-cs-ws').length,2);
+  assert.equal(byClass('acid-cs-set').find(node=>node[1]['aria-pressed'])[1]['data-set'],'neon');
+  byClass('acid-cs-set').find(node=>node[1]['data-set']==='industrial')[1].onClick();
+  assert.deepEqual({...updates.at(-1)},{colorSet:'industrial'});
+  const tags=byClass('acid-cs-tag').map(node=>node[2]);assert.deepEqual([...tags],['AUTO','CUSTOM']);
+  all.find(node=>node[1]?.['aria-pressed']===false&&node[2]==='wsAccent.off')[1].onClick();
+  assert.deepEqual({...updates.at(-1)},{workspaceAccent:'off'});
 });

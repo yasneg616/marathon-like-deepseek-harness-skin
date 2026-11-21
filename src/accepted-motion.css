@@ -3,17 +3,25 @@
 .acid-hover-corner{position:absolute;width:11px;height:11px;border:solid currentColor;opacity:0;pointer-events:none}
 .acid-hover-corner.tl{left:0;top:0;border-width:3px 0 0 3px}.acid-hover-corner.tr{right:0;top:0;border-width:3px 3px 0 0}
 .acid-hover-corner.bl{left:0;bottom:0;border-width:0 0 3px 3px}.acid-hover-corner.br{right:0;bottom:0;border-width:0 3px 3px 0}
-.acid-hover-line{position:absolute;left:5px;right:5px;bottom:2px;height:1px;background:currentColor;transform-origin:left;opacity:0}
+.acid-layered[data-acid-key]:is(:hover,:focus-visible)>.acid-fx .acid-hover-corner{opacity:1}
+.acid-hover-line{display:none;position:absolute;left:5px;right:5px;bottom:2px;height:1px;background:currentColor;transform-origin:left;opacity:0}
 .acid-press-fill{position:absolute;inset:0;background:currentColor;opacity:0;pointer-events:none}
 .acid-press-outline{position:absolute;inset:0;border:1px solid currentColor;opacity:0;pointer-events:none}
-/* 04/06/07/10: vertical round trips; sidebars mirror horizontal round trips. */
+/* 04/06/07/10, v3 print slab: one workspace colour printed four ways; columns by event size. */
+.acid-approved-mask{position:absolute;inset:0;z-index:5;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));pointer-events:none;overflow:hidden;--mask-c:var(--acid-ws-context,var(--acid-lime));--mask-ink:var(--acid-ws-context-fore,var(--acid-accent-fore))}
+.acid-approved-mask[data-cols="1"]{grid-template-columns:minmax(0,1fr)}.acid-approved-mask[data-cols="2"]{grid-template-columns:repeat(2,minmax(0,1fr))}.acid-approved-mask[data-cols="3"]{grid-template-columns:repeat(3,minmax(0,1fr))}
+.acid-mask-col{position:relative;display:block;min-width:0;overflow:hidden;background:var(--mask-c);color:var(--mask-ink)}
+.acid-mask-col+.acid-mask-col{box-shadow:inset 1px 0 0 rgba(11,12,13,.28)}
+.acid-mask-col[data-face=dither]{background:radial-gradient(circle,var(--mask-c) 0 1.15px,#0B0C0D 1.35px) 0 0/4px 4px}
+.acid-mask-col[data-face=hud]{background:#0B0C0D;color:var(--mask-c)}
+.acid-mask-hud{position:absolute;inset:0;display:block}
+.acid-mask-plus{position:absolute;left:8px;top:10px;width:9px;height:9px;background:linear-gradient(currentColor,currentColor) 4px 0/1px 9px no-repeat,linear-gradient(currentColor,currentColor) 0 4px/9px 1px no-repeat}
+.acid-mask-barcode{position:absolute;left:10px;top:28px;width:28px;height:14px}
+.acid-mask-label{position:absolute;left:50%;bottom:14px;max-height:calc(100% - 64px);overflow:hidden;writing-mode:vertical-rl;transform:translateX(-50%) rotate(180deg);font:700 11px/1 var(--acid-mono);letter-spacing:.1em;white-space:nowrap;text-transform:uppercase}
+.acid-mask-number{position:absolute;left:50%;bottom:10px;writing-mode:vertical-rl;transform:translateX(-50%) rotate(180deg);font:900 clamp(48px,9vw,140px)/1 var(--acid-display);font-synthesis:none;white-space:nowrap}
+.acid-mask-col[data-face=mark] .acid-ws-mark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(2);color:var(--mask-ink);--mk-fg:var(--mask-ink);--mk-bg:var(--mask-c)}
+.acid-approved-mask[data-cols="1"] .acid-mask-col,.acid-approved-mask[data-cols="2"] .acid-mask-col{min-height:0}
 .acid-mask-positioned{position:relative}
-.acid-approved-mask{position:absolute;inset:0;z-index:5;display:grid;grid-template-columns:repeat(4,1fr);background:var(--acid-lime);color:var(--acid-accent-fore);pointer-events:none;overflow:hidden}
-.acid-approved-mask>i{border-right:1px solid color-mix(in srgb,currentColor 20%,transparent)}
-.acid-approved-mask>i:nth-child(1){background:var(--acid-lime)}
-.acid-approved-mask>i:nth-child(2){background:var(--acid-blue)}
-.acid-approved-mask>i:nth-child(3){background:var(--acid-palette-surface)}
-.acid-approved-mask>i:nth-child(4){background:var(--acid-palette-text)}
 .acid-transition-proxy{position:fixed;z-index:2200;overflow:hidden;pointer-events:none!important;isolation:isolate}
 .acid-transition-proxy *{pointer-events:none!important;animation:none!important;transition:none!important}
 .acid-transition-proxy>.acid-approved-mask{z-index:10}

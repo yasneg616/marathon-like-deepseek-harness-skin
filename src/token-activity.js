@@ -82,7 +82,7 @@ function TokenActivity({ wide, t, store, useAppearance }) {
   const state = React.useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot), appearance = useAppearance();
   const [settingsOpen, setSettingsOpen] = React.useState(false), [hovered, setHovered] = React.useState(null);
   const calendarId = React.useId();
-  const palette = appearance.palettes[appearance.mode], colors = [palette.surface, palette.text, palette.signal, palette.accent];
+  const palette = (appearance.effectivePalettes ?? appearance.palettes)[appearance.mode], colors = [palette.surface, palette.text, palette.signal, palette.accent];
   const calendar = tokenActivityCalendar(), records = new Map(state.data?.days.map(day => [day.date, day]) ?? []);
   const days = calendar.map(day => ({ ...(records.get(day.date) ?? { input: 0, output: 0, missingUsage: 0 }), ...day }));
   const today = days.find(day => day.today), available = !!state.data;

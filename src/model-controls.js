@@ -55,7 +55,7 @@ function ModelGlyph({ kind = 'model' }) {
 function ReasonEnergy({ motion, appearance, levels, position, readout, compact = false }) {
   const owner = React.useRef(null), instance = React.useRef(null);
   const signature = JSON.stringify(levels?.map(level => [level.id, level.name]) ?? []);
-  const scheme = makeScheme(appearance.mode, appearance.palettes[appearance.mode]);
+  const scheme = makeScheme(appearance.mode, (appearance.effectivePalettes ?? appearance.palettes)[appearance.mode]);
   const paletteVariables = {
     '--max-accent': scheme.variables['--acid-accent-display'], '--max-signal': scheme.tokens['--dsw-alias-link'],
     '--max-surface': scheme.palette.surface, '--max-ink': scheme.text,
@@ -85,7 +85,7 @@ function ReasonEnergy({ motion, appearance, levels, position, readout, compact =
 function IndustrialModelControls({ locked, available, directory, load, select, t, useAppearance }) {
   const state = React.useSyncExternalStore(fn => directory.subscribe(fn), () => directory.getSnapshot());
   const appearance = useAppearance(), motion = appearance.effectiveMotion;
-  const accent = appearance.palettes[appearance.mode].accent;
+  const accent = (appearance.effectivePalettes ?? appearance.palettes)[appearance.mode].accent;
   const snapshot = modelControlSnapshot(state, t('models.default'));
   const busy = state.pending !== null, disabled = locked || !available || busy;
   const [open, setOpen] = React.useState(false), [query, setQuery] = React.useState('');

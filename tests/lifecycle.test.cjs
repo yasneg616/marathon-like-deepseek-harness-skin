@@ -237,7 +237,7 @@ test('default, preset and midtone custom palettes keep text, metadata, links and
   }
 });
 
-test('NEXT footer keeps day/night and palette inside a collapsed bottom drawer', () => {
+test('NEXT footer keeps day/night inside the SYS drawer; colours live in the masthead color system', () => {
   const runtime = harness(); runtime.exports.apply(runtime.ctx, {});
   runtime.html.setAttribute('data-acid-sidebar', 'next');
   const tree = runtime.slots.get('industrial.signature').Component({ wide: true, t: value => value });
@@ -246,9 +246,10 @@ test('NEXT footer keeps day/night and palette inside a collapsed bottom drawer',
   assert.ok(drawer);
   const handle = find(drawer, n => n[1]?.className === 'acid-drawer-handle');
   assert.equal(handle[1]['aria-expanded'], false);
+  assert.equal(handle[1]['data-state'], 'idle');
   const body = find(drawer, n => n[1]?.className === 'acid-drawer-body');
   assert.ok(find(body, n => n[1]?.['data-appearance-option'] === 'night'));
-  assert.ok(find(body, n => n[1]?.className === 'acid-palette-shortcut'));
+  assert.equal(find(body, n => n[1]?.className === 'acid-palette-shortcut'), undefined);
   runtime.dispose();
 });
 
@@ -333,4 +334,41 @@ test('workspace colour changes persist, synchronize and reset without changing i
   assert.equal(restored.storage.get(identity),JSON.stringify(initial));
   restored.storage.set(key,'{}');restored.notifyStorage(key);assert.deepEqual({...colors(restored)},{});
   runtime.dispose();restored.dispose();
+});
+
+test('the current or hovered workspace colour drives the skin accent without touching the saved palette', () => {
+  const runtime=harness();runtime.exports.apply(runtime.ctx,{});
+  const masthead=()=>runtime.slots.get('industrial.masthead').Component({})[1];
+  const sidebarFill=()=>[...runtime.layers.values()][0].tokens['--dsw-specific-sidebar-fill'].light;
+  const saved=JSON.stringify(masthead().useAppearance().palettes);
+  assert.equal(sidebarFill(),'#D5FF00');
+  masthead().setWorkspaceAccent('#ff2d78');
+  assert.equal(sidebarFill(),'#FF2D78');
+  assert.equal(masthead().useAppearance().effectivePalettes.day.accent,'#FF2D78');
+  assert.equal(masthead().useAppearance().effectivePalettes.night.accent,'#FF2D78');
+  assert.equal(JSON.stringify(masthead().useAppearance().palettes),saved);
+  assert.equal(runtime.storage.get('dsh-industrial-acid-skin:palettes'),undefined);
+  masthead().setWorkspaceAccent('url(evil)');
+  assert.equal(sidebarFill(),'#D5FF00');
+  masthead().setWorkspaceAccent('#2B45FF');
+  assert.equal(sidebarFill(),'#2B45FF');
+  masthead().setWorkspaceAccent(null);
+  assert.equal(sidebarFill(),'#D5FF00');
+  runtime.dispose();
+});
+
+test('the workspace colour follow can be switched off and syncs across windows', () => {
+  const key='dsh-industrial-acid-skin:workspace-accent';
+  const runtime=harness({storage:{[key]:'off'}});runtime.exports.apply(runtime.ctx,{});
+  const masthead=()=>runtime.slots.get('industrial.masthead').Component({})[1];
+  const sidebarFill=()=>[...runtime.layers.values()][0].tokens['--dsw-specific-sidebar-fill'].light;
+  assert.equal(masthead().useAppearance().workspaceAccent,'off');
+  masthead().setWorkspaceAccent('#FF2D78');
+  assert.equal(sidebarFill(),'#D5FF00');
+  runtime.storage.set(key,'on');runtime.notifyStorage(key);
+  assert.equal(masthead().useAppearance().workspaceAccent,'on');
+  assert.equal(sidebarFill(),'#FF2D78');
+  runtime.storage.set(key,'bogus');runtime.notifyStorage(key);
+  assert.equal(masthead().useAppearance().workspaceAccent,'on');
+  runtime.dispose();
 });

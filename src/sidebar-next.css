@@ -25,9 +25,9 @@ html[data-acid-sidebar=next] [class*=_card_]:has(>.wnFoaW_hoverContent){display:
 html[data-acid-sidebar=next] [data-slot="sidebar.workspaces"] [class$="_exits"][aria-hidden="true"],html[data-acid-sidebar=next] .GAkraW_fade{display:none!important}
 /* 2 — v3 rail: 113px, two 46px columns, 5px gaps, 16px inset, half-strip offset. */
 html[data-industrial-acid]{--acid-next-bg:#1E2022;--acid-next-fore:#E4E5E1;--acid-next-block:#0B0C0D;--acid-next-line:rgba(226,228,224,.22);--acid-next-ink:#0B0C0D;--acid-next-card:#E4E5E1;--acid-next-card-row:#D2D4CF;--acid-next-hazard:var(--acid-lime);--acid-next-hazard-ink:var(--acid-accent-fore)}
-html[data-acid-sidebar=next] .mP3x-q_frame:not([data-sidebar-collapsed]){grid-template-columns:var(--acid-next-columns,113px minmax(0,1fr) 0px)!important;--dsh-windows-sidebar-width:113px!important}
+html[data-acid-sidebar=next] .mP3x-q_frame:not([data-sidebar-collapsed]){grid-template-columns:var(--acid-side-w) minmax(0,1fr) var(--acid-next-right,0px)!important;--dsh-windows-sidebar-width:var(--acid-side-w)!important}
 html[data-acid-sidebar=next] .mP3x-q_frame:not([data-sidebar-collapsed])>.mP3x-q_handle[data-side=sidebar]{display:none!important}
-html[data-acid-sidebar=next] .mP3x-q_sidebarCol{width:113px!important;min-width:0!important;overflow:visible!important;position:relative;z-index:6;background:var(--acid-next-bg)!important;border-right:1px solid var(--acid-next-line)}
+html[data-acid-sidebar=next] .mP3x-q_sidebarCol{width:var(--acid-side-w)!important;min-width:0!important;overflow:visible!important;position:relative;z-index:6;background:var(--acid-next-bg)!important;border-right:1px solid var(--acid-next-line)}
 html[data-acid-sidebar=next] .wtg9ga_root:not(.wtg9ga_collapsed){position:relative;box-sizing:border-box;width:113px!important;min-width:0!important;max-width:113px!important;height:100%;padding:16px 0 34px 16px!important;background:var(--acid-next-bg)!important;--dsh-sidebar-inline-padding:0px}
 html[data-acid-sidebar=next] .wtg9ga_regionArea{overflow:visible!important;min-height:0}
 html[data-acid-sidebar=next] [data-slot="sidebar.workspaces"] .GAkraW_root{position:static;min-height:0}
@@ -49,7 +49,7 @@ html[data-acid-sidebar=next] [data-acid-ws-strip] .wnFoaW_projectRow:before{cont
 html[data-acid-sidebar=next] [data-acid-ws-strip] .wnFoaW_projectRow:after{content:none}
 html[data-acid-sidebar=next] [data-acid-ws-strip] .wnFoaW_folder,html[data-acid-sidebar=next] [data-acid-ws-strip] .wnFoaW_chevron{display:none!important}
 html[data-acid-sidebar=next] [data-acid-ws-strip] .wnFoaW_projectText{position:absolute!important;left:0;right:0;bottom:9px;display:block!important;min-width:0;margin:0!important;padding:0!important}
-html[data-acid-sidebar=next] [data-acid-ws-strip] .wnFoaW_title{display:block!important;width:max-content!important;margin:0 auto!important;max-height:150px;writing-mode:vertical-rl;text-orientation:sideways;transform:rotate(180deg);color:var(--acid-next-ink)!important;font:700 9px/1 var(--acid-mono);letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}
+html[data-acid-sidebar=next] [data-acid-ws-strip] .wnFoaW_title{display:block!important;width:max-content!important;margin:0 auto!important;max-height:100px;writing-mode:vertical-rl;text-orientation:sideways;transform:rotate(180deg);color:var(--acid-next-ink)!important;font:700 9px/1 var(--acid-mono);letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}
 html[data-acid-sidebar=next] [data-acid-ws-strip] .wnFoaW_title:empty:before{content:attr(data-acid-fallback);opacity:.7}
 /* Keep the real menu trigger on the strip so its native menu and confirmation stay anchored. */
 html[data-acid-sidebar=next] [data-acid-ws-strip] .wnFoaW_rowActions{position:absolute;left:0;right:0;top:30px;height:22px!important;display:flex!important;justify-content:center;gap:0;z-index:4;opacity:1!important;pointer-events:auto!important}
@@ -59,8 +59,8 @@ html[data-acid-sidebar=next] [data-acid-ws-strip] .wnFoaW_rowActions .wnFoaW_ico
 html[data-acid-sidebar=next] [data-acid-ws-strip]:hover,html[data-acid-sidebar=next] [data-acid-ws-strip][data-acid-ws-open]{filter:saturate(1.08) brightness(1.04);box-shadow:inset 0 0 0 2px var(--acid-next-ink)}
 html[data-acid-sidebar=next] [data-acid-ws-strip] .wnFoaW_projectRow:focus-visible{outline:2px solid #fff;outline-offset:-4px}
 /* 5 — command block: the half-strip slot right of 001, above 002 */
-.acid-ws-commands{grid-column:2;grid-row:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:0;background:var(--acid-next-block)}
-.acid-ws-command{display:grid;place-items:center;width:26px;height:26px;padding:0;border:1px solid rgba(232,234,230,.72);border-radius:0;background:transparent;color:#E8EAE6;cursor:pointer}
+.acid-ws-commands{grid-column:2;grid-row:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;background:var(--acid-next-block)}
+.acid-ws-command{display:grid;place-items:center;width:22px;height:22px;padding:0;border:1px solid rgba(232,234,230,.72);border-radius:0;background:transparent;color:#E8EAE6;cursor:pointer}
 .acid-ws-command:hover{background:#E8EAE6;color:var(--acid-next-block)}
 .acid-ws-command[aria-pressed=true]{background:var(--acid-ws-first,#C6F500);border-color:var(--acid-ws-first,#C6F500);color:var(--acid-next-block)}
 .acid-ws-command:focus-visible{outline:2px solid #fff;outline-offset:1px}
@@ -178,16 +178,154 @@ html[data-acid-sidebar=next] .wtg9ga_footArea .acid-drawer-body>*{min-height:aut
 html[data-acid-sidebar=next] .wtg9ga_footArea ._5Qcc8a_trigger,html[data-acid-sidebar=next] .wtg9ga_footArea .AnXs9G_trigger{border:1px solid var(--acid-accent-display)!important;color:var(--acid-accent-display)!important}
 html[data-acid-sidebar=next] .wtg9ga_footArea ._5Qcc8a_trigger svg,html[data-acid-sidebar=next] .wtg9ga_footArea .AnXs9G_trigger svg{stroke:currentColor;fill:none;color:inherit}
 html[data-acid-sidebar=next] .wtg9ga_footArea ._5Qcc8a_label,html[data-acid-sidebar=next] .wtg9ga_footArea ._5Qcc8a_trigger span{color:inherit}
-/* Workspace activity loops: working, needs input, unread completion. Drawn on the project row's free
-   ::after layer in strip ink so every identity colour carries them; the native rows are untouched.
-   Motion off or reduced keeps the static badge and pattern without movement. */
-html[data-acid-sidebar=next] [data-acid-ws-strip][data-acid-ws-status] .wnFoaW_projectRow:after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none}
-html[data-acid-sidebar=next] [data-acid-ws-strip][data-acid-ws-status=working] .wnFoaW_projectRow:after{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Crect width='18' height='18' fill='%230B0C0D'/%3E%3Cpath d='M4 13l3-8M8 13l3-8M12 13l3-8' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E") 50% 40%/18px 18px no-repeat,linear-gradient(180deg,transparent 0 47%,rgba(255,255,255,.85) 48% 49.4%,rgba(11,12,13,.65) 49.4% 50.8%,transparent 52% 100%) 0 100%/100% 300% no-repeat,repeating-linear-gradient(-45deg,rgba(11,12,13,.2) 0 5px,transparent 5px 10px) 0 0/100% 14.1421px;animation:acid-ws-working 1.6s linear infinite}
-@keyframes acid-ws-working{from{background-position:50% 40%,0 100%,0 0}to{background-position:50% 40%,0 0,0 -56.5685px}}
-html[data-acid-sidebar=next] [data-acid-ws-strip][data-acid-ws-status=attention] .wnFoaW_projectRow:after{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Crect width='18' height='18' fill='%230B0C0D'/%3E%3Cpath d='M9 4v6.5M9 12.5v2' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E") 50% 40%/18px 18px no-repeat,repeating-linear-gradient(-45deg,rgba(11,12,13,.3) 0 6px,transparent 6px 12px);box-shadow:inset 0 0 0 3px #0B0C0D;animation:acid-ws-attention 1.2s steps(1,end) infinite}
 @keyframes acid-ws-attention{0%{opacity:1}50%{opacity:.4}}
-html[data-acid-sidebar=next] [data-acid-ws-strip][data-acid-ws-status=done] .wnFoaW_projectRow:after{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Crect width='18' height='18' fill='%230B0C0D'/%3E%3Cpath d='M4 9.5l3.2 3.2L14 5.5' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E") 50% 40%/18px 18px no-repeat,linear-gradient(165deg,transparent 0 42%,rgba(255,255,255,.72) 48% 52%,transparent 58% 100%) 0 100%/100% 300% no-repeat;box-shadow:inset 0 -6px 0 #0B0C0D;animation:acid-ws-done 3s cubic-bezier(.45,0,.2,1) infinite}
-@keyframes acid-ws-done{0%{background-position:50% 40%,0 100%}50%,100%{background-position:50% 40%,0 0}}
-html[data-industrial-motion=quiet] [data-acid-ws-strip][data-acid-ws-status] .wnFoaW_projectRow:after{animation-duration:3.2s}
-html[data-industrial-motion=off] [data-acid-ws-strip][data-acid-ws-status] .wnFoaW_projectRow:after{animation:none!important}
-@media(prefers-reduced-motion:reduce){[data-acid-ws-strip][data-acid-ws-status] .wnFoaW_projectRow:after{animation:none!important}}
+/* 7 — idle strips are grey; the current strip, a hovered strip and an open flyout show their colour.
+   The whole skin follows that colour (client.js), so the rail reads as one selector. */
+html[data-industrial-acid]{--acid-next-idle:#3A3D40;--acid-next-idle-ink:#B4B8B1}
+html[data-acid-sidebar=next] [data-acid-ws-strip]{transition:background-color .16s,filter .12s steps(2),box-shadow .12s steps(2)}
+html[data-acid-sidebar=next] [data-acid-ws-strip]:not([data-acid-ws-active]):not([data-acid-ws-open]):not(:hover):not(:focus-within):not([data-acid-ws-status=working]):not([data-acid-ws-status=attention]){background:var(--acid-next-idle);--acid-next-ink:var(--acid-next-idle-ink);--acid-strip-bg:var(--acid-next-idle)}
+/* 8 — collapsed (Ctrl+B or the fourth command key): one thin colour line per workspace */
+html[data-industrial-acid][data-acid-sidebar=thin]:not([data-acid-sidebar=next]) .mP3x-q_frame[data-sidebar-collapsed]{grid-template-columns:var(--acid-side-w) minmax(0,1fr) var(--acid-next-right,0px)!important;--dsh-windows-sidebar-width:var(--acid-side-w)!important}
+html[data-acid-sidebar=thin] .mP3x-q_frame[data-sidebar-collapsed]>.mP3x-q_handle[data-side=sidebar]{display:none!important}
+html[data-acid-sidebar=thin] .mP3x-q_sidebarCol{position:relative;width:var(--acid-side-w)!important;min-width:0!important;overflow:visible!important;background:var(--acid-next-bg)!important;border-right:1px solid var(--acid-next-line)}
+html[data-acid-sidebar=thin] .mP3x-q_sidebarCol>:not(.acid-thin-rail){display:none!important}
+.acid-thin-rail{position:absolute;inset:0 auto 0 0;width:18px;box-sizing:border-box;z-index:6;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 0 14px;overflow-x:visible;overflow-y:auto;scrollbar-width:none;background:var(--acid-next-bg)}
+.acid-thin-rail::-webkit-scrollbar{display:none}
+.acid-thin-expand{flex:none;display:grid;place-items:center;width:14px;height:24px;margin-bottom:4px;padding:0;border:0;border-radius:0;background:var(--acid-lime);color:var(--acid-accent-fore);font:900 11px/1 var(--acid-mono);cursor:pointer}
+.acid-thin-expand:is(:hover,:focus-visible){outline:1px solid #fff;outline-offset:1px}
+.acid-thin-line{flex:none;width:4px;height:34px;padding:0;border:0;border-radius:0;background:var(--acid-next-idle);cursor:pointer;transition:width .14s cubic-bezier(.2,.8,.2,1),background-color .14s}
+.acid-thin-line[data-active]{width:6px;background:var(--acid-ws-id)}
+.acid-thin-line:is(:hover,:focus-visible){width:10px;background:var(--acid-ws-id);outline:0}
+.acid-thin-line[data-status=working]{background-image:repeating-linear-gradient(180deg,transparent 0 5px,rgba(255,255,255,.75) 5px 7px);animation:acid-thin-working 1s linear infinite}
+@keyframes acid-thin-working{from{background-position:0 0}to{background-position:0 14px}}
+.acid-thin-line[data-status=attention]{box-shadow:0 0 0 1px #fff;animation:acid-ws-attention 1.2s steps(1,end) infinite}
+.acid-thin-line[data-status=done]{box-shadow:inset 0 5px 0 #fff}
+.acid-thin-tip{position:fixed;z-index:70;display:flex;align-items:center;gap:8px;transform:translateY(-50%);padding:6px 10px 6px 8px;background:var(--acid-next-card);color:var(--acid-next-card-ink);border-left:6px solid var(--acid-ws-id);box-shadow:4px 4px 0 rgba(0,0,0,.5);font:700 11px/1 var(--acid-mono);letter-spacing:.06em;white-space:nowrap;pointer-events:none;text-transform:uppercase}
+.acid-thin-tip b{font:900 13px/1 var(--acid-display)}
+html[data-industrial-motion=off] .acid-thin-line{animation:none!important;transition:none!important}
+@media(prefers-reduced-motion:reduce){.acid-thin-line{animation:none!important;transition:none!important}}
+/* 9 — fold / unfold: one width eases (no mask); flat blocks fly between strips and lines (railMorph) */
+@property --acid-side-w{syntax:'<length>';inherits:true;initial-value:113px}
+html[data-industrial-acid][data-acid-sidebar=thin]{--acid-side-w:18px}
+html[data-industrial-acid]:is([data-acid-sidebar=next],[data-acid-sidebar=thin]){transition:--acid-side-w .46s cubic-bezier(.7,0,.2,1)}
+html[data-industrial-acid][data-industrial-motion=quiet]:is([data-acid-sidebar=next],[data-acid-sidebar=thin]){transition-duration:.16s}
+html[data-industrial-acid][data-industrial-motion=off]{transition:none!important}
+@media(prefers-reduced-motion:reduce){html[data-industrial-acid]{transition:none!important}}
+/* while the column grows, the 113px content inside it is revealed by the edge instead of spilling over the page */
+html[data-acid-rail-morph] .mP3x-q_sidebarCol{clip-path:inset(0)}
+.acid-rail-morph{position:fixed;inset:0;z-index:12;pointer-events:none;contain:strict}
+.acid-rail-ghost{position:absolute;transform-origin:0 0;will-change:transform,opacity}
+/* 10 — workspace marks: a flat symbol under the number, in strip ink. The session state plays on
+   the mark itself: running animates the family's own motion plus a scan line, needs-you inverts in
+   hard steps, an unread completion is framed and stamped, an aborted run is struck through. */
+html[data-acid-sidebar=next] [data-acid-ws-strip]>.acid-ws-mark-host{display:block!important;position:absolute;top:54px;left:6px;z-index:2;width:34px;height:40px;pointer-events:none;color:var(--acid-next-ink);--mk-fg:var(--acid-next-ink);--mk-bg:var(--acid-strip-bg,var(--acid-ws-id))}
+.acid-ws-mark{position:relative;display:block;width:34px;height:40px}
+.acid-ws-mark-body,.acid-ws-mark-svg{display:block;width:34px;height:40px}
+.acid-ws-mark svg *{transform-box:view-box}
+.acid-ws-mark text{font-family:var(--acid-mono)}
+.acid-ws-mark-scan{position:absolute;left:-3px;right:-3px;top:0;height:2px;background:currentColor;opacity:.55;animation:acid-mk-scan 1.1s linear infinite}
+.acid-ws-mark-badge{position:absolute;top:-3px;right:-3px;display:grid;place-items:center;width:11px;height:11px;background:currentColor;animation:acid-mk-stamp .5s cubic-bezier(.2,.8,.2,1) both}
+.acid-ws-mark-slash{position:absolute;inset:0}
+@keyframes acid-mk-scan{from{transform:translateY(0)}to{transform:translateY(40px)}}
+@keyframes acid-mk-row{0%,100%{opacity:.22}25%,45%{opacity:1}}
+@keyframes acid-mk-bars{from{transform:translateX(0)}to{transform:translateX(-28px)}}
+@keyframes acid-mk-dot{0%,49%{opacity:1}50%,100%{opacity:.15}}
+@keyframes acid-mk-march-r{from{transform:translateX(0)}to{transform:translateX(6px)}}
+@keyframes acid-mk-march-l{from{transform:translateX(0)}to{transform:translateX(-6px)}}
+@keyframes acid-mk-step{0%{transform:rotate(0)}25%{transform:rotate(90deg)}50%{transform:rotate(180deg)}75%{transform:rotate(270deg)}100%{transform:rotate(360deg)}}
+@keyframes acid-mk-pulse{0%,100%{transform:scale(1)}50%{transform:scale(.78)}}
+@keyframes acid-mk-nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(2px)}}
+@keyframes acid-mk-invert{0%,49.9%{background:transparent;color:var(--mk-fg)}50%,100%{background:var(--mk-fg);color:var(--mk-bg)}}
+@keyframes acid-mk-stamp{0%{transform:scale(1.9);opacity:0}60%{transform:scale(.9);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes acid-mk-glitch{0%,86%,100%{transform:translateX(0);clip-path:inset(0)}88%{transform:translateX(3px);clip-path:inset(0 0 55% 0)}90%{transform:translateX(-2px);clip-path:inset(40% 0 0 0)}92%{transform:translateX(0);clip-path:inset(0)}}
+.acid-ws-mark[data-state=working][data-family=totem] .mk-px{animation:acid-mk-row .9s ease-in-out infinite}
+.acid-ws-mark[data-state=working][data-family=data] .mk-bars{animation:acid-mk-bars 1.6s linear infinite}
+.acid-ws-mark[data-state=working][data-family=data] .mk-dot{animation:acid-mk-dot .8s steps(1,end) infinite}
+.acid-ws-mark[data-state=working][data-family=hazard] .mk-stripes[data-dir="1"]{animation:acid-mk-march-r .45s linear infinite}
+.acid-ws-mark[data-state=working][data-family=hazard] .mk-stripes[data-dir="-1"]{animation:acid-mk-march-l .45s linear infinite}
+.acid-ws-mark[data-state=working][data-family=hazard] .mk-icon{animation:acid-mk-nudge .9s steps(2,end) infinite}
+.acid-ws-mark[data-state=working][data-family=registration] .mk-corners{transform-origin:17px 20px;animation:acid-mk-step 2s steps(4,end) infinite}
+.acid-ws-mark[data-state=working][data-family=registration] .mk-glyph{transform-origin:17px 20px;animation:acid-mk-pulse 1s ease-in-out infinite}
+.acid-ws-mark[data-state=attention]{outline:2px solid currentColor;outline-offset:1px;animation:acid-mk-invert 1s steps(1,end) infinite}
+.acid-ws-mark[data-state=done]{outline:1.5px solid currentColor;outline-offset:2px}
+.acid-ws-mark[data-state=aborted] .acid-ws-mark-body{opacity:.4;animation:acid-mk-glitch 2.6s steps(1,end) infinite}
+.acid-thin-line:is([data-status=working],[data-status=attention]){background-color:var(--acid-ws-id)}
+/* Collapsed: lines are too thin for a mark, so the hover tag carries it with the state. */
+.acid-thin-tip-mark{display:block;flex:none;padding:3px;background:var(--acid-ws-id);color:var(--acid-thin-ink,#0B0C0D);--mk-fg:var(--acid-thin-ink,#0B0C0D);--mk-bg:var(--acid-ws-id)}
+.acid-thin-tip-text{display:flex;flex-direction:column;gap:5px}
+.acid-thin-tip-state{font:500 10px/1 var(--acid-mono);letter-spacing:.08em;opacity:.7}
+html[data-industrial-motion=quiet] .acid-ws-mark-scan{display:none}
+html[data-industrial-motion=off] .acid-ws-mark,html[data-industrial-motion=off] .acid-ws-mark *{animation:none!important}
+html[data-industrial-motion=off] .acid-ws-mark-scan{display:none}
+html[data-industrial-motion=off] .acid-ws-mark[data-state=attention]{background:var(--mk-fg);color:var(--mk-bg)}
+@media(prefers-reduced-motion:reduce){.acid-ws-mark,.acid-ws-mark *{animation:none!important}.acid-ws-mark-scan{display:none}.acid-ws-mark[data-state=attention]{background:var(--mk-fg);color:var(--mk-bg)}}
+/* 11 — SYS drawer handle: quiet by default (grip + today's token meter), hazard only on a real
+   alert, the workspace colour while open. */
+html[data-industrial-acid] .acid-drawer-handle[data-state]{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:0 9px;box-sizing:border-box;background:#161818;border-top:1px solid var(--acid-next-line);color:#ECECE8;cursor:pointer}
+html[data-industrial-acid] .acid-drawer-handle[data-state] .acid-drawer-label{padding:0;background:none;box-shadow:none;color:inherit;font:700 9px/1 var(--acid-mono);letter-spacing:.08em}
+.acid-drawer-grip{display:block;flex:none;width:13px;height:10px;background:repeating-linear-gradient(90deg,currentColor 0 1px,transparent 1px 3px);opacity:.55}
+.acid-drawer-meter{display:flex;flex:none;gap:2px}
+.acid-drawer-meter>i{display:block;width:5px;height:5px;box-shadow:inset 0 0 0 1px #3A3D3D}
+.acid-drawer-meter>i[data-on]{background:currentColor;box-shadow:inset 0 0 0 1px currentColor}
+html[data-industrial-acid] .acid-drawer-handle[data-state] .acid-drawer-chevron{transform:none!important;font:700 9px/1 var(--acid-mono);letter-spacing:.06em;color:#9A9E9C;white-space:nowrap}
+html[data-industrial-acid] .acid-drawer-handle[data-state=alert]{background:repeating-linear-gradient(135deg,#FFE600 0 8px,#0B0C0D 8px 16px);background-size:22.6px 22.6px;color:#0B0C0D;border-top-color:#0B0C0D;animation:acid-sys-march .9s linear infinite}
+html[data-industrial-acid] .acid-drawer-handle[data-state=alert] :is(.acid-drawer-label,.acid-drawer-chevron){padding:4px 5px 3px;background:#FFE600;box-shadow:0 0 0 2px #0B0C0D;color:#0B0C0D}
+.acid-drawer-handle[data-state=alert] :is(.acid-drawer-grip,.acid-drawer-meter){display:none}
+html[data-industrial-acid] .acid-drawer-handle[data-state=open]{background:var(--acid-ws-context,var(--acid-lime));color:var(--acid-ws-context-fore,var(--acid-accent-fore));border-top-color:transparent}
+html[data-industrial-acid] .acid-drawer-handle[data-state=open] .acid-drawer-chevron{color:inherit}
+@keyframes acid-sys-march{from{background-position:0 0}to{background-position:22.6px 0}}
+html[data-industrial-motion=off] .acid-drawer-handle[data-state=alert]{animation:none}
+@media(prefers-reduced-motion:reduce){.acid-drawer-handle[data-state=alert]{animation:none}}
+/* 12 — 01 COLOR SYSTEM dialog */
+.acid-dialog.acid-cs-dialog{width:min(900px,calc(100vw - 36px))}
+.acid-color-system{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:0;margin-top:6px;border:1px solid var(--acid-rule)}
+.acid-cs-col{display:flex;flex-direction:column;gap:14px;min-width:0;padding:16px}
+.acid-cs-col+.acid-cs-col{border-left:1px solid var(--acid-rule)}
+.acid-cs-block{display:flex;flex-direction:column;gap:10px}
+.acid-cs-head{display:flex;align-items:baseline;gap:9px;padding-bottom:9px;border-bottom:1px solid var(--acid-rule)}
+.acid-cs-head>span:first-child{font:500 9px/1 var(--acid-mono);color:var(--dsw-alias-label-tertiary)}
+.acid-cs-head>b{font:700 11px/1 var(--acid-mono);letter-spacing:.08em}
+.acid-cs-head>span:last-child{font:13px/1 var(--dsw-font-family);color:var(--dsw-alias-label-secondary)}
+.acid-cs-note{margin:-4px 0 0;font:12px/1.4 var(--dsw-font-family);color:var(--dsw-alias-label-secondary)}
+.acid-cs-sets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.acid-cs-set{display:flex;flex-direction:column;gap:7px;padding:9px;border:1px solid var(--acid-rule);border-radius:0;background:transparent;color:inherit;text-align:left;cursor:pointer}
+.acid-cs-set[aria-pressed=true]{border-color:var(--dsw-alias-label-primary);box-shadow:inset 0 0 0 1px var(--dsw-alias-label-primary)}
+.acid-cs-set-name{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.acid-cs-set-name>b{font:700 10px/1 var(--acid-mono);letter-spacing:.08em}
+.acid-cs-set-name>span{font:12px/1 var(--dsw-font-family);color:var(--dsw-alias-label-secondary)}
+.acid-cs-set-strip{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:2px}
+.acid-cs-set-strip>i{display:block;height:13px}
+.acid-cs-list{display:flex;flex-direction:column;max-height:min(360px,calc(100dvh - 360px));overflow:auto;border:1px solid var(--acid-rule)}
+.acid-cs-ws+.acid-cs-ws{border-top:1px solid var(--acid-rule)}
+.acid-cs-ws[data-open]{background:var(--dsw-alias-interactive-bg-hover);box-shadow:inset 3px 0 0 var(--acid-ws-id)}
+.acid-cs-row{display:flex;align-items:center;gap:10px;width:100%;padding:7px 8px;border:0;border-radius:0;background:transparent;color:inherit;text-align:left;cursor:pointer}
+.acid-cs-row:hover{background:var(--dsw-alias-interactive-bg-hover)}
+.acid-cs-row:focus-visible{outline:2px solid var(--dsw-focus-ring-color);outline-offset:-2px}
+.acid-cs-mark{display:block;flex:none;width:26px;height:30px;padding:3px 4px;box-sizing:border-box;overflow:hidden;background:var(--acid-ws-id);color:var(--acid-ws-id-fore,#0B0C0D);--mk-fg:var(--acid-ws-id-fore,#0B0C0D);--mk-bg:var(--acid-ws-id)}
+.acid-cs-mark>.acid-ws-mark{transform:scale(.53);transform-origin:0 0}
+.acid-cs-num{flex:none;width:32px;font:700 12px/1 var(--acid-mono)}
+.acid-cs-name{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.acid-cs-name>span{font:700 11px/1.1 var(--acid-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acid-cs-name>small{font:500 9px/1.1 var(--acid-mono);color:var(--dsw-alias-label-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acid-cs-tag{flex:none;padding:3px 5px;border:1px solid var(--acid-rule);font:700 8px/1 var(--acid-mono);letter-spacing:.08em;color:var(--dsw-alias-label-secondary)}
+.acid-cs-tag[data-custom]{background:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-label-primary);color:var(--dsw-alias-bg-base)}
+.acid-cs-swatch{flex:none;width:18px;height:18px;background:var(--acid-ws-id);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+.acid-cs-row>code{flex:none;width:60px;font:500 10px/1 var(--acid-mono)}
+.acid-cs-edit{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:4px 10px 12px 44px}
+.acid-cs-picks{display:flex;gap:5px}
+.acid-cs-picks>button{width:20px;height:20px;padding:0;border:0;border-radius:0;cursor:pointer}
+.acid-cs-picks>button[aria-pressed=true]{outline:2px solid var(--dsw-alias-label-primary);outline-offset:2px}
+.acid-cs-edit .acid-color-field{flex:1;min-width:200px}
+.acid-cs-reset,.acid-cs-foot>button{padding:6px 10px;border:1px solid var(--acid-rule);border-radius:0;background:transparent;color:inherit;font:12px/1 var(--dsw-font-family);cursor:pointer}
+.acid-cs-reset:disabled{opacity:.45;cursor:default}
+.acid-cs-seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);border:1px solid var(--acid-rule)}
+.acid-cs-seg>button{padding:8px 0;border:0;border-radius:0;background:transparent;color:inherit;font:12px/1 var(--dsw-font-family);cursor:pointer}
+.acid-cs-seg>button+button{border-left:1px solid var(--acid-rule)}
+.acid-cs-seg>button[aria-pressed=true]{background:var(--dsw-alias-label-primary);color:var(--dsw-alias-bg-base);font-weight:700}
+.acid-cs-contrast{display:flex;align-items:center;gap:8px;margin:0;font:12px/1.3 var(--dsw-font-family);color:var(--dsw-alias-label-secondary)}
+.acid-cs-contrast>b{padding:3px 6px;background:var(--dsw-alias-label-primary);color:var(--dsw-alias-bg-base);font:700 10px/1 var(--acid-mono)}
+.acid-cs-follow{display:grid;grid-template-columns:minmax(0,1fr) 150px;align-items:center;gap:10px}
+.acid-cs-follow>span{display:flex;flex-direction:column;gap:3px;font:13px/1.2 var(--dsw-font-family)}
+.acid-cs-follow small{font-size:11px;color:var(--dsw-alias-label-secondary)}
+.acid-cs-foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding:12px 0 0;border-top:1px solid var(--acid-rule);font:12px/1 var(--dsw-font-family);color:var(--dsw-alias-label-secondary)}
+@media(max-width:760px){.acid-color-system{grid-template-columns:minmax(0,1fr)}.acid-cs-col+.acid-cs-col{border-left:0;border-top:1px solid var(--acid-rule)}.acid-cs-row>code,.acid-cs-tag{display:none}}
