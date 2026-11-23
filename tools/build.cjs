@@ -5,8 +5,10 @@ const font = name => fs.readFileSync(path.join(root, 'assets/fonts', name)).toSt
 const css = (fs.readFileSync(path.join(root, 'src/skin.css'), 'utf8') + '\n' + fs.readFileSync(path.join(root,'src/planar.css'),'utf8') + '\n' + fs.readFileSync(path.join(root,'src/model-controls.css'),'utf8') + '\n' + fs.readFileSync(path.join(root,'src/accepted-motion.css'),'utf8') + '\n' + fs.readFileSync(path.join(root,'src/sidebar-next.css'),'utf8'))
   .concat('\n', fs.readFileSync(path.join(root, 'src/token-activity.css'), 'utf8'))
   .concat('\n', fs.readFileSync(path.join(root, 'src/marathon.css'), 'utf8'))
+  .concat('\n', fs.readFileSync(path.join(root, 'src/chrome.css'), 'utf8'))
   .replaceAll('__GRID_WOFF2__', font('eventide-grid.woff2'))
-  .replaceAll('__SIGNAL_WOFF2__', font('eventide-signal.woff2'));
+  .replaceAll('__SIGNAL_WOFF2__', font('eventide-signal.woff2'))
+  .replaceAll('__CIPHER_OTF__', font('acid-cipher.otf'));
 const svg = fs.readFileSync(path.join(root, 'assets/masthead.svg'), 'utf8');
 const source = fs.readFileSync(path.join(root, 'src/client.js'), 'utf8')
   .replace('/*__WORKSPACE_CORE__*/', fs.readFileSync(path.join(root,'src/workspaces.js'),'utf8'))
@@ -33,4 +35,4 @@ const structuralPrefixes = authoredPrefixes.filter(prefix => STRUCTURAL.has(pref
 fs.mkdirSync(path.join(root, 'lib'), { recursive: true });
 fs.writeFileSync(path.join(root, 'lib/client.js'), source.replace('__AUTHORED_MODULES__', JSON.stringify(authoredPrefixes)).replace('__STRUCTURAL_MODULES__', JSON.stringify(structuralPrefixes)));
 for (const name of ['token-activity-core.js', 'token-activity-host.js', 'desktop-icon-host.js', 'desktop-icon.ps1']) fs.copyFileSync(path.join(root, 'src', name), path.join(root, 'lib', name));
-console.log(JSON.stringify({ clientBytes: Buffer.byteLength(source), fontsEmbedded: 2, harnessLetters: [...svg.matchAll(/data-harness-letter="([A-Z])"/g)].map(x => x[1]).join('') }));
+console.log(JSON.stringify({ clientBytes: Buffer.byteLength(source), fontsEmbedded: 3, harnessLetters: [...svg.matchAll(/data-harness-letter="([A-Z])"/g)].map(x => x[1]).join('') }));

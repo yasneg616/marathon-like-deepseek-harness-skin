@@ -285,3 +285,21 @@ html[data-industrial-acid] .acid-masthead[data-acid-hud] .acid-window-controls b
   .acid-masthead[data-acid-hud] :is(.acid-menus,.acid-context-mark){display:none!important}
   html[data-industrial-acid] .acid-masthead[data-acid-hud] :is(.workspace-counter,.acid-context-number){font-size:64px!important}
 }
+/* Windows without the caption adapter: Harness keeps its own minimize / maximize / close in the
+   top-right Window Controls Overlay. The HUD treats that strip as a workspace-coloured tab: the keys
+   column widens to the overlay with its two keys underneath, the HUD's upper band shrinks to the
+   overlay height so one rule runs under the HUD fields and the tab, and the native buttons take the
+   slab colour through the probe Harness samples for its caption (the masthead re-syncs it on every
+   workspace change). Nothing patches app.asar, so a Harness update cannot undo it; the fallbacks
+   (3×46 px, 40 px) apply where the overlay geometry is unknown. */
+html[data-industrial-acid][data-windows-titlebar]{--acid-cap-w:max(0px,calc(100vw - env(titlebar-area-x,0px) - env(titlebar-area-width,calc(100vw - 138px))));--acid-cap-h:env(titlebar-area-height,40px)}
+html[data-industrial-acid][data-windows-titlebar] body>span[style*="--dsw-specific-sidebar-fill"]{--dsw-specific-sidebar-fill:var(--acid-ws-context,var(--acid-lime));--dsw-alias-label-primary:var(--acid-ws-context-fore,var(--acid-accent-fore))}
+html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-acid-hud][data-native-controls=false]{grid-template-columns:236px 456px minmax(0,1fr) max(136px,var(--acid-cap-w))!important}
+html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-acid-hud][data-native-controls=false] .acid-hud{grid-template-rows:var(--acid-cap-h) minmax(0,1fr)!important;box-shadow:inset -1px 0 var(--hud-line)}
+html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-acid-hud][data-native-controls=false] .acid-menus{padding-top:var(--acid-cap-h)!important}
+html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-acid-hud][data-native-controls=false] .acid-menus button{gap:4px!important}
+html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-acid-hud][data-native-controls=false] .acid-menus button:first-child{border-left:0!important}
+html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-acid-hud][data-native-controls=false] .acid-menus .acid-hud-serial{display:none}
+@media(max-width:1190px){html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-acid-hud][data-native-controls=false]{grid-template-columns:196px 396px minmax(0,1fr) max(120px,var(--acid-cap-w))!important}}
+@media(max-width:980px){html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-acid-hud][data-native-controls=false]{grid-template-columns:176px minmax(0,1fr) max(112px,var(--acid-cap-w))!important}html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-acid-hud][data-native-controls=false] .acid-menus button:first-child{border-left:1px solid var(--hud-line)!important}}
+@media(max-width:720px){html[data-industrial-acid][data-windows-titlebar] .acid-masthead[data-acid-hud][data-native-controls=false]{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr) var(--acid-cap-w)!important;grid-template-areas:"brand ctx ."}}

@@ -130,6 +130,18 @@ function ColorSystem({t,appearance,updateAppearance,items,numbers,identity,marks
           csSegmented([['on',t('wsAccent.on')],['off',t('wsAccent.off')]],appearance.workspaceAccent,value=>updateAppearance({workspaceAccent:value}),t('wsAccent')))),
       h('div',{className:'acid-cs-foot'},h('span',null,t('cs.live')),h('button',{type:'button',onClick:()=>setPalette(DEFAULT_PALETTES[mode])},t('reset')))));
 }
+// Without the caption adapter, Windows Harness paints its own minimize / maximize / close from a
+// probe element it re-reads only when <head> changes. The slab colour moves through a root style
+// property, which Harness does not observe, so the masthead also writes the colour into <head>:
+// each workspace change is then a real edit and the native buttons follow the slab. With no
+// workspace colour the rule is dropped and planar.css's palette fallback applies.
+const CAPTION_PROBE='html[data-industrial-acid][data-windows-titlebar] body>span[style*="--dsw-specific-sidebar-fill"]';
+function syncCaptionProbe(accent){
+  let style=document.head.querySelector('style[data-acid-caption-probe]');
+  if(!/^#[\da-f]{3,8}$/i.test(accent??'')){style?.remove();return;}
+  if(!style){style=document.createElement('style');style.dataset.acidCaptionProbe='';document.head.append(style);}
+  style.textContent=`${CAPTION_PROBE}{--dsw-specific-sidebar-fill:${accent};--dsw-alias-label-primary:${foreground(accent)}}`;
+}
 function Masthead(props){
   const items=props.useWorkspaces(state=>state.items);
   const current=props.useSessions(state=>Object.values(state.byId).find(session=>(session.retainedBy?.mainView??0)>0)?.id);
@@ -229,7 +241,9 @@ function Masthead(props){
     const root=document.documentElement;
     if(accent){root.style.setProperty('--acid-ws-context',accent);root.style.setProperty('--acid-ws-context-fore',foreground(accent));}
     else{root.style.removeProperty('--acid-ws-context');root.style.removeProperty('--acid-ws-context-fore');}
+    if(!native&&root.hasAttribute('data-windows-titlebar'))syncCaptionProbe(accent);
   },[accent]);
+  React.useEffect(()=>()=>syncCaptionProbe(null),[]);
   // The classic list is the only layout whose reorder never announces itself: a drag leaves the
   // persisted order alone, so the numbers drift away from what is on screen. The rendered list is
   // read instead, and a settled permutation that differs from the stored one is adopted; the bump

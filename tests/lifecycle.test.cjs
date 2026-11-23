@@ -50,8 +50,10 @@ test('mount and withdraw only owned visuals, preserving another plugin and prior
   assert.equal(runtime.slots.size, 7);
   assert.ok(runtime.slots.has('industrial.marathon'));
   assert.equal(runtime.attributes.get('data-industrial-canvas'), 'paper');
+  assert.equal(runtime.attributes.get('data-acid-chrome'), 'marathon');
   assert.equal(runtime.layers.size, 1);
   runtime.dispose();
+  assert.equal(runtime.attributes.has('data-acid-chrome'), false);
   assert.deepEqual([...runtime.styles], [unrelated]);
   assert.equal(runtime.slots.size, 0);
   assert.equal(runtime.layers.size, 0);

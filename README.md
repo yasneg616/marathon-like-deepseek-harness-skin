@@ -2,13 +2,49 @@
 
 给 DeepSeek Harness 做的一套酸性工业皮肤。
 
-从 Marathon 的大色块、硬边界和工业排版开始：字标切开，按钮收方，工作区放上三位数字。3.0 让每个工作区都有自己的颜色和符号，整套界面跟着当前工作区走。
+从 Marathon 的大色块、硬边界和工业排版开始：字标切开，按钮收方，工作区放上三位数字。3.0 让每个工作区都有自己的颜色和符号，整套界面跟着当前工作区走；3.1 照着 Marathon 游戏内菜单把界面收成石墨灰，颜色只当信号。
 
-`v3.0.0` · `Windows / macOS` · `Harness 0.2.0-rc.2 / 0.2.1（含 RC） / 0.2.2-rc.1 / rc.2 / rc.3 / rc.5`
+`v3.1.0` · `Windows / macOS` · `Harness 0.2.0-rc.2 / 0.2.1（含 RC） / 0.2.2-rc.1 / rc.2 / rc.3 / rc.5`
 
-[下载 3.0.0](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v3.0.0) · [安装与回退](docs/INSTALL.md) · [本次更新](docs/RELEASE-v3.0.0.md)
+[下载 3.1.0](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v3.1.0) · [安装与回退](docs/INSTALL.md) · [本次更新](docs/RELEASE-v3.1.0.md)
 
-![3.0 的 HUD 顶栏、带符号的工作区色条与 SYS 抽屉，独立展示页](docs/media/v3-overview.png)
+![3.1 的石墨灰顶栏、工作区色条与准星格线，独立展示页](docs/media/v31-overview.png)
+
+## 3.1：Marathon 化
+
+照着 Marathon 游戏内菜单的做法整理整套界面。游戏的菜单本身是平的，颜色很克制，实物感来自框里的 3D 物件；所以 3.1 不做假立体，而是收颜色、补填料、统一标签和菜单的写法。
+
+### 颜色只当信号
+
+顶栏改为石墨灰，当前工作区的颜色只留在编号区的淡色底、左侧色带、符号和「✓ ACTIVE WORKSPACE」标签上；大号码移到垂直中心。侧栏只有当前工作区是整片饱和色，其他有状态的工作区是石墨卡片加顶部色带。色条编号是白底黑字的价格标签，当前那个反转。
+
+![顶栏：石墨灰底，工作区颜色只剩色带、符号与标签](docs/media/v31-masthead.png)
+
+### 空白处有填料，选中就反转
+
+对话区铺一层很淡的「+」准星格线，侧栏底部铺斜线网纹。发送键是白底黑字的反转块，运行状态、模型和推理档位都改成小标签。
+
+### 二级菜单
+
+所有二级界面照游戏的物品浮窗：顶部色带＋大字标题＋小标签，中段深色说明，列表「方形状态点 · 名称 · 右侧数值」悬停反转，底部较暗的一条放次要操作。
+
+![工作区悬浮卡：工作区色标头、反转编号、NEW CHAT HERE 标签与方形状态点](docs/media/v31-flyout.png)
+
+![01 配色系统：A / B / C 分区、色票组卡片、物品清单式的工作区列表与对比度数据格](docs/media/v31-color-system.png)
+
+### Windows 原生窗口按钮与直角窗口
+
+没装标题栏适配器时，Harness 自己的最小化 / 最大化 / 关闭不再叠在「配色 / 工作区」上：顶栏右上角让出位置，三个按钮使用当前工作区的颜色并跟着切换。窗口改为直角，停用插件时恢复系统圆角。两者都由皮肤完成，不修改 `app.asar`，Harness 更新后依然有效。
+
+![Windows 原生窗口按钮跟随工作区颜色（橙、蓝），实机截图](docs/media/v31-native-caption.png)
+
+### 鲸跃彩蛋
+
+在 Harness 首页空白处点击，鲸鱼会跃出水面，其中一种画法由代码文字组成。皮肤把这些代码换成原创的像素未知文字「Acid Cipher」，用当前工作区的颜色画出来。
+
+![Acid Cipher 字形与鲸鱼代码填充的对照：上方原字体，下方未知文字](docs/media/v31-acid-cipher.png)
+
+3.1 的展示图录自独立展示页（**1×**，正式插件的样式与字体，虚构的工作区与会话）；原生窗口按钮一图为 Windows 实机截图。
 
 ## 3.0：每个工作区都有自己的颜色和符号
 
@@ -66,16 +102,16 @@
 
 ## 安装
 
-1. 下载 [v3.0.0 正式版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v3.0.0) 中的 `dsh-industrial-acid-skin-3.0.0.tgz`。无需 Node.js。
+1. 下载 [v3.1.0 正式版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v3.1.0) 中的 `dsh-industrial-acid-skin-3.1.0.tgz`。无需 Node.js。
 2. Harness「插件 → 添加插件」，粘贴完整下载链接，或输入已下载文件的本机绝对路径：
 
    ```text
-   https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v3.0.0/dsh-industrial-acid-skin-3.0.0.tgz
+   https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v3.1.0/dsh-industrial-acid-skin-3.1.0.tgz
    ```
 
-3. 启用插件，按提示重启。从 2.x 升级时，工作区编号、颜色和用量界限都会保留。
+3. 启用插件，按提示重启。从 3.0 或 2.x 升级时，工作区编号、颜色和用量界限都会保留。
 
-Windows 竖排窗口按钮的可选适配器请看 [适配器说明](docs/DESKTOP-ADAPTER.md)。macOS 最小化与全屏控制可能需要系统辅助功能权限，仍欢迎 Mac 用户实机反馈。
+Windows 不再需要适配器：3.1 起原生窗口按钮由皮肤让位并配色。仍想要竖排窗口按钮可选用 [适配器](docs/DESKTOP-ADAPTER.md)。macOS 最小化与全屏控制可能需要系统辅助功能权限，仍欢迎 Mac 用户实机反馈。
 
 ## Marathon 彩蛋
 

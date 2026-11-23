@@ -21,7 +21,11 @@ export function apply(ctx, raw = {}) {
   if (raw.desktopIcon !== undefined && typeof raw.desktopIcon !== 'boolean') {
     throw new Error('desktopIcon must be a boolean.');
   }
-  if (raw.desktopIcon !== false) installDesktopIcon(ctx);
+  if (raw.squareCorners !== undefined && typeof raw.squareCorners !== 'boolean') {
+    throw new Error('squareCorners must be a boolean.');
+  }
+  // Windows only, and reversible: the helper hands the icon and the corners back on disable.
+  installDesktopIcon(ctx, process, undefined, { icon: raw.desktopIcon !== false, squareCorners: raw.squareCorners !== false });
   ctx.inject(['connection', 'sessionQuery'], installTokenActivityHost);
   // The macOS build exposes no window-control channel to the renderer, so the caption buttons
   // route through the host half, which can reach the accessibility API.

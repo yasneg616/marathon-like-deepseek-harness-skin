@@ -1,0 +1,11 @@
+{
+  "family": "Acid Cipher",
+  "generator": "tools/cipher-font.cjs",
+  "opentype": "1.3.4",
+  "grid": "5x7",
+  "unitsPerEm": 700,
+  "advance": 600,
+  "asciiCoverage": 95,
+  "distinctLettersAndDigits": 62,
+  "otfSha256": "c48852af69f0342f800b737c9d2e69670ad273580f4d9d0bb3ac9eb53e02260f"
+}

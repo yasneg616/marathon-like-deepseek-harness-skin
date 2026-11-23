@@ -222,12 +222,16 @@ window.__ModuleLoader__.load({
       ctx.effect(() => ctx.locale.register(NS, { zh:{...dictionaries.zh,...MODEL_DICTIONARIES.zh,...ACTIVITY_DICTIONARIES.zh,...MARATHON_DICTIONARIES.zh}, en:{...dictionaries.en,...MODEL_DICTIONARIES.en,...ACTIVITY_DICTIONARIES.en,...MARATHON_DICTIONARIES.en} }), `${ID}: locale`);
       ctx.effect(() => {
         const root = document.documentElement;
-        const previous = { enabled: root.getAttribute('data-industrial-acid'), canvas: root.getAttribute('data-industrial-canvas'), mode: root.getAttribute('data-industrial-mode'), shell: root.getAttribute('data-industrial-shell'), motion: root.getAttribute('data-industrial-motion'), motionSet: root.getAttribute('data-industrial-motion-set'), height: root.style.getPropertyValue('--acid-header-max'), priority: root.style.getPropertyPriority('--acid-header-max') };
+        const previous = { enabled: root.getAttribute('data-industrial-acid'), canvas: root.getAttribute('data-industrial-canvas'), mode: root.getAttribute('data-industrial-mode'), shell: root.getAttribute('data-industrial-shell'), motion: root.getAttribute('data-industrial-motion'), motionSet: root.getAttribute('data-industrial-motion-set'), chrome: root.getAttribute('data-acid-chrome'), height: root.style.getPropertyValue('--acid-header-max'), priority: root.style.getPropertyPriority('--acid-header-max') };
         const style = document.createElement('style');
         style.dataset.pluginCss = `${ID}/skin.css`;
         style.dataset.plugin = ID;
         ownedStyle = style;
         root.setAttribute('data-industrial-acid', '');root.setAttribute('data-industrial-shell','planar-v2');root.setAttribute('data-industrial-motion-set','accepted-r3');
+        // Marathon chrome: graphite surfaces with colour as a signal, filled empty space, inverted
+        // selection and tag-style labels (src/chrome.css). Keyed on its own attribute so it can
+        // become a user choice without touching the rest of the stylesheet.
+        root.setAttribute('data-acid-chrome','marathon');
         // The stylesheet keys the traffic-light band on the platform, so the attribute has to be
         // present before the first paint. The desktop host publishes one of its own; only fill the
         // gap. `navigator` is absent in the test sandbox, which mounts this effect without a page.
@@ -238,6 +242,9 @@ window.__ModuleLoader__.load({
         syncAppearance();
         root.style.setProperty('--acid-header-max', `${height}px`);
         document.head.appendChild(style);
+        // Harness's home whale letters its code once, on the first click, using whatever font has
+        // loaded by then; a canvas never triggers a web-font load itself. Load the cipher up front.
+        document.fonts?.load?.('7px "Acid Cipher"').catch(() => {});
         // Host stylesheets are injected around the same time and carry each module's complete
         // class list, so the first resolution can already be correct. They may arrive slightly
         // after this plugin, so newly added <style> elements are watched too; a resolution that
@@ -273,7 +280,7 @@ window.__ModuleLoader__.load({
           if (sweep) cancelAnimationFrame(sweep);
           style.remove();
           ownedStyle = undefined;
-          for (const [key, value] of [['data-industrial-acid', previous.enabled], ['data-industrial-canvas', previous.canvas], ['data-industrial-mode', previous.mode], ['data-industrial-shell', previous.shell], ['data-industrial-motion', previous.motion], ['data-industrial-motion-set', previous.motionSet]]) {
+          for (const [key, value] of [['data-industrial-acid', previous.enabled], ['data-industrial-canvas', previous.canvas], ['data-industrial-mode', previous.mode], ['data-industrial-shell', previous.shell], ['data-industrial-motion', previous.motion], ['data-acid-chrome', previous.chrome], ['data-industrial-motion-set', previous.motionSet]]) {
             if (value === null) root.removeAttribute(key); else root.setAttribute(key, value);
           }
           if (previous.height) root.style.setProperty('--acid-header-max', previous.height, previous.priority); else root.style.removeProperty('--acid-header-max');
@@ -366,6 +373,6 @@ window.__ModuleLoader__.load({
       installModelControls(ctx, useAppearance);
     }
 
-    return { inject: ['slots', 'locale', 'theme', 'layout', 'uiWorkspace', 'connection'], apply, tokenOverrides, workspaceContext, formatWorkspaceIndex, normalizePalettes, normalizeCanvas, resolveMode, makeScheme, contrast, DEFAULT_PALETTES, PALETTE_PRESETS, modelControlSnapshot, effortSelection, modelPopoverPlacement, effortVisual, selectionIdentity, createMaxEpisode, acceptedDuration, ACCEPTED_MOTION, rankWorkspaces, moveInOrder, workspaceNumbers, markWorkspaceReorder, migrateIdentity, MARATHON_EGGS, MARATHON_FINALE, MARATHON_SEQUENCE, MARATHON_SEQUENCE_WINDOW, MARATHON_THEME, MARATHON_PREF, MARATHON_SCENES, normalizeMarathonText, matchMarathonKeyword, normalizeMarathonState, advanceMarathonSequence, createMarathonGate, createMarathonStore, recordMarathonTrigger, installMarathonProtocol, workspaceActivity, createStatusRelay };
+    return { inject: ['slots', 'locale', 'theme', 'layout', 'uiWorkspace', 'connection'], apply, syncCaptionProbe, tokenOverrides, workspaceContext, formatWorkspaceIndex, normalizePalettes, normalizeCanvas, resolveMode, makeScheme, contrast, DEFAULT_PALETTES, PALETTE_PRESETS, modelControlSnapshot, effortSelection, modelPopoverPlacement, effortVisual, selectionIdentity, createMaxEpisode, acceptedDuration, ACCEPTED_MOTION, rankWorkspaces, moveInOrder, workspaceNumbers, markWorkspaceReorder, migrateIdentity, MARATHON_EGGS, MARATHON_FINALE, MARATHON_SEQUENCE, MARATHON_SEQUENCE_WINDOW, MARATHON_THEME, MARATHON_PREF, MARATHON_SCENES, normalizeMarathonText, matchMarathonKeyword, normalizeMarathonState, advanceMarathonSequence, createMarathonGate, createMarathonStore, recordMarathonTrigger, installMarathonProtocol, workspaceActivity, createStatusRelay };
   }
 });
