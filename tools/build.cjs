@@ -13,7 +13,7 @@ const svg = fs.readFileSync(path.join(root, 'assets/masthead.svg'), 'utf8');
 const source = fs.readFileSync(path.join(root, 'src/client.js'), 'utf8')
   .replace('/*__WORKSPACE_CORE__*/', fs.readFileSync(path.join(root,'src/workspaces.js'),'utf8'))
   .replace('/*__MODULE_MAP__*/', () => fs.readFileSync(path.join(root, 'src/module-map.cjs'), 'utf8').replace(/^'use strict';\n/, ''))
-  .replace('/*__MOTION_CORE__*/', fs.readFileSync(path.join(root,'src/accepted-motion.js'),'utf8') + '\n' + fs.readFileSync(path.join(root,'src/motion.js'),'utf8'))
+  .replace('/*__MOTION_CORE__*/', fs.readFileSync(path.join(root,'src/accepted-motion.js'),'utf8') + '\n' + fs.readFileSync(path.join(root,'src/motion.js'),'utf8') + '\n' + fs.readFileSync(path.join(root,'src/dot-motion.js'),'utf8'))
   .replace('/*__SHELL_CORE__*/', fs.readFileSync(path.join(root,'src/shell.js'),'utf8'))
   .replace('/*__SIDEBAR_CORE__*/', fs.readFileSync(path.join(root,'src/sidebar-next.js'),'utf8'))
   .replace('/*__MODEL_CORE__*/', fs.readFileSync(path.join(root,'src/max-berserk.js'),'utf8') + '\n' + fs.readFileSync(path.join(root,'src/model-controls.js'),'utf8'))

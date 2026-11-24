@@ -1,8 +1,12 @@
 # 安装与开发
 
-当前正式版 **v3.1.0** 支持 Harness 0.2.0-rc.2 至 0.2.2-rc.5（rc.4 除外）。[更新说明](RELEASE-v3.1.0.md)
+当前正式版 **v3.2.0** 支持 Harness 0.2.0-rc.2 至 0.2.2-rc.5（rc.4 除外）。[更新说明](RELEASE-v3.2.0.md)
 
-从 3.0 或 2.x 升级会保留工作区编号、颜色、侧栏样式、动效档位与用量界限。
+从 3.1、3.0 或 2.x 升级会保留工作区编号、颜色、侧栏样式、动效档位与用量界限。
+
+## 3.2.0 点阵动态
+
+对话区点阵跟着发送、输出和会话完成亮起，HUD 增加输出速率表；工作区编号切换改为 LED 翻牌，名称、路径、标签和符号同步解码，四色遮罩每列都有内容。动效档位「克制」只保留速率表与翻牌，「停止」全部关闭。仅在 Marathon 外观下运行，停用插件时清除所有画布、监听和临时节点。兼容范围与 3.1.0 相同。
 
 ## 3.1.0 Marathon 化与 Windows 窗口
 
@@ -40,11 +44,11 @@ Windows 不再需要标题栏适配器：没有适配器时，皮肤在顶栏右
 
 ## 安装
 
-1. 下载 v3.1.0 的 `dsh-industrial-acid-skin-3.1.0.tgz` 运行包。[当前发行版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v3.1.0) · [历史版本](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases)
+1. 下载 v3.2.0 的 `dsh-industrial-acid-skin-3.2.0.tgz` 运行包。[当前发行版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v3.2.0) · [历史版本](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases)
 2. 在 Harness「插件 → 添加插件」的**包名或地址**输入框粘贴下方的 `.tgz` 完整 URL 后安装，完成后点击「立即启用」（提示重启时重启）：
 
    ```text
-   https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v3.1.0/dsh-industrial-acid-skin-3.1.0.tgz
+   https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v3.2.0/dsh-industrial-acid-skin-3.2.0.tgz
    ```
 
    或先从 Release 下载 `.tgz`，输入下载文件的**本机绝对路径**。Harness 的输入框接受 npm 包名、Git 地址、tarball URL 或本地路径。只输入文件名会触发 npm 查询。
@@ -52,9 +56,9 @@ Windows 不再需要标题栏适配器：没有适配器时，皮肤在顶栏右
 
 运行包内置字体、SVG 和编译后的客户端，皮肤资源可离线加载。插件包名保留 `dsh-industrial-acid-skin`，便于现有安装升级并保留外观偏好。
 
-核心皮肤使用 `ctx.theme.overrideTokens` 和原生扩展槽。3.1.0 兼容 DSH `>=0.2.0-rc.2 <0.2.2-0` 以及 `0.2.2-rc.1`、`0.2.2-rc.2`、`0.2.2-rc.3` 和 `0.2.2-rc.5`。
+核心皮肤使用 `ctx.theme.overrideTokens` 和原生扩展槽。3.2.0 兼容 DSH `>=0.2.0-rc.2 <0.2.2-0` 以及 `0.2.2-rc.1`、`0.2.2-rc.2`、`0.2.2-rc.3` 和 `0.2.2-rc.5`。
 
-Windows 运行窗口图标沿用 2.4.1 的可撤销实现，3.1.0 起同一个助手也负责直角窗口，停用插件时恢复原图标与系统圆角。可选标题栏适配器（仅在想要竖排窗口按钮时需要）支持已核对哈希的原始 0.2.0-rc.2、0.2.1-rc.2、rc.3、rc.5、0.2.2-rc.1、0.2.2-rc.2 和 0.2.2-rc.3。适配器目前仍为 v2.4.17 发布的 `dsh-industrial-caption-adapter-2.4.17.zip`，3.0.0 与 3.1.0 没有更新适配器。Harness 更新可能覆盖旧适配器，保留旧恢复记录并先检查当前 archive。[下载适配器](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.17) · [适配器说明](DESKTOP-ADAPTER.md)
+Windows 运行窗口图标沿用 2.4.1 的可撤销实现，3.1.0 起同一个助手也负责直角窗口，停用插件时恢复原图标与系统圆角。可选标题栏适配器（仅在想要竖排窗口按钮时需要）支持已核对哈希的原始 0.2.0-rc.2、0.2.1-rc.2、rc.3、rc.5、0.2.2-rc.1、0.2.2-rc.2 和 0.2.2-rc.3。适配器目前仍为 v2.4.17 发布的 `dsh-industrial-caption-adapter-2.4.17.zip`，3.0.0 至 3.2.0 没有更新适配器。Harness 更新可能覆盖旧适配器，保留旧恢复记录并先检查当前 archive。[下载适配器](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v2.4.17) · [适配器说明](DESKTOP-ADAPTER.md)
 
 ## 构建与测试
 

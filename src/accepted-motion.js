@@ -45,6 +45,91 @@ function maskFaces(cols,info={}){
   const mark={kind:'mark',html:`${info.mark||''}<span class="acid-mask-plus"></span>`};
   return [colour,dither,hud,mark].slice(0,cols);
 }
+// ── Marathon chrome: the workspace switch as LEDs ───────────────────────────────────────────────
+// Everything here works on real nodes (the actual digits, the actual mark) through CSS masks, so the
+// last frame is the unmasked node itself and nothing snaps when the mask is dropped.
+const LED_TILE=6,LED_DOT=1.6,LED_FULL=4.7;
+function chromeMarathon(){return globalThis.document?.documentElement?.dataset?.acidChrome==='marathon';}
+function ledDots(r,tile=LED_TILE){return `radial-gradient(circle at ${tile/2}px ${tile/2}px, #000 ${r}px, transparent ${r+.6}px)`;}
+function ledLerp(a,b,k){return a+(b-a)*Math.max(0,Math.min(1,k));}
+function setLedMask(el,layers){
+  if(!el)return;
+  if(!layers){for(const p of ['maskImage','maskSize','maskRepeat','maskComposite'])el.style[p]='';return;}
+  el.style.maskImage=layers.map(l=>l[0]).join(',');el.style.maskSize=layers.map(l=>l[1]).join(',');
+  el.style.maskRepeat=layers.map(l=>l[2]).join(',');el.style.maskComposite=layers.map(()=>'intersect').join(',');
+}
+// Type is fitted to its column: set at 100 px, measured, scaled to the room.
+function fitType(el,maxW,maxH){
+  el.style.fontSize='100px';const r=el.getBoundingClientRect();if(!r.width||!r.height)return 0;
+  const size=Math.max(12,Math.floor(100*Math.min(maxW/r.width,maxH/r.height)));el.style.fontSize=size+'px';return size;
+}
+// The faces printed on the workspace mask (full motion: column 1 covered 150 ms, column 4 at
+// 240 ms, reveal 330 ms). NUMBER fills its column in LED dots; each digit flickers through two wrong
+// digits and locks with a pop (110–290). LABEL is the name, one word per vertical line, plus the
+// code, fitted to the column; letters decode out of the Acid Cipher script (130–310). MARK fills
+// the last column at the largest whole scale; corner brackets close in and lock (110–240), its
+// pixels assemble in a fixed shuffle (140–290), a scan bar runs down it (290–400).
+function dressWorkspaceMask(current,columns,pace){
+  const at=(ms,fn)=>current.at(ms*pace,fn),PAD=24;
+  const numberCol=columns.find(c=>c.dataset.face==='colour'),number=numberCol?.querySelector('.acid-mask-number'),text=number?.textContent||'';
+  if(number){
+    number.textContent='';
+    [...text].forEach((ch,k)=>{
+      const digit=document.createElement('i');digit.className='acid-led-digit';digit.textContent=/\d/.test(ch)?String((Number(ch)+3)%10):ch;number.append(digit);
+      const start=110+k*55;
+      at(start,()=>{digit.dataset.phase='scramble';});
+      at(start+30,()=>{if(/\d/.test(ch))digit.textContent=String((Number(ch)+7)%10);});
+      at(start+60,()=>{digit.textContent=ch;digit.dataset.phase='lock';});
+    });
+    const size=fitType(number,numberCol.clientWidth-PAD*2,numberCol.clientHeight-56-PAD);
+    number.style.bottom=PAD+'px';
+    const tile=Math.max(8,Math.round(size/26));number.style.setProperty('--led-tile',tile+'px');number.style.setProperty('--led-k',String(tile/8));
+  }
+  const hud=columns.find(c=>c.dataset.face==='hud'),label=hud?.querySelector('.acid-mask-label');
+  if(label){
+    const [code,...rest]=label.textContent.split(' · '),name=rest.join(' · ');label.textContent='';
+    const letters=[];
+    const line=(value,kind)=>{
+      const row=document.createElement('span');row.className='acid-mask-line '+kind;
+      // A space inside an inline-block collapses to nothing, so it becomes a fixed gap.
+      for(const c of value){const s=document.createElement('i');s.className=c===' '?'acid-mask-char acid-mask-gap':'acid-mask-char';s.textContent=c===' '?' ':c;row.append(s);if(c!==' ')letters.push(s);}
+      label.append(row);
+    };
+    // One vertical line per word: shorter lines let the name grow into the column's width.
+    if(name)for(const word of name.split(/\s+/).filter(Boolean))line(word,'name');
+    line(code,'code');
+    const cw=hud.clientWidth,ch=hud.clientHeight,bar=hud.querySelector('.acid-mask-barcode'),barH=Math.round((cw-PAD*2)*.2);
+    if(bar){bar.setAttribute('preserveAspectRatio','none');Object.assign(bar.style,{left:PAD+'px',top:'34px',width:(cw-PAD*2)+'px',height:barH+'px'});}
+    Object.assign(label.style,{maxHeight:'none',overflow:'visible',bottom:PAD+'px'});
+    fitType(label,cw-PAD*2,ch-(34+barH+PAD)-PAD);
+    // Fix each letter's advance at its decoded size, so the line keeps its length while the wider
+    // cipher shows; then the letters wait in cipher for their turn.
+    for(const s of letters){s.style.inlineSize=s.getBoundingClientRect().height+'px';s.dataset.cipher='';}
+    letters.forEach((s,i)=>at(130+(i/Math.max(1,letters.length-1))*180,()=>{delete s.dataset.cipher;s.dataset.lock='';}));
+  }
+  const column=columns.find(c=>c.dataset.face==='mark'),mark=column?.querySelector('.acid-ws-mark');
+  if(!column||!mark)return;
+  const cw=column.clientWidth,ch=column.clientHeight,scale=Math.max(2,Math.floor(Math.min((cw-56)/34,(ch*.72)/40)));
+  column.style.setProperty('--mark-scale',String(scale));
+  // State frames are drawn 3 grid units outside the 34×40 box, so the lock targets the box plus that.
+  const box=mark.getBoundingClientRect(),cr=column.getBoundingClientRect(),out=3*scale;
+  const mx=box.left-cr.left-out,my=box.top-cr.top-out,mw=box.width+out*2,mh=box.height+out*2;
+  let seed=[...(text||'0')].reduce((a,c)=>a*31+c.charCodeAt(0),7)>>>0;
+  const rnd=()=>(seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296;
+  const parts=[...mark.querySelectorAll('.acid-ws-mark-svg > *')].map(node=>({node,key:rnd()})).sort((a,b)=>a.key-b.key);
+  parts.forEach(({node},i)=>current.animate(node,[{opacity:0},{opacity:0,offset:.999},{opacity:1}],(140+(i/Math.max(1,parts.length-1))*150)*pace,0,'linear'));
+  mark.querySelectorAll(':scope > :not(.acid-ws-mark-body)').forEach(extra=>current.animate(extra,[{visibility:'hidden'},{visibility:'hidden',offset:.999},{visibility:'visible'}],400*pace,0,'linear'));
+  const reticle=current.temp('acid-mask-reticle',column),G=22,L=28;
+  for(const [name,x0,y0,x1,y1] of [['tl',10,10,mx-G,my-G],['tr',cw-L-10,10,mx+mw+G-L,my-G],['bl',10,ch-L-10,mx-G,my+mh+G-L],['br',cw-L-10,ch-L-10,mx+mw+G-L,my+mh+G-L]]){
+    const corner=current.temp('acid-mask-corner '+name,reticle);
+    current.animate(corner,[{transform:`translate(${x0}px,${y0}px)`},{transform:`translate(${x1}px,${y1}px)`}],130*pace,110*pace,'steps(4,end)');
+  }
+  const lock=current.temp('acid-mask-lock',reticle);lock.textContent=`WS ${text} // LOCK`;lock.style.transform=`translate(${mx+mw}px,${my+mh+G-6}px)`;
+  current.animate(lock,[{opacity:0},{opacity:0,offset:.999},{opacity:1}],250*pace,0,'linear');
+  const scan=current.temp('acid-mask-scan',reticle);scan.style.width=mw+'px';
+  current.animate(scan,[{transform:`translate(${mx}px,${my}px)`,opacity:1},{transform:`translate(${mx}px,${my+mh}px)`,opacity:1},{transform:`translate(${mx}px,${my+mh}px)`,opacity:0}],110*pace,290*pace,'linear');
+}
+
 function createAcceptedMotionController(getMotion) {
   const runs = new Set(), surfaces = new WeakMap(), buttonRuns = new WeakMap();
   const buttons = new Set(), composers = new Set(), statuses = new Map(), panels = new Map();
@@ -104,6 +189,7 @@ function createAcceptedMotionController(getMotion) {
     const sheet=current.temp('acid-approved-mask');sheet.dataset.cols=String(cols);sheet.dataset.kind=kind;
     const [from,to]=MASK_SHUTTER[direction]??MASK_SHUTTER['down-up'];
     const columns=maskFaces(cols,info).map(face=>{const column=current.temp('acid-mask-col',sheet);column.dataset.face=face.kind;column.innerHTML=face.html;return column;});
+    if(kind==='workspace'&&chromeMarathon())dressWorkspaceMask(current,columns,quiet?.5:1);
     // Horizontal shutters run from the edge they enter at, so the wave starts on that side.
     const order=direction==='right-left'?[...columns].reverse():columns;
     order.forEach((column,i)=>current.animate(column,[{clipPath:from},{clipPath:'inset(0)'}],enter,i*stagger,MASK_EASE));
@@ -329,8 +415,92 @@ function createAcceptedMotionController(getMotion) {
     for(const record of [...shellSurfaces.values(),...dockBodies.values()])record.captured=undefined;
   }
   function cancelWorkspace() { workspaceRun?.finish();workspaceRun=undefined; }
+  // Marathon chrome replaces the digit roll with an LED flip, scored against the workspace mask:
+  // 0–14 % the old number breaks into dots · 11–43 % the scan line wipes them left → right ·
+  // 43–84 % the new number lights row by row, the leading rows in the workspace colour ·
+  // 84–100 % the dots grow until they touch, which is exactly the unmasked glyph.
+  function ledWorkspace(button,index,label,ordinal,name,duration){
+    const counter=index.closest('.workspace-counter')||index,before=counter.cloneNode(true),value=formatWorkspaceIndex(ordinal);
+    paintDigits(index,value);index.dataset.ordinal=String(ordinal);label.textContent=name;
+    button.setAttribute('aria-label',`切换工作区：${value} ${name}`);index.dataset.calibration='led';
+    if(!duration)return;
+    let frame=0,tick=0;
+    const detail=button.querySelector('.workspace-detail');
+    const clear=()=>{cancelAnimationFrame(frame);setLedMask(counter,null);if(detail)detail.style.opacity='';};
+    const current=run(index,duration,clear);workspaceRun=current;
+    const place=clone=>{
+      clone.classList.add('acid-led-clone');clone.removeAttribute('id');clone.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));
+      clone.setAttribute('aria-hidden','true');clone.dataset.acidMotionOwned='';
+      Object.assign(clone.style,{position:'absolute',left:counter.offsetLeft+'px',top:counter.offsetTop+'px',width:counter.offsetWidth+'px',height:counter.offsetHeight+'px',margin:'0',pointerEvents:'none',zIndex:'2'});
+      button.append(clone);current.nodes.push(clone);return clone;
+    };
+    const old=place(before),edge=place(counter.cloneNode(true));edge.classList.add('acid-led-edge');
+    const scan=current.temp('acid-workspace-scan',button);
+    Object.assign(scan.style,{left:counter.offsetLeft+'px',top:counter.offsetTop+'px',bottom:'auto',height:counter.offsetHeight+'px',opacity:'0'});
+    // Name and path decode letter by letter, the tag stamps. React owns parts of the original block,
+    // so the work happens on a clone laid over it; the original is hidden until the clone is done,
+    // and both lay out identically, so the hand-back is invisible. Both texts are monospaced, so the
+    // random letters shown before each one locks take exactly its width — nothing reflows.
+    const decoders=[];
+    if(detail){
+      const copy=detail.cloneNode(true);copy.classList.add('acid-led-detail');copy.setAttribute('aria-hidden','true');copy.dataset.acidMotionOwned='';
+      // The copy keeps #workspace-name: the name's type is keyed on that id. It comes after the
+      // original in the DOM, so every lookup still finds the original.
+      // Placed from client rects, not offset*: those round to whole pixels, and a fraction of a pixel
+      // is enough to change the text's antialiasing at the hand-back.
+      const at=detail.getBoundingClientRect(),own=button.getBoundingClientRect();
+      Object.assign(copy.style,{position:'absolute',left:(at.left-own.left-button.clientLeft)+'px',top:(at.top-own.top-button.clientTop)+'px',width:at.width+'px',height:at.height+'px',margin:'0',pointerEvents:'none',zIndex:'2'});
+      button.append(copy);current.nodes.push(copy);detail.style.opacity='0';
+      const decode=(el,from,span)=>{
+        if(!el)return;const text=el.textContent;el.textContent='';
+        decoders.push({el,text,from,span,cells:[...text].map(ch=>{const cell=document.createElement('span');cell.textContent=ch;el.append(cell);return {cell,ch};})});
+      };
+      decode(copy.querySelector('.acid-context-title'),.30,.45);
+      decode(copy.querySelector('.acid-context-path'),.45,.40);
+      const tag=copy.querySelector('.acid-meta');
+      if(tag)current.animate(tag,[{filter:'invert(1)'},{filter:'invert(1)',offset:.5},{filter:'none'}],duration*.14,duration*.05,'steps(1,end)');
+    }
+    // The mark assembles in a fixed shuffle, then a scan bar runs down it; state extras come last.
+    const mark=button.querySelector('.acid-context-mark .acid-ws-mark');
+    if(mark){
+      let seed=(ordinal*2654435761)>>>0;const rnd=()=>(seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296;
+      const parts=[...mark.querySelectorAll('.acid-ws-mark-svg > *')].map(node=>({node,key:rnd()})).sort((a,b)=>a.key-b.key);
+      parts.forEach(({node},i)=>current.animate(node,[{opacity:0},{opacity:0,offset:.999},{opacity:1}],duration*(.40+(i/Math.max(1,parts.length-1))*.35),0,'linear'));
+      mark.querySelectorAll(':scope > :not(.acid-ws-mark-body)').forEach(extra=>current.animate(extra,[{visibility:'hidden'},{visibility:'hidden',offset:.999},{visibility:'visible'}],duration*.9,0,'linear'));
+      const box=mark.getBoundingClientRect(),own=button.getBoundingClientRect(),sweep=current.temp('acid-led-markscan',button);
+      Object.assign(sweep.style,{left:(box.left-own.left-3)+'px',top:(box.top-own.top)+'px',width:(box.width+6)+'px'});
+      current.animate(sweep,[{opacity:0,transform:'translateY(0)'},{opacity:1,transform:'translateY(0)',offset:.05},{opacity:1,transform:`translateY(${box.height}px)`,offset:.95},{opacity:0,transform:`translateY(${box.height}px)`}],duration*.18,duration*.75,'linear');
+    }
+    const GLYPHS='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const t0=performance.now(),T=LED_TILE;
+    const draw=()=>{
+      if(current.ended){clear();return;}
+      const k=(performance.now()-t0)/duration,w=counter.offsetWidth,h=counter.offsetHeight,wipe=ledLerp(0,w,(k-.11)/.32);
+      if(k<.43)setLedMask(old,[[ledDots(ledLerp(LED_FULL,LED_DOT,k/.14)),`${T}px ${T}px`,'repeat'],[`linear-gradient(to right, transparent ${wipe}px, #000 ${wipe}px)`,'100% 100%','no-repeat']]);
+      else old.style.visibility='hidden';
+      scan.style.transform=`translateX(${wipe}px)`;scan.style.opacity=k>.09&&k<.45?'1':'0';
+      if(k>=1){clear();return;}
+      tick++;
+      // Once a line has fully locked it goes back to one text node: per-letter spans round their
+      // sub-pixel positions slightly differently, which would show as a flicker at the hand-back.
+      for(const d of decoders)if(!d.done&&k>=d.from+d.span){d.el.textContent=d.text;d.done=true;}
+      for(const {from,span,cells,done} of decoders)if(!done)cells.forEach(({cell,ch},i)=>{
+        const lock=from+(cells.length>1?i/(cells.length-1):0)*span;
+        if(k<lock-.08)cell.style.visibility='hidden';
+        else if(k<lock&&ch.trim()){cell.style.visibility='';if(tick%2===0||cell.textContent===ch)cell.textContent=GLYPHS[Math.floor(Math.random()*GLYPHS.length)];}
+        else{cell.style.visibility='';cell.textContent=ch;}
+      });
+      const row=k<.43?0:Math.floor(ledLerp(0,h+T,(k-.43)/.41)/T)*T,r=k<.84?LED_DOT:ledLerp(LED_DOT,LED_FULL,(k-.84)/.16);
+      setLedMask(counter,[[ledDots(r),`${T}px ${T}px`,'repeat'],[`linear-gradient(to bottom, #000 ${row}px, transparent ${row}px)`,'100% 100%','no-repeat']]);
+      if(k>=.43&&k<.9){edge.style.visibility='';setLedMask(edge,[[ledDots(LED_DOT),`${T}px ${T}px`,'repeat'],[`linear-gradient(to bottom, transparent ${row-T*2}px, #000 ${row-T*2}px, #000 ${row}px, transparent ${row}px)`,'100% 100%','no-repeat']]);}
+      else edge.style.visibility='hidden';
+      frame=requestAnimationFrame(draw);
+    };
+    draw();return current;
+  }
   function calibrateWorkspace(button,ordinal,name) {
     cancelWorkspace();const index=button.querySelector('#workspace-index'),label=button.querySelector('#workspace-name');
+    if(chromeMarathon())return ledWorkspace(button,index,label,ordinal,name,acceptedDuration('workspace',getMotion()));
     const previous=index.textContent,value=formatWorkspaceIndex(ordinal);paintDigits(index,value);index.dataset.ordinal=String(ordinal);label.textContent=name;
     button.setAttribute('aria-label',`切换工作区：${value} ${name}`);index.dataset.calibration='scan-digits-only';
     const duration=acceptedDuration('workspace',getMotion());if(!duration)return;

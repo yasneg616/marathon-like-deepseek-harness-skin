@@ -235,3 +235,40 @@ html[data-acid-chrome=marathon] [data-phase]:has([data-composer-card]){backgroun
    font swap and the ink takes the workspace colour instead of grey. Glyphs: tools/cipher-font.cjs. */
 @font-face{font-family:Acid Cipher;src:url(data:font/otf;base64,__CIPHER_OTF__) format('opentype');font-weight:100 900;font-style:normal;font-display:block}
 html[data-acid-chrome=marathon] [data-home-whale]{font-family:'Acid Cipher',monospace!important;--home-whale-code-ink:var(--mf-ws);color:var(--mf-ws)!important;filter:none!important;opacity:.3!important}
+
+/* ───────── 7 · dot-matrix motion and the workspace switch as LEDs ─────────
+   dot-motion.js: the conversation's dot field and the HUD rate meter. accepted-motion.js: the
+   LED number flip and the workspace mask's faces (number, name, mark). */
+html[data-acid-chrome=marathon] [data-acid-dots]{isolation:isolate}
+html[data-acid-chrome=marathon] .acid-dots-field{position:absolute;inset:0;z-index:-1;width:100%;height:100%;pointer-events:none}
+html[data-acid-chrome=marathon] .acid-hud-tokens{display:flex!important;align-items:flex-end;gap:8px}
+html[data-acid-chrome=marathon] .acid-hud-rate{display:block;width:72px;height:15px;margin-bottom:1px}
+/* LED flip: the edge clone shows the freshly lit rows in the workspace colour. */
+html[data-acid-chrome=marathon] .acid-masthead[data-acid-hud] .acid-context .acid-led-edge :is(.workspace-glyph,.workspace-digit,.acid-context-number){color:var(--acid-ws-context,var(--acid-lime))!important}
+/* Mask number: LED digits whose dot grows with the type and pops when a digit locks. */
+@property --led-r{syntax:'<length>';inherits:false;initial-value:0px}
+html[data-acid-chrome=marathon] .acid-led-digit{display:inline-block;font-style:normal;--led-r:0px;--led-dot:calc(var(--led-r) * var(--led-k,1));-webkit-mask:radial-gradient(circle at calc(var(--led-tile,8px) / 2) calc(var(--led-tile,8px) / 2),#000 var(--led-dot),transparent calc(var(--led-dot) + .6px)) 0 0/var(--led-tile,8px) var(--led-tile,8px);mask:radial-gradient(circle at calc(var(--led-tile,8px) / 2) calc(var(--led-tile,8px) / 2),#000 var(--led-dot),transparent calc(var(--led-dot) + .6px)) 0 0/var(--led-tile,8px) var(--led-tile,8px)}
+html[data-acid-chrome=marathon] .acid-led-digit[data-phase=scramble]{--led-r:1.5px;opacity:.75}
+html[data-acid-chrome=marathon] .acid-led-digit[data-phase=lock]{--led-r:2.4px;animation:acid-led-pop 90ms steps(2,end) both}
+@keyframes acid-led-pop{from{--led-r:3.6px}to{--led-r:2.4px}}
+/* Mask label: the name in display type one word per line, the code small beside it; letters decode out of the cipher. */
+html[data-acid-chrome=marathon] .acid-mask-label .acid-mask-line{display:block;white-space:nowrap}
+html[data-acid-chrome=marathon] .acid-mask-label .acid-mask-line.name{font:900 1em/1 var(--acid-display);letter-spacing:.02em}
+html[data-acid-chrome=marathon] .acid-mask-label .acid-mask-line.code{padding-block-start:.18em;font:700 .3em/1 var(--acid-mono);letter-spacing:.14em;opacity:.85}
+html[data-acid-chrome=marathon] .acid-mask-char{display:inline-block;font-style:normal;text-align:center;overflow:hidden;vertical-align:top}
+html[data-acid-chrome=marathon] .acid-mask-char.acid-mask-gap{inline-size:.35em}
+html[data-acid-chrome=marathon] .acid-mask-char[data-cipher]{font-family:'Acid Cipher',monospace!important;opacity:.7}
+html[data-acid-chrome=marathon] .acid-mask-char[data-lock]{animation:acid-mask-char-flash 70ms steps(1,end)}
+@keyframes acid-mask-char-flash{0%{color:#fff}}
+/* Mask mark: fills its column at a whole scale, under a locking reticle and a scan bar. */
+html[data-acid-chrome=marathon] .acid-mask-col[data-face=mark] .acid-ws-mark{transform:translate(-50%,-50%) scale(var(--mark-scale,2))!important}
+html[data-acid-chrome=marathon] .acid-mask-reticle{position:absolute;inset:0;pointer-events:none;color:var(--mask-ink)}
+html[data-acid-chrome=marathon] .acid-mask-corner{position:absolute;left:0;top:0;width:28px;height:28px;border:0 solid currentColor}
+html[data-acid-chrome=marathon] .acid-mask-corner.tl{border-width:3px 0 0 3px}
+html[data-acid-chrome=marathon] .acid-mask-corner.tr{border-width:3px 3px 0 0}
+html[data-acid-chrome=marathon] .acid-mask-corner.bl{border-width:0 0 3px 3px}
+html[data-acid-chrome=marathon] .acid-mask-corner.br{border-width:0 3px 3px 0}
+html[data-acid-chrome=marathon] .acid-mask-lock{position:absolute;left:0;top:0;translate:-100% 0;font:700 10px/1 var(--acid-mono);letter-spacing:.12em;white-space:nowrap}
+html[data-acid-chrome=marathon] .acid-mask-scan{position:absolute;left:0;top:0;height:3px;background:currentColor;opacity:0;box-shadow:0 0 0 1px var(--mask-c)}
+/* LED flip companions: the decoding copy of the name block and the scan bar over the mark. */
+html[data-acid-chrome=marathon] .acid-led-markscan{position:absolute;z-index:3;height:2px;background:var(--acid-ws-context,var(--acid-lime));box-shadow:0 0 0 1px rgba(11,12,13,.5);pointer-events:none}

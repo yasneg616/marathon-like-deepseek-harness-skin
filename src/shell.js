@@ -324,7 +324,10 @@ function Masthead(props){
       h('span',{className:'acid-workspace-arrow','aria-hidden':true},'↗')),
     h('div',{className:'acid-hud'},
       h('div',{className:'acid-hud-fields'},
-        ...[['SESSIONS',hudCount(shownItem?.sessionIds?.length??0)],['RUNNING',hudCount(running)],['WAITING',hudCount(waiting)],['TOKENS · TODAY',todayTokens(tokenView)]].map(([label,value])=>h('span',{key:label,className:'acid-hud-field'},h('span',null,label),h('b',null,value)))),
+        ...[['SESSIONS',hudCount(shownItem?.sessionIds?.length??0)],['RUNNING',hudCount(running)],['WAITING',hudCount(waiting)],['TOKENS · TODAY',todayTokens(tokenView)]].map(([label,value])=>h('span',{key:label,className:'acid-hud-field'},h('span',null,label),label==='TOKENS · TODAY'
+          // Today's total with the live arrival rate beside it (dot-motion.js draws the meter).
+          ?h('b',{className:'acid-hud-tokens'},h('span',null,value),h('canvas',{className:'acid-hud-rate','aria-hidden':true,ref:canvas=>props.dots?.()?.attachRate(canvas)}))
+          :h('b',null,value)))),
       h('div',{className:'acid-hud-ops'},h('span',{className:'acid-hud-label'},'OPS'),
         ops.length?ops.slice(0,4).map(id=>{
           const state=activity[id],number=formatWorkspaceIndex(numbers[id]??1),name=workspaceLabel(items.find(item=>String(item.workspaceId)===id));

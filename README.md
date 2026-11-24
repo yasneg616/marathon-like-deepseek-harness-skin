@@ -2,13 +2,37 @@
 
 给 DeepSeek Harness 做的一套酸性工业皮肤。
 
-从 Marathon 的大色块、硬边界和工业排版开始：字标切开，按钮收方，工作区放上三位数字。3.0 让每个工作区都有自己的颜色和符号，整套界面跟着当前工作区走；3.1 照着 Marathon 游戏内菜单把界面收成石墨灰，颜色只当信号。
+从 Marathon 的大色块、硬边界和工业排版开始：字标切开，按钮收方，工作区放上三位数字。3.0 让每个工作区都有自己的颜色和符号，整套界面跟着当前工作区走；3.1 照着 Marathon 游戏内菜单把界面收成石墨灰，颜色只当信号；3.2 加上跟着真实事件亮起的点阵动态和 LED 编号翻牌。
 
-`v3.1.0` · `Windows / macOS` · `Harness 0.2.0-rc.2 / 0.2.1（含 RC） / 0.2.2-rc.1 / rc.2 / rc.3 / rc.5`
+`v3.2.0` · `Windows / macOS` · `Harness 0.2.0-rc.2 / 0.2.1（含 RC） / 0.2.2-rc.1 / rc.2 / rc.3 / rc.5`
 
-[下载 3.1.0](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v3.1.0) · [安装与回退](docs/INSTALL.md) · [本次更新](docs/RELEASE-v3.1.0.md)
+[下载 3.2.0](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v3.2.0) · [安装与回退](docs/INSTALL.md) · [本次更新](docs/RELEASE-v3.2.0.md)
 
 ![3.1 的石墨灰顶栏、工作区色条与准星格线，独立展示页](docs/media/v31-overview.png)
+
+## 3.2：点阵动态
+
+3.1 的画面稳了，但有点静。3.2 加一层点阵动态，只在真实事件发生时出现：发送、输出、完成、切换工作区。
+
+### LED 编号翻牌与遮罩
+
+切换工作区时，大号码碎成点阵、扫描线带着新颜色刷过、新数字逐行点亮，最后合成为真实字形，不会再跳一下。名称和路径从随机字符解码成新内容，ACTIVE WORKSPACE 标签反转盖章，工作区符号的零件逐个拼上。四色遮罩的每一列也有内容：填满整列的 LED 编号、用 Acid Cipher 解码的名称、放大条码，以及贴合最右一列、带准星框和 LOCK 标签的符号。
+
+![工作区 003 → 004：遮罩、LED 翻牌、名称解码与符号拼装，实际速度](docs/media/v32-workspace-switch.gif)
+
+### 对话区点阵
+
+「+」格线下面多一层很淡的点阵：按 Enter 发送时从输入框扩散一圈波纹，回复文字到达时在写字的位置留下拖尾，会话跑完时一条扫描带扫过。
+
+![发送、输出、完成三个时刻的对话区点阵](docs/media/v32-dot-field.png)
+
+### 输出速率表
+
+HUD 的 TOKENS 旁边是一个 24 × 5 的点阵表，按每秒到达的字符数亮起（对数刻度，约每秒 600 字满格），没有输出时熄灭。
+
+![HUD 的输出速率表](docs/media/v32-rate.png)
+
+动效「完整」全部开启；「克制」只保留速率表和编号翻牌；「停止」全部关闭，也跟随系统的“减少动态效果”。3.2 的展示图录自独立展示页（**1×**，正式插件的样式与动效，虚构的工作区与会话）。
 
 ## 3.1：Marathon 化
 
@@ -102,11 +126,11 @@
 
 ## 安装
 
-1. 下载 [v3.1.0 正式版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v3.1.0) 中的 `dsh-industrial-acid-skin-3.1.0.tgz`。无需 Node.js。
+1. 下载 [v3.2.0 正式版](https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/tag/v3.2.0) 中的 `dsh-industrial-acid-skin-3.2.0.tgz`。无需 Node.js。
 2. Harness「插件 → 添加插件」，粘贴完整下载链接，或输入已下载文件的本机绝对路径：
 
    ```text
-   https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v3.1.0/dsh-industrial-acid-skin-3.1.0.tgz
+   https://github.com/yasneg616/marathon-like-deepseek-harness-skin/releases/download/v3.2.0/dsh-industrial-acid-skin-3.2.0.tgz
    ```
 
 3. 启用插件，按提示重启。从 3.0 或 2.x 升级时，工作区编号、颜色和用量界限都会保留。
